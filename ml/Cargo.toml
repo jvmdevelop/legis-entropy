@@ -1,0 +1,15 @@
+[package]
+name = "legis-entropy"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+leptos = { version = "0.7", features = ["ssr", "hydrate"] }
+petgraph = "0.6"
+tantivy = "0.22"
+rust-bert = "0.22"
+scraper = "0.20"
+quick-xml = { version = "0.36", features = ["serialize"] }
+reqwest = { version = "0.12", features = ["json", "stream"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
