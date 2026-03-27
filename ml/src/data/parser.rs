@@ -1,83 +1,100 @@
-use reqwest::Client;
 use scraper::{Html, Selector};
 
-struct DocumentData {
-    title: String,
-    text: String,
-    status: Option<String>,
-}
+use super::model::{DocumentId, DocumentMeta, DocumentStatus};
 
-pub async fn parse_raw_document(doc_url: &str) -> Result<DocumentData, Box<dyn std::error::Error>> {
-    let client = Client::builder()
-        .danger_accept_invalid_certs(true)
-        .danger_accept_invalid_hostnames(true)
-        .build()?;
+/// Body text is capped so memory stays bounded on low-end hardware.
+const TEXT_LIMIT: usize = 8_000;
 
-    let body = client
-        .get(doc_url)
-        .header("User-Agent", "Mozilla/5.0")
-        .send()
-        .await?
-        .text()
-        .await?;
+const TITLE_SELECTORS: &[&str] = &[
+    "h1",
+    ".container_alpha.slogan, .container_alpha .slogan",
+    "article h1, article h2, article .post_header",
+];
 
-    let document = Html::parse_document(&body);
+const STATUS_SELECTORS: &[&str] = &[
+    "span.status",
+    ".doc_status",
+    ".status_label",
+    "span.label",
+];
 
-    let title = parse_title(&document);
+/// Parses raw HTML into a `DocumentMeta`. Has no I/O dependencies.
+pub struct DocumentParser;
 
-    let status_selector = Selector::parse("span.status").ok();
-    let status = status_selector
-        .as_ref()
-        .and_then(|sel| document.select(sel).next())
-        .map(|el| el.text().collect::<String>().trim().to_string())
-        .filter(|s| !s.is_empty());
-
-    let content_selector = Selector::parse("article").unwrap();
-
-    let text: String = document
-        .select(&content_selector)
-        .flat_map(|el| el.text())
-        .map(|t| t.trim())
-        .filter(|t| !t.is_empty())
-        .collect::<Vec<_>>()
-        .join("\n");
-
-    Ok(DocumentData {
-        title,
-        text,
-        status,
-    })
-}
-
-fn parse_title(document: &Html) -> String {
-    if let Some(selector) = Selector::parse("h1").ok() {
-        if let Some(el) = document.select(&selector).next() {
-            let title = el.text().collect::<String>().trim().to_string();
-            if !title.is_empty() && title.len() < 500 {
-                return title;
-            }
+impl DocumentParser {
+    pub fn parse(&self, html: &str, id: DocumentId, url: String) -> DocumentMeta {
+        let doc = Html::parse_document(html);
+        DocumentMeta {
+            id,
+            title: self.extract_title(&doc),
+            url,
+            status: self.extract_status(&doc),
+            references: self.extract_references(&doc),
+            text: self.extract_text(&doc),
         }
     }
 
-    if let Some(selector) =
-        Selector::parse(".container_alpha.slogan, .container_alpha .slogan").ok()
-    {
-        if let Some(el) = document.select(&selector).next() {
-            let title = el.text().collect::<String>().trim().to_string();
-            if !title.is_empty() && title.len() < 500 {
-                return title;
-            }
-        }
+    fn extract_text(&self, doc: &Html) -> String {
+        let Ok(sel) = Selector::parse("article") else { return String::new() };
+        let full: String = doc
+            .select(&sel)
+            .flat_map(|el| el.text())
+            .map(str::trim)
+            .filter(|t| !t.is_empty())
+            .collect::<Vec<_>>()
+            .join(" ");
+        full.chars().take(TEXT_LIMIT).collect()
     }
 
-    if let Some(selector) = Selector::parse("article h1, article h2, article .post_header").ok() {
-        if let Some(el) = document.select(&selector).next() {
-            let title = el.text().collect::<String>().trim().to_string();
-            if !title.is_empty() && title.len() < 500 {
-                return title;
-            }
-        }
+    fn extract_title(&self, doc: &Html) -> String {
+        TITLE_SELECTORS
+            .iter()
+            .find_map(|sel| self.first_text(doc, sel))
+            .unwrap_or_else(|| "Без названия".to_owned())
     }
 
-    "Без названия".to_string()
+    fn extract_status(&self, doc: &Html) -> DocumentStatus {
+        STATUS_SELECTORS
+            .iter()
+            .find_map(|sel| {
+                let text = self.first_text(doc, sel)?.to_lowercase();
+                if text.contains("утратил") || text.contains("недействующ") {
+                    Some(DocumentStatus::Outdated)
+                } else if text.contains("действующ") || text.contains("актуальн") {
+                    Some(DocumentStatus::Active)
+                } else {
+                    None
+                }
+            })
+            .unwrap_or(DocumentStatus::Unknown)
+    }
+
+    fn extract_references(&self, doc: &Html) -> Vec<DocumentId> {
+        let Ok(sel) = Selector::parse("article a[href]") else {
+            return vec![];
+        };
+
+        let mut refs: Vec<DocumentId> = doc
+            .select(&sel)
+            .filter_map(|el| el.value().attr("href"))
+            .filter(|href| href.contains("/docs/"))
+            .filter_map(|href| {
+                let id = href.trim_end_matches('/').split('/').last()?;
+                (id.len() > 3).then(|| DocumentId::new(id))
+            })
+            .collect();
+
+        refs.sort();
+        refs.dedup();
+        refs
+    }
+
+    /// Returns the trimmed text content of the first element matching `selector`,
+    /// or `None` if no match or the text is empty / too long to be a title.
+    fn first_text(&self, doc: &Html, selector: &str) -> Option<String> {
+        let sel = Selector::parse(selector).ok()?;
+        let text = doc.select(&sel).next()?.text().collect::<String>();
+        let trimmed = text.trim().to_owned();
+        (!trimmed.is_empty() && trimmed.len() < 500).then_some(trimmed)
+    }
 }

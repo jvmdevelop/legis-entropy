@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+    default-property-inclusion: non_null
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=10,expireAfterWrite=5m
+
+services:
+  rust:
+    base-url: ${RUST_SERVICE_URL:http://localhost:3001}
+  ml:
+    base-url: ${ML_SERVICE_URL:http://localhost:8000}
