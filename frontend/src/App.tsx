@@ -16,6 +16,18 @@ export default function App() {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [compareNode, setCompareNode] = useState<GraphNode | null>(null);
   const [searchHits, setSearchHits] = useState<string[]>([]);
+  const [corpusReview, setCorpusReview] = useState<{ review: string; llm_ready: boolean } | null>(null);
+  const [corpusReviewLoading, setCorpusReviewLoading] = useState(false);
+
+  const fetchCorpusReview = async () => {
+    setCorpusReviewLoading(true);
+    try {
+      const res = await fetch('/api/corpus-review');
+      if (res.ok) setCorpusReview(await res.json());
+    } finally {
+      setCorpusReviewLoading(false);
+    }
+  };
 
   // Track Ctrl/Meta key globally — canvas events sometimes lose ctrlKey
   const ctrlHeld = useRef(false);
@@ -111,38 +123,73 @@ export default function App() {
         compareNode={compareNode}
       />
 
-      {/* Top bar */}
-      <div className="absolute top-3 left-3 flex items-center gap-2 z-10">
-        <div className="flex items-center gap-2.5 px-6 py-4 rounded-lg bg-white border border-gray-200 shadow-sm">
-          <Logo size={18} />
-          <div className="w-px h-4 bg-gray-200" />
-          <span className="text-xs font-medium text-gray-500">Граф НПА</span>
+      {/* Top bar — single unified card */}
+      <div className="absolute top-3 left-3 z-10">
+        <div className="flex items-center rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden divide-x divide-gray-100">
+          {/* Brand */}
+          <div className="flex items-center gap-2 px-5 py-3">
+            <Logo size={16} />
+            <span className="text-xs font-semibold text-gray-700">Граф НПА</span>
+          </div>
+
+          {/* Анализ */}
+          <button
+            onClick={startStream}
+            disabled={stream.running}
+            className="flex items-center gap-1.5 px-5 py-3 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+          >
+            {stream.running ? (
+              <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
+                <path d="M10.5 6A4.5 4.5 0 1 1 7.5 1.9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+                <path d="M7.5 1v2.5H10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+            {stream.running ? 'Анализ…' : 'Анализ'}
+          </button>
+
+          {/* AI обзор */}
+          <button
+            onClick={fetchCorpusReview}
+            disabled={corpusReviewLoading}
+            className="flex items-center gap-1.5 px-5 py-3 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 disabled:opacity-40 transition-colors"
+          >
+            {corpusReviewLoading ? (
+              <div className="w-3 h-3 border border-indigo-400 border-t-transparent rounded-full animate-spin" />
+            ) : (
+              <span className="text-sm leading-none">✦</span>
+            )}
+            {corpusReviewLoading ? 'AI анализ…' : 'AI обзор'}
+          </button>
+
+          {/* Search */}
+          <div className="flex items-center gap-2 px-2">
+            <SearchBar onResults={setSearchHits} embedded />
+            {searchHits.length > 0 && (
+              <span className="px-2.5 py-0.5 text-[10px] font-semibold rounded-full bg-gray-900 text-white">
+                {searchHits.length}
+              </span>
+            )}
+          </div>
         </div>
-
-        <button
-          onClick={startStream}
-          disabled={stream.running}
-          className="flex items-center gap-1.5 px-6 py-4 text-xs font-medium rounded-lg bg-white border border-gray-200 shadow-sm text-gray-600 hover:text-gray-900 hover:border-gray-300 disabled:opacity-40 transition-all"
-        >
-          {stream.running ? (
-            <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path d="M10.5 6A4.5 4.5 0 1 1 7.5 1.9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
-              <path d="M7.5 1v2.5H10" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          )}
-          {stream.running ? 'Анализ…' : 'Анализ'}
-        </button>
-
-        <SearchBar onResults={setSearchHits} />
-
-        {searchHits.length > 0 && (
-          <span className="px-4 py-2 text-[10px] font-semibold rounded-full bg-gray-900 text-white">
-            {searchHits.length}
-          </span>
-        )}
       </div>
+
+      {/* Corpus AI review panel */}
+      {corpusReview && !compareNode && (
+        <div className="absolute top-16 left-3 z-20 w-80 rounded-xl bg-white border border-indigo-200 shadow-lg overflow-hidden">
+          <div className="h-0.5 bg-indigo-500" />
+          <div className="p-5 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-600">
+                {corpusReview.llm_ready ? '✦ AI-обзор корпуса (Qwen2)' : '⏳ AI-обзор'}
+              </span>
+              <button onClick={() => setCorpusReview(null)} className="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+            </div>
+            <p className="text-[11px] text-indigo-900 leading-relaxed">{corpusReview.review}</p>
+          </div>
+        </div>
+      )}
 
       {/* Ctrl hint — показываем когда нода выбрана но compareNode не выбран */}
       {selectedNode && !compareNode && (

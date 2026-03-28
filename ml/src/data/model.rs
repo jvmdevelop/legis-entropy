@@ -79,6 +79,8 @@ pub enum IssueKind {
     OutdatedReference,
     /// A group of documents reference each other in a cycle.
     CircularReference,
+    /// Document is an amendment act ("О внесении изменений") modifying another document.
+    Amendment,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -108,6 +110,10 @@ pub struct GraphNode {
     pub status: DocumentStatus,
     pub ref_count: usize,
     pub issue_count: usize,
+    /// Number of articles ("Статья N") found in the document body.
+    pub article_count: usize,
+    /// True if this document is an amendment act ("О внесении изменений…").
+    pub is_amendment: bool,
 }
 
 impl GraphNode {
@@ -119,8 +125,24 @@ impl GraphNode {
             status: meta.status.clone(),
             ref_count: meta.references.len(),
             issue_count,
+            article_count: count_articles(&meta.text),
+            is_amendment: is_amendment_title(&meta.title),
         }
     }
+}
+
+fn count_articles(text: &str) -> usize {
+    // Count "статья " occurrences (case-insensitive). Use match_indices for
+    // safety — avoids manual byte-offset arithmetic on multi-byte Cyrillic chars.
+    text.to_lowercase().match_indices("статья ").count()
+}
+
+pub fn is_amendment_title(title: &str) -> bool {
+    let lower = title.to_lowercase();
+    lower.starts_with("о внесении изменений")
+        || lower.starts_with("о внесении дополнений")
+        || lower.starts_with("о внесении поправок")
+        || lower.starts_with("об изменении")
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

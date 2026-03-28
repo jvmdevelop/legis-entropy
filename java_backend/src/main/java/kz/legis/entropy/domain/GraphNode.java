@@ -8,5 +8,7 @@ public record GraphNode(
         String url,
         String status,
         @JsonProperty("ref_count") int refCount,
-        @JsonProperty("issue_count") int issueCount
+        @JsonProperty("issue_count") int issueCount,
+        @JsonProperty("article_count") int articleCount,
+        @JsonProperty("is_amendment") boolean isAmendment
 ) {}

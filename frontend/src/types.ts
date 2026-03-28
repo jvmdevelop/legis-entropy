@@ -1,6 +1,6 @@
 export type DocumentStatus = 'active' | 'outdated' | 'unknown';
 export type Severity = 'low' | 'medium' | 'high';
-export type IssueKind = 'duplication' | 'contradiction' | 'outdated_reference' | 'circular_reference';
+export type IssueKind = 'duplication' | 'contradiction' | 'outdated_reference' | 'circular_reference' | 'amendment';
 export type Assessment = 'duplicate' | 'highly_related' | 'related' | 'independent';
 
 export interface Issue {
@@ -17,6 +17,8 @@ export interface GraphNode {
   status: DocumentStatus;
   ref_count: number;
   issue_count: number;
+  article_count: number;
+  is_amendment: boolean;
   x?: number;
   y?: number;
 }
@@ -59,6 +61,8 @@ export interface CompareResult {
   assessment: Assessment;
   explanation: string;
   shared_issues: number;
+  llm_review: string;
+  llm_ready: boolean;
 }
 
 export interface AnalysisEvent {

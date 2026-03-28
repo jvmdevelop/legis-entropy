@@ -25,11 +25,11 @@ const DELAY_MIN_MS: u64 = 1_500;
 const DELAY_MAX_MS: u64 = 3_500;
 
 /// How long to back off after a CAPTCHA (seconds the doc is delayed in queue).
-const CAPTCHA_RETRY_DELAY_SECS: i64 = 3_600; // 1 hour
+const CAPTCHA_RETRY_DELAY_SECS: i64 = 60; // 1 minute
 
 /// Extra sleep for the worker thread itself after detecting CAPTCHA,
 /// so we don't hammer the next queued document immediately.
-const CAPTCHA_WORKER_PAUSE_SECS: u64 = 30;
+const CAPTCHA_WORKER_PAUSE_SECS: u64 = 5;
 
 /// Maximum BFS depth to follow from seeds.
 const MAX_DEPTH: usize = 3;
@@ -148,7 +148,7 @@ async fn process_one(
         url,
     );
 
-    let title_preview = &doc.title[..doc.title.len().min(50)];
+    let title_preview: String = doc.title.chars().take(50).collect();
     info!(
         "Parsed {id}: '{title_preview}', {} refs, status={:?}",
         doc.references.len(),

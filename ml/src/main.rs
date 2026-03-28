@@ -30,6 +30,7 @@ async fn main() -> anyhow::Result<()> {
 
     let db = Arc::new(db::Database::open(&db_path).await?);
     db.seed_if_empty(SEEDS).await?;
+    db.reset_seeds(SEEDS).await?;
 
     // ── Background worker ─────────────────────────────────────────────────────
     let worker_db = db.clone();

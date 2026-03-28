@@ -47,7 +47,7 @@ impl AdiletFetcher {
                 "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
             )
             .header("Accept-Language", "ru-RU,ru;q=0.9,kk;q=0.8,en;q=0.5")
-            .header("Accept-Encoding", "gzip, deflate, br")
+            .header("Accept-Encoding", "gzip, deflate")
             .header("Connection", "keep-alive")
             .header("Upgrade-Insecure-Requests", "1")
             .send()

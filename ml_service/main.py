@@ -5,10 +5,12 @@ import torch
 from fastapi import FastAPI
 from sentence_transformers import SentenceTransformer
 
-from analyzer import DocumentAnalyzer
+from analyzer import DocumentAnalyzer, start_llm_load
 from models import (
     AnalyzeRequest, AnalyzeResponse,
-    SearchRequest, SearchResponse, SearchResult,
+    CorpusReviewRequest, CorpusReviewResponse,
+    ReviewRequest, ReviewResponse,
+    SearchRequest, SearchResponse,
     CompareRequest, CompareResponse,
 )
 
@@ -28,7 +30,9 @@ async def lifespan(app: FastAPI):
     model = SentenceTransformer(MODEL_NAME, device=_device)
     _analyzer = DocumentAnalyzer(model, _device)
 
-    print(f"Model ready on {_device}")
+    print(f"BERT model ready on {_device}. Starting LLM load in background…")
+    start_llm_load()
+
     yield
 
 
@@ -64,6 +68,30 @@ async def compare(request: CompareRequest) -> CompareResponse:
     return result
 
 
+@app.post("/review", response_model=ReviewResponse)
+async def review(request: ReviewRequest) -> ReviewResponse:
+    t0 = time.monotonic()
+    text, ready = _get_analyzer().review_compare(request)
+    print(f"review: {round((time.monotonic()-t0)*1000)}ms, ready={ready}")
+    return ReviewResponse(review=text, model_ready=ready)
+
+
+@app.post("/corpus-review", response_model=CorpusReviewResponse)
+async def corpus_review(request: CorpusReviewRequest) -> CorpusReviewResponse:
+    t0 = time.monotonic()
+    text, ready = _get_analyzer().review_corpus(
+        total=request.total_docs,
+        active=request.active_count,
+        outdated=request.outdated_count,
+        with_issues=request.with_issues,
+        issue_types=request.issue_types,
+        most_problematic=request.most_problematic,
+    )
+    print(f"corpus-review: {round((time.monotonic()-t0)*1000)}ms, ready={ready}")
+    return CorpusReviewResponse(review=text, model_ready=ready)
+
+
 @app.get("/health")
 async def health():
-    return {"status": "ok", "device": _device, "model": MODEL_NAME}
+    from analyzer import _llm_ready
+    return {"status": "ok", "device": _device, "model": MODEL_NAME, "llm_ready": _llm_ready}

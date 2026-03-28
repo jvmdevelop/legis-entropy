@@ -74,3 +74,42 @@ class CompareRequest(BaseModel):
 class CompareResponse(BaseModel):
     similarity: float
     assessment: str
+
+
+# ── /review ───────────────────────────────────────────────────────────────────
+
+class DocMeta(BaseModel):
+    title: str
+    status: str
+    ref_count: int = 0
+    article_count: int = 0
+    is_amendment: bool = False
+
+
+class ReviewRequest(BaseModel):
+    doc_a: DocMeta
+    doc_b: DocMeta
+    similarity: float
+    assessment: str
+    shared_issues: list[str] = []
+
+
+class ReviewResponse(BaseModel):
+    review: str
+    model_ready: bool
+
+
+# ── /corpus-review ────────────────────────────────────────────────────────────
+
+class CorpusReviewRequest(BaseModel):
+    total_docs: int
+    active_count: int
+    outdated_count: int
+    with_issues: int
+    issue_types: dict[str, int] = {}
+    most_problematic: list[str] = []
+
+
+class CorpusReviewResponse(BaseModel):
+    review: str
+    model_ready: bool

@@ -89,6 +89,33 @@ impl Database {
 // ── Seeding ───────────────────────────────────────────────────────────────────
 
 impl Database {
+    /// On every startup: clear captcha_blocked flag for seeds and re-enqueue
+    /// them for immediate fetching. This ensures a service restart always
+    /// unblocks the core seed documents regardless of prior CAPTCHA state.
+    pub async fn reset_seeds(&self, seeds: &[&str]) -> Result<()> {
+        let seeds: Vec<String> = seeds.iter().map(|&s| s.to_owned()).collect();
+        let conn = self.conn.clone();
+        tokio::task::spawn_blocking(move || -> Result<()> {
+            let conn = conn.lock().unwrap();
+            let now = Utc::now().timestamp();
+            for id in &seeds {
+                conn.execute(
+                    "UPDATE documents SET captcha_blocked = 0 WHERE id = ?1",
+                    params![id],
+                )?;
+                conn.execute(
+                    "INSERT OR REPLACE INTO fetch_queue (id, depth, added_at, attempt_after)
+                     VALUES (?1, 0, ?2, 0)",
+                    params![id, now],
+                )?;
+            }
+            tracing::info!("Reset captcha state for {} seed documents", seeds.len());
+            Ok(())
+        })
+        .await
+        .context("spawn_blocking panicked")?
+    }
+
     /// Insert seed documents + queue them if the DB is completely empty.
     pub async fn seed_if_empty(&self, seeds: &[&str]) -> Result<()> {
         let seeds: Vec<String> = seeds.iter().map(|&s| s.to_owned()).collect();

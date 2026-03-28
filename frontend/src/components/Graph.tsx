@@ -72,16 +72,32 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
         ctx.fill();
       }
 
-      // Node body
+      // Node body — amendment docs are blue-tinted
       ctx.beginPath();
       ctx.arc(x, y, r, 0, 2 * Math.PI);
-      ctx.fillStyle = isDimmed
-        ? STATUS_DIM[node.status] ?? '#f3f4f6'
-        : STATUS_COLOR[node.status] ?? '#9ca3af';
+      if (node.is_amendment && !isDimmed) {
+        ctx.fillStyle = '#3b82f6'; // blue for amendment docs
+      } else {
+        ctx.fillStyle = isDimmed
+          ? STATUS_DIM[node.status] ?? '#f3f4f6'
+          : STATUS_COLOR[node.status] ?? '#9ca3af';
+      }
       ctx.fill();
 
-      // Issue ring (orange border)
-      if (node.issue_count > 0 && !isDimmed) {
+      // Amendment: dashed outer ring to visually distinguish version-change acts
+      if (node.is_amendment && !isDimmed) {
+        ctx.save();
+        ctx.setLineDash([3 / globalScale, 2 / globalScale]);
+        ctx.beginPath();
+        ctx.arc(x, y, r + 3, 0, 2 * Math.PI);
+        ctx.strokeStyle = 'rgba(59,130,246,0.5)';
+        ctx.lineWidth = 1.5 / globalScale;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // Issue ring (orange border for non-amendment issues)
+      if (node.issue_count > 0 && !isDimmed && !node.is_amendment) {
         ctx.strokeStyle = '#f97316';
         ctx.lineWidth = 1.5 / globalScale;
         ctx.stroke();

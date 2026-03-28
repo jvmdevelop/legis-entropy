@@ -25,17 +25,15 @@ const STATUS_SELECTORS: &[&str] = &[
 
 /// Substrings that indicate the page is a CAPTCHA / bot-check wall.
 /// Checked case-insensitively against the raw HTML.
+/// Keep these specific — generic words like "captcha" or "cloudflare" appear
+/// in normal pages (ad scripts, CDN references) and cause false positives.
 const CAPTCHA_MARKERS: &[&str] = &[
-    "не робот",
     "вы не робот",
     "g-recaptcha",
     "cf-browser-verification",
-    "cloudflare",
-    "captcha",
-    "access denied",
-    "please verify",
-    "verify you are human",
     "ddos-guard",
+    "verify you are human",
+    "please complete the security check",
 ];
 
 // ── Public interface ──────────────────────────────────────────────────────────
@@ -149,21 +147,21 @@ impl DocumentParser {
         refs
     }
 
-    /// Returns up to `limit` chars of body text (faster than full extract_text).
+    /// Returns up to `limit` *chars* of body text (faster than full extract_text).
     fn extract_text_short(&self, doc: &Html, limit: usize) -> String {
         let Ok(sel) = Selector::parse("article") else { return String::new() };
-        let mut out = String::with_capacity(limit);
+        let mut out = String::with_capacity(limit * 3); // UTF-8: up to 3 bytes/char
+        let mut char_count = 0usize;
         'outer: for el in doc.select(&sel) {
             for chunk in el.text() {
                 let chunk = chunk.trim();
                 if chunk.is_empty() { continue; }
-                if out.len() + chunk.len() >= limit {
-                    let remaining = limit - out.len();
-                    out.push_str(&chunk[..remaining.min(chunk.len())]);
-                    break 'outer;
+                for ch in chunk.chars() {
+                    if char_count >= limit { break 'outer; }
+                    out.push(ch);
+                    char_count += 1;
                 }
-                out.push_str(chunk);
-                out.push(' ');
+                if char_count < limit { out.push(' '); char_count += 1; }
             }
         }
         out

@@ -20,8 +20,9 @@ public class RouterConfig {
                 .GET("/api/graph",          graphHandler::getGraph)
                 .GET("/api/stats",          graphHandler::getStats)
                 .GET("/api/stream/analyze", analysisHandler::streamAnalysis)
-                .POST("/api/search",        analysisHandler::search)
-                .POST("/api/compare",       analysisHandler::compare)
+                .POST("/api/search",         analysisHandler::search)
+                .POST("/api/compare",        analysisHandler::compare)
+                .GET("/api/corpus-review",   analysisHandler::corpusReview)
                 .build();
     }
 }

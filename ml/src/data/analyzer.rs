@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use petgraph::{Graph, algo::tarjan_scc, graph::NodeIndex};
 
-use super::model::{DocumentId, DocumentMeta, DocumentStatus, Issue, IssueKind, Severity};
+use super::model::{is_amendment_title, DocumentId, DocumentMeta, DocumentStatus, Issue, IssueKind, Severity};
 
 // ── Tuning constants ──────────────────────────────────────────────────────────
 
@@ -35,6 +35,7 @@ impl DocumentAnalyzer {
         issues.extend(self.outdated_references(docs, &status_map));
         issues.extend(self.circular_references(docs));
         issues.extend(self.duplications(docs));
+        issues.extend(self.amendments(docs));
         issues
     }
 }
@@ -173,6 +174,44 @@ impl DocumentAnalyzer {
         }
 
         issues
+    }
+}
+
+// ── Check: amendment acts ("О внесении изменений…") ──────────────────────────
+
+impl DocumentAnalyzer {
+    fn amendments(&self, docs: &[DocumentMeta]) -> Vec<Issue> {
+        docs.iter()
+            .filter(|d| is_amendment_title(&d.title))
+            .map(|doc| {
+                let amended_count = doc.references.len();
+                let sample: Vec<&str> = doc.references.iter().take(3).map(|r| r.as_str()).collect();
+                let sample_str = sample.join(", ");
+                let explanation = if amended_count > 0 {
+                    format!(
+                        "«{}» является актом внесения изменений, затрагивает {} документ(а/ов) \
+                         (в т.ч. {}{}). Базовые акты могут содержать устаревший текст без учёта поправок.",
+                        doc.title,
+                        amended_count,
+                        sample_str,
+                        if amended_count > 3 { " и др." } else { "" }
+                    )
+                } else {
+                    format!(
+                        "«{}» — акт внесения изменений; изменяемые документы не определены из ссылок.",
+                        doc.title
+                    )
+                };
+                Issue {
+                    kind: IssueKind::Amendment,
+                    severity: Severity::Low,
+                    document_ids: std::iter::once(doc.id.as_str().to_owned())
+                        .chain(doc.references.iter().map(|r| r.as_str().to_owned()))
+                        .collect(),
+                    explanation,
+                }
+            })
+            .collect()
     }
 }
 
