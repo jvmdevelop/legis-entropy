@@ -17,14 +17,14 @@ const STATUS_LABEL: Record<string, string> = {
 };
 
 const STATUS_DOT: Record<string, string> = {
-  active: 'bg-emerald-500',
-  outdated: 'bg-red-500',
+  active: 'bg-gray-800',
+  outdated: 'bg-gray-600',
   unknown: 'bg-gray-400',
 };
 
 const STATUS_STYLE: Record<string, string> = {
-  active: 'text-emerald-700 bg-emerald-50 border-emerald-200',
-  outdated: 'text-red-600 bg-red-50 border-red-200',
+  active: 'text-gray-800 bg-gray-100 border-gray-300',
+  outdated: 'text-gray-700 bg-gray-100 border-gray-300',
   unknown: 'text-gray-500 bg-gray-100 border-gray-200',
 };
 
@@ -45,9 +45,9 @@ const ISSUE_KIND_ICON: Record<string, string> = {
 };
 
 const SEVERITY_STYLE: Record<string, string> = {
-  high: 'text-red-600 bg-red-50 border-red-200',
-  medium: 'text-orange-600 bg-orange-50 border-orange-200',
-  low: 'text-yellow-700 bg-yellow-50 border-yellow-200',
+  high: 'text-gray-800 bg-gray-100 border-gray-300',
+  medium: 'text-gray-700 bg-gray-100 border-gray-300',
+  low: 'text-gray-600 bg-gray-100 border-gray-200',
 };
 
 const SEVERITY_LABEL: Record<string, string> = {
@@ -67,31 +67,42 @@ function IssueCard({ issue }: { issue: Issue; index: number }) {
     : issue.explanation;
 
   return (
-    <div className={`rounded-xl border p-4 space-y-2 ${
-      issue.kind === 'amendment' ? 'border-blue-100 bg-blue-50/50' : 'border-gray-100 bg-gray-50/50'
-    }`}>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
-          <span className="text-base leading-none shrink-0">{ISSUE_KIND_ICON[issue.kind] ?? '⚠'}</span>
-          <span className="text-[11px] font-semibold text-gray-800 truncate">
-            {ISSUE_KIND_LABEL[issue.kind] ?? issue.kind}
-          </span>
+    <div className={`rounded-lg border p-6 space-y-4 transition-all duration-300 hover:elevation-3 ${
+      issue.kind === 'amendment' ? 'border-gray-300 bg-gradient-to-br from-gray-50 to-slate-50' : 'border-gray-200 bg-white'
+    } elevation-2`}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-gray-100 to-slate-100 border border-gray-300 flex items-center justify-center shrink-0 mt-0.5 elevation-1">
+            <span className="text-base leading-none text-gray-700">{ISSUE_KIND_ICON[issue.kind] ?? '⚠'}</span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-[12px] font-bold text-gray-900 leading-tight mb-1">
+              {ISSUE_KIND_LABEL[issue.kind] ?? issue.kind}
+            </h3>
+          </div>
         </div>
-        <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${SEVERITY_STYLE[issue.severity]}`}>
+        <span className={`text-[9px] font-bold px-3 py-1.5 rounded-full border shrink-0 elevation-1 ${SEVERITY_STYLE[issue.severity]}`}>
           {SEVERITY_LABEL[issue.severity]}
         </span>
       </div>
-      <p className="text-[11px] text-gray-500 leading-relaxed">{text}</p>
-      {long && (
-        <button
-          onClick={() => setExpanded(e => !e)}
-          className="text-[9px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
-        >
-          {expanded ? '↑ Свернуть' : '↓ Подробнее'}
-        </button>
-      )}
-      <div className="text-[9px] text-gray-400">
-        Затронуто документов: {issue.document_ids.length}
+      
+      <div className="pl-13 space-y-3">
+        <p className="text-[11px] text-gray-600 leading-relaxed">{text}</p>
+        
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          {long && (
+            <button
+              onClick={() => setExpanded(e => !e)}
+              className="text-[9px] font-medium text-gray-600 hover:text-gray-800 transition-colors flex items-center gap-1.5 ripple"
+            >
+              <span className="text-xs">{expanded ? '↑' : '↓'}</span>
+              {expanded ? 'Свернуть' : 'Подробнее'}
+            </button>
+          )}
+          <div className="text-[9px] text-gray-400 ml-auto">
+            {issue.document_ids.length} {issue.document_ids.length === 1 ? 'документ' : issue.document_ids.length < 5 ? 'документа' : 'документов'}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -104,12 +115,12 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
 
   return (
     <div className="absolute top-0 right-0 h-full w-80 flex flex-col z-10 pointer-events-none">
-    <div className="flex flex-col h-full bg-white border-l border-gray-200 pointer-events-auto">
+    <div className="flex flex-col h-full bg-white/95 backdrop-blur-md border-l border-white/20 elevation-3 pointer-events-auto">
 
       {/* Header */}
       <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-2.5">
-          <div className="w-1 h-4 rounded-full bg-gradient-to-b from-indigo-500 to-violet-500" />
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-4 rounded-full bg-gradient-to-b from-gray-700 to-gray-800 elevation-1" />
           <span className="text-xs font-bold text-gray-900 tracking-tight">Инспектор</span>
         </div>
         {stats && (
@@ -142,12 +153,12 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
                 {STATUS_LABEL[node.status]}
               </span>
               {node.is_amendment && (
-                <span className="inline-flex items-center gap-1 px-4 py-1 rounded-full text-[10px] font-medium text-blue-600 bg-blue-50 border border-blue-200">
+                <span className="inline-flex items-center gap-1 px-4 py-1 rounded-full text-[10px] font-medium text-gray-700 bg-gray-100 border border-gray-300">
                   ✎ Акт изменений
                 </span>
               )}
               {node.issue_count > 0 && (
-                <span className="inline-flex items-center gap-1 px-4 py-1 rounded-full text-[10px] font-medium text-orange-600 bg-orange-50 border border-orange-200">
+                <span className="inline-flex items-center gap-1 px-4 py-1 rounded-full text-[10px] font-medium text-gray-700 bg-gray-100 border border-gray-300">
                   ⚠ {node.issue_count} {node.issue_count === 1 ? 'проблема' : 'проблем'}
                 </span>
               )}
@@ -179,10 +190,13 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
 
             {/* Issues */}
             {nodeIssues.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2 border-l-2 border-gray-200">
-                  Почему помечен ({nodeIssues.length})
-                </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1.5 h-4 bg-gradient-to-b from-gray-500 to-gray-600 rounded-full elevation-1" />
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    Почему помечен ({nodeIssues.length})
+                  </p>
+                </div>
                 {nodeIssues.map((issue, i) => (
                   <IssueCard key={i} issue={issue} index={i} />
                 ))}
@@ -230,18 +244,21 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
             </div>
 
             {issues.length > 0 ? (
-              <div className="space-y-2">
-                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2 border-l-2 border-gray-200">
-                  Обнаруженные проблемы ({issues.length})
-                </p>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1.5 h-4 bg-gradient-to-b from-gray-500 to-gray-600 rounded-full elevation-1" />
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                    Обнаруженные проблемы ({issues.length})
+                  </p>
+                </div>
                 {issues.map((issue, i) => (
                   <IssueCard key={i} issue={issue} index={i} />
                 ))}
               </div>
             ) : (
-              <div className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-5">
-                <p className="text-[11px] font-medium text-emerald-700">Проблем не обнаружено</p>
-                <p className="text-[10px] text-emerald-600 mt-1">Корпус документов согласован</p>
+              <div className="rounded-lg border border-gray-300 bg-gradient-to-br from-gray-50 to-slate-50 p-6 elevation-2">
+                <p className="text-[11px] font-bold text-gray-800">Проблем не обнаружено</p>
+                <p className="text-[10px] text-gray-600 mt-1">Корпус документов согласован</p>
               </div>
             )}
           </div>
@@ -249,15 +266,18 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
 
         {/* Corpus stats */}
         {stats && (
-          <div className="px-8 pb-8 space-y-3 border-t border-gray-100 pt-8">
-            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2 border-l-2 border-gray-200">Состояние корпуса</p>
+          <div className="px-8 pb-8 space-y-4 border-t border-gray-100 pt-8">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-1.5 h-4 bg-gradient-to-b from-gray-500 to-gray-600 rounded-full elevation-1" />
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Состояние корпуса</p>
+            </div>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'Действующих', value: stats.active_count, colorClass: 'text-emerald-600', accentColor: '#34d399' },
-                { label: 'Утративших', value: stats.outdated_count, colorClass: 'text-red-500', accentColor: '#f87171' },
-                { label: 'С проблемами', value: stats.with_issues, colorClass: 'text-orange-500', accentColor: '#fb923c' },
-                { label: 'Ср. ссылок', value: stats.avg_ref_count.toFixed(1), colorClass: 'text-gray-700', accentColor: '#a5b4fc' },
+                { label: 'Действующих', value: stats.active_count, colorClass: 'text-gray-800', accentColor: '#000000' },
+                { label: 'Утративших', value: stats.outdated_count, colorClass: 'text-gray-600', accentColor: '#666666' },
+                { label: 'С проблемами', value: stats.with_issues, colorClass: 'text-gray-700', accentColor: '#333333' },
+                { label: 'Ср. ссылок', value: stats.avg_ref_count.toFixed(1), colorClass: 'text-gray-700', accentColor: '#999999' },
               ].map(({ label, value, colorClass, accentColor }) => (
                 <div key={label} className="rounded-lg border border-gray-100 bg-gray-50/50 p-4 overflow-hidden relative">
                   <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: accentColor }} />
@@ -273,7 +293,7 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
                 {stats.most_problematic.slice(0, 3).map(n => (
                   <div key={n.id} className="flex items-center justify-between gap-2 py-3 border-b border-gray-100 last:border-0">
                     <span className="text-[10px] text-gray-600 truncate flex-1">{n.title}</span>
-                    <span className="text-[10px] text-orange-500 font-semibold font-mono shrink-0">{n.issue_count}</span>
+                    <span className="text-[10px] text-gray-600 font-semibold font-mono shrink-0">{n.issue_count}</span>
                   </div>
                 ))}
               </div>

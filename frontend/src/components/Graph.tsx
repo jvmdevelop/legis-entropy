@@ -13,16 +13,16 @@ interface GraphProps {
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  active: '#10b981',
-  outdated: '#ef4444',
-  unknown: '#9ca3af',
+  active: '#000000',
+  outdated: '#666666',
+  unknown: '#999999',
 };
 
 // Dimmed versions for light background
 const STATUS_DIM: Record<string, string> = {
-  active: '#d1fae5',
-  outdated: '#fee2e2',
-  unknown: '#f3f4f6',
+  active: '#e5e5e5',
+  outdated: '#d4d4d4',
+  unknown: '#f5f5f5',
 };
 
 export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }: GraphProps) {
@@ -56,31 +56,31 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
       if (isSelected) {
         ctx.beginPath();
         ctx.arc(x, y, r + 6, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(99,102,241,0.15)';
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
         ctx.fill();
       }
       if (isCompare) {
         ctx.beginPath();
         ctx.arc(x, y, r + 6, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(249,115,22,0.15)';
+        ctx.fillStyle = 'rgba(102,102,102,0.15)';
         ctx.fill();
       }
       if (isHit) {
         ctx.beginPath();
         ctx.arc(x, y, r + 4, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(234,179,8,0.15)';
+        ctx.fillStyle = 'rgba(153,153,153,0.15)';
         ctx.fill();
       }
 
-      // Node body — amendment docs are blue-tinted
+      // Node body — amendment docs are gray-tinted
       ctx.beginPath();
       ctx.arc(x, y, r, 0, 2 * Math.PI);
       if (node.is_amendment && !isDimmed) {
-        ctx.fillStyle = '#3b82f6'; // blue for amendment docs
+        ctx.fillStyle = '#333333'; // dark gray for amendment docs
       } else {
         ctx.fillStyle = isDimmed
-          ? STATUS_DIM[node.status] ?? '#f3f4f6'
-          : STATUS_COLOR[node.status] ?? '#9ca3af';
+          ? STATUS_DIM[node.status] ?? '#f5f5f5'
+          : STATUS_COLOR[node.status] ?? '#999999';
       }
       ctx.fill();
 
@@ -90,22 +90,22 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
         ctx.setLineDash([3 / globalScale, 2 / globalScale]);
         ctx.beginPath();
         ctx.arc(x, y, r + 3, 0, 2 * Math.PI);
-        ctx.strokeStyle = 'rgba(59,130,246,0.5)';
+        ctx.strokeStyle = 'rgba(51,51,51,0.5)';
         ctx.lineWidth = 1.5 / globalScale;
         ctx.stroke();
         ctx.restore();
       }
 
-      // Issue ring (orange border for non-amendment issues)
+      // Issue ring (gray border for non-amendment issues)
       if (node.issue_count > 0 && !isDimmed && !node.is_amendment) {
-        ctx.strokeStyle = '#f97316';
+        ctx.strokeStyle = '#666666';
         ctx.lineWidth = 1.5 / globalScale;
         ctx.stroke();
       }
 
       // Selection / compare border
       if (isSelected || isCompare) {
-        ctx.strokeStyle = isCompare ? '#f97316' : '#6366f1';
+        ctx.strokeStyle = isCompare ? '#666666' : '#000000';
         ctx.lineWidth = 2.5 / globalScale;
         ctx.stroke();
       }
