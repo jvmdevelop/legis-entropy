@@ -1,19 +1,14 @@
-//! Axum HTTP server.
-//!
-//! All routes are non-blocking: they read from SQLite and return immediately.
-//! The background worker fills the DB independently over time.
-
 use std::{net::SocketAddr, sync::Arc};
 
 use axum::{extract::State, http::StatusCode, routing::get, Json, Router};
 use tower_http::cors::{Any, CorsLayer};
 
 use crate::{
-    data::{analyzer::DocumentAnalyzer, graph::assemble_graph, ml_client::MlClient, model::GraphData},
+    data::{
+        analyzer::DocumentAnalyzer, graph::assemble_graph, ml_client::MlClient, model::GraphData,
+    },
     db::{Database, WorkerStatus},
 };
-
-// ── Application state ─────────────────────────────────────────────────────────
 
 #[derive(Clone)]
 struct AppState {
@@ -22,8 +17,6 @@ struct AppState {
     analyzer: Arc<DocumentAnalyzer>,
     seeds: &'static [&'static str],
 }
-
-// ── Entry point ───────────────────────────────────────────────────────────────
 
 pub async fn run(
     db: Arc<Database>,
@@ -55,14 +48,7 @@ pub async fn run(
     Ok(())
 }
 
-// ── Handlers ──────────────────────────────────────────────────────────────────
-
-/// Build and return `GraphData` from the current DB contents.
-///
-/// Always fast — reads from SQLite, no network I/O.
-async fn graph_handler(
-    State(state): State<AppState>,
-) -> Result<Json<GraphData>, StatusCode> {
+async fn graph_handler(State(state): State<AppState>) -> Result<Json<GraphData>, StatusCode> {
     let docs = state.db.get_fetched_docs().await.map_err(|e| {
         tracing::error!("get_fetched_docs: {e}");
         StatusCode::INTERNAL_SERVER_ERROR
@@ -75,10 +61,7 @@ async fn graph_handler(
     Ok(Json(assemble_graph(docs, all_issues)))
 }
 
-/// Return worker / DB statistics.
-async fn status_handler(
-    State(state): State<AppState>,
-) -> Json<WorkerStatus> {
+async fn status_handler(State(state): State<AppState>) -> Json<WorkerStatus> {
     let status = state.db.get_status().await.unwrap_or(WorkerStatus {
         total_docs: 0,
         fetched_docs: 0,
@@ -88,10 +71,7 @@ async fn status_handler(
     Json(status)
 }
 
-/// Re-queue all seeds so the worker re-fetches them (and discovers new refs).
-async fn refresh_handler(
-    State(state): State<AppState>,
-) -> Json<serde_json::Value> {
+async fn refresh_handler(State(state): State<AppState>) -> Json<serde_json::Value> {
     match state.db.enqueue_seeds(state.seeds).await {
         Ok(()) => serde_json::json!({ "ok": true, "queued": state.seeds.len() }),
         Err(e) => serde_json::json!({ "ok": false, "error": e.to_string() }),

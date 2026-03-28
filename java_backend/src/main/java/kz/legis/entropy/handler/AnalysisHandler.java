@@ -81,7 +81,6 @@ public class AnalysisHandler {
                         var a = nodeA.get();
                         var b = nodeB.get();
 
-                        // Shared issue explanations for LLM context
                         var sharedIssueExplanations = graph.issues().stream()
                             .filter(i -> i.documentIds().contains(a.id()) && i.documentIds().contains(b.id()))
                             .map(i -> i.explanation())
@@ -90,7 +89,6 @@ public class AnalysisHandler {
 
                         long sharedIssueCount = sharedIssueExplanations.size();
 
-                        // Run BERT compare then LLM review sequentially
                         return mlClient.compare(a, b)
                             .flatMap(mlResult -> {
                                 String assessment = mlResult.assessment();

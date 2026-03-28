@@ -1,5 +1,6 @@
-from pydantic import BaseModel
 from enum import Enum
+
+from pydantic import BaseModel
 
 
 class DocumentStatus(str, Enum):
@@ -14,8 +15,6 @@ class DocumentInput(BaseModel):
     text: str
     status: DocumentStatus
 
-
-# ── /analyze ─────────────────────────────────────────────────────────────────
 
 class AnalyzeRequest(BaseModel):
     documents: list[DocumentInput]
@@ -46,8 +45,6 @@ class AnalyzeResponse(BaseModel):
     device: str
 
 
-# ── /search ───────────────────────────────────────────────────────────────────
-
 class SearchRequest(BaseModel):
     query: str
     documents: list[DocumentInput]
@@ -64,8 +61,6 @@ class SearchResponse(BaseModel):
     results: list[SearchResult]
 
 
-# ── /compare ─────────────────────────────────────────────────────────────────
-
 class CompareRequest(BaseModel):
     doc_a: DocumentInput
     doc_b: DocumentInput
@@ -75,8 +70,6 @@ class CompareResponse(BaseModel):
     similarity: float
     assessment: str
 
-
-# ── /review ───────────────────────────────────────────────────────────────────
 
 class DocMeta(BaseModel):
     title: str
@@ -98,8 +91,6 @@ class ReviewResponse(BaseModel):
     review: str
     model_ready: bool
 
-
-# ── /corpus-review ────────────────────────────────────────────────────────────
 
 class CorpusReviewRequest(BaseModel):
     total_docs: int

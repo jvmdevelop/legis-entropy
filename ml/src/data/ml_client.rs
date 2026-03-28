@@ -1,20 +1,12 @@
-//! Async client for the Python ML service (`/analyze` endpoint).
-//!
-//! Returns an empty vec on any error so the server degrades gracefully when
-//! the ML service is unavailable or still warming up.
-
 use serde::{Deserialize, Serialize};
 
 use super::model::{DocumentMeta, Issue, IssueKind, Severity};
-
-// ── Wire types (mirror ml_service/models.py) ──────────────────────────────────
 
 #[derive(Serialize)]
 struct MlDocument<'a> {
     id: &'a str,
     title: &'a str,
     text: &'a str,
-    /// Serialised via `DocumentStatus::as_str()` — always a static string.
     status: &'static str,
 }
 
@@ -38,8 +30,6 @@ struct MlResponse {
     issues: Vec<MlIssue>,
 }
 
-// ── Client ────────────────────────────────────────────────────────────────────
-
 pub struct MlClient {
     client: reqwest::Client,
     analyze_url: String,
@@ -53,9 +43,6 @@ impl MlClient {
         }
     }
 
-    /// Send documents to the ML service and return semantic issues.
-    ///
-    /// Returns an empty vec (with a warning) if the service is unavailable.
     pub async fn analyze(&self, docs: &[DocumentMeta]) -> Vec<Issue> {
         let payload = MlRequest {
             documents: docs
@@ -74,7 +61,13 @@ impl MlClient {
             return vec![];
         }
 
-        match self.client.post(&self.analyze_url).json(&payload).send().await {
+        match self
+            .client
+            .post(&self.analyze_url)
+            .json(&payload)
+            .send()
+            .await
+        {
             Err(e) => {
                 tracing::warn!("ML service unreachable, skipping semantic analysis: {e}");
                 vec![]
@@ -89,8 +82,6 @@ impl MlClient {
         }
     }
 }
-
-// ── Wire → domain conversion ──────────────────────────────────────────────────
 
 fn issue_from_wire(w: MlIssue) -> Option<Issue> {
     let kind = match w.kind.as_str() {

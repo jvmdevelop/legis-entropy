@@ -1,10 +1,7 @@
-//! HTML → `DocumentMeta` parser with CAPTCHA detection.
-
 use scraper::{Html, Selector};
 
 use super::model::{DocumentId, DocumentMeta, DocumentStatus};
 
-/// Body text is capped so memory stays bounded.
 const TEXT_LIMIT: usize = 8_000;
 
 const TITLE_SELECTORS: &[&str] = &[
@@ -16,17 +13,8 @@ const TITLE_SELECTORS: &[&str] = &[
     "article .post_header",
 ];
 
-const STATUS_SELECTORS: &[&str] = &[
-    "span.status",
-    ".doc_status",
-    ".status_label",
-    "span.label",
-];
+const STATUS_SELECTORS: &[&str] = &["span.status", ".doc_status", ".status_label", "span.label"];
 
-/// Substrings that indicate the page is a CAPTCHA / bot-check wall.
-/// Checked case-insensitively against the raw HTML.
-/// Keep these specific — generic words like "captcha" or "cloudflare" appear
-/// in normal pages (ad scripts, CDN references) and cause false positives.
 const CAPTCHA_MARKERS: &[&str] = &[
     "вы не робот",
     "g-recaptcha",
@@ -36,20 +24,14 @@ const CAPTCHA_MARKERS: &[&str] = &[
     "please complete the security check",
 ];
 
-// ── Public interface ──────────────────────────────────────────────────────────
-
 pub struct DocumentParser;
 
 impl DocumentParser {
-    /// Returns `true` if the HTML looks like a CAPTCHA / anti-bot page.
-    ///
-    /// This is a fast string scan — no DOM parsing needed.
     pub fn is_captcha(&self, html: &str) -> bool {
         let lower = html.to_lowercase();
         CAPTCHA_MARKERS.iter().any(|marker| lower.contains(marker))
     }
 
-    /// Parse raw HTML into a `DocumentMeta`.
     pub fn parse(&self, html: &str, id: DocumentId, url: String) -> DocumentMeta {
         let doc = Html::parse_document(html);
         DocumentMeta {
@@ -62,8 +44,6 @@ impl DocumentParser {
         }
     }
 }
-
-// ── Private extraction logic ──────────────────────────────────────────────────
 
 impl DocumentParser {
     fn extract_text(&self, doc: &Html) -> String {
@@ -88,7 +68,6 @@ impl DocumentParser {
     }
 
     fn extract_status(&self, doc: &Html) -> DocumentStatus {
-        // Try CSS selectors first
         let from_selectors = STATUS_SELECTORS.iter().find_map(|sel| {
             let text = self.first_text(doc, sel)?.to_lowercase();
             if text.contains("утратил") || text.contains("недействующ") {
@@ -103,11 +82,7 @@ impl DocumentParser {
             return s;
         }
 
-        // Fallback: scan the first 2 000 chars of body text for status cues.
-        // adilet.zan.kz embeds status notes like "Сноска. Утратил силу …"
-        // or "Действующим правом …" inside the article body.
         let body = self.extract_text_short(doc, 2_000).to_lowercase();
-        // Outdated markers are more specific — check them first.
         if body.contains("утратил силу")
             || body.contains("утратила силу")
             || body.contains("утратило силу")
@@ -116,7 +91,6 @@ impl DocumentParser {
         {
             return DocumentStatus::Outdated;
         }
-        // Active markers
         if body.contains("действующ") || body.contains("актуальн") {
             return DocumentStatus::Active;
         }
@@ -135,8 +109,6 @@ impl DocumentParser {
             .filter(|href| href.contains("/docs/"))
             .filter_map(|href| {
                 let raw = href.trim_end_matches('/').split('/').last()?;
-                // Strip intra-document anchor fragments (#z123) — these are article
-                // sections within the same document, not separate documents.
                 let id = raw.split('#').next().unwrap_or(raw);
                 (id.len() > 3).then(|| DocumentId::new(id))
             })
@@ -147,21 +119,29 @@ impl DocumentParser {
         refs
     }
 
-    /// Returns up to `limit` *chars* of body text (faster than full extract_text).
     fn extract_text_short(&self, doc: &Html, limit: usize) -> String {
-        let Ok(sel) = Selector::parse("article") else { return String::new() };
-        let mut out = String::with_capacity(limit * 3); // UTF-8: up to 3 bytes/char
+        let Ok(sel) = Selector::parse("article") else {
+            return String::new();
+        };
+        let mut out = String::with_capacity(limit * 3);
         let mut char_count = 0usize;
         'outer: for el in doc.select(&sel) {
             for chunk in el.text() {
                 let chunk = chunk.trim();
-                if chunk.is_empty() { continue; }
+                if chunk.is_empty() {
+                    continue;
+                }
                 for ch in chunk.chars() {
-                    if char_count >= limit { break 'outer; }
+                    if char_count >= limit {
+                        break 'outer;
+                    }
                     out.push(ch);
                     char_count += 1;
                 }
-                if char_count < limit { out.push(' '); char_count += 1; }
+                if char_count < limit {
+                    out.push(' ');
+                    char_count += 1;
+                }
             }
         }
         out

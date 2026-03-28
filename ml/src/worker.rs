@@ -1,9 +1,3 @@
-//! Background BFS fetch worker.
-//!
-//! Runs as a long-lived Tokio task. Continuously pops items from the
-//! persistent queue in SQLite, fetches them with rate limiting and CAPTCHA
-//! detection, saves results, and enqueues discovered references.
-
 use std::{sync::Arc, time::Duration};
 
 use rand::Rng;
@@ -15,47 +9,34 @@ use crate::{
     db::Database,
 };
 
-// ── Tuning constants ──────────────────────────────────────────────────────────
-
-/// Maximum simultaneous HTTP fetches.
 const MAX_CONCURRENT: usize = 2;
 
-/// Random jitter between requests to avoid hammering the server.
 const DELAY_MIN_MS: u64 = 1_500;
 const DELAY_MAX_MS: u64 = 3_500;
 
-/// How long the CAPTCHA'd document is delayed in the queue before retry.
 const CAPTCHA_RETRY_DELAY_SECS: i64 = 60;
 
-/// After detecting a CAPTCHA, the spawned task sleeps to occupy a semaphore
-/// slot and naturally throttle the overall fetch rate.
 const CAPTCHA_SLOT_HOLD_SECS: u64 = 5;
 
-/// Maximum BFS depth to follow from seeds.
 const MAX_DEPTH: usize = 3;
 
-/// Documents successfully fetched within this many days are considered fresh.
 const STALE_DAYS: i64 = 7;
 
-/// Sleep when the queue is empty.
 const IDLE_SLEEP_SECS: u64 = 30;
 
-/// Sleep after a dequeue error before retrying.
 const DEQUEUE_ERROR_SLEEP_SECS: u64 = 5;
 
-// ── FetchContext ──────────────────────────────────────────────────────────────
-
-/// Groups the HTTP fetcher and HTML parser so they can be shared as one unit.
 struct FetchContext {
     fetcher: AdiletFetcher,
     parser: DocumentParser,
 }
 
-// ── Entry point ───────────────────────────────────────────────────────────────
-
 pub async fn run(db: Arc<Database>) {
     let ctx = match AdiletFetcher::new() {
-        Ok(fetcher) => Arc::new(FetchContext { fetcher, parser: DocumentParser }),
+        Ok(fetcher) => Arc::new(FetchContext {
+            fetcher,
+            parser: DocumentParser,
+        }),
         Err(e) => {
             error!("Cannot create fetcher: {e}");
             return;
@@ -88,7 +69,6 @@ pub async fn run(db: Arc<Database>) {
             _ => {}
         }
 
-        // Random jitter before acquiring a permit so bursts are spread out.
         let delay = rand::thread_rng().gen_range(DELAY_MIN_MS..DELAY_MAX_MS);
         tokio::time::sleep(Duration::from_millis(delay)).await;
 
@@ -99,13 +79,11 @@ pub async fn run(db: Arc<Database>) {
         let depth = item.depth;
 
         tokio::spawn(async move {
-            let _permit = permit; // released when this task completes
+            let _permit = permit;
             process_one(&db2, &ctx2, &id, depth).await;
         });
     }
 }
-
-// ── Per-document fetch logic ──────────────────────────────────────────────────
 
 async fn process_one(db: &Database, ctx: &FetchContext, id: &str, depth: usize) {
     let url = format!("https://adilet.zan.kz/rus/docs/{id}");
@@ -127,14 +105,19 @@ async fn process_one(db: &Database, ctx: &FetchContext, id: &str, depth: usize) 
         if let Err(e) = db.mark_captcha(id, CAPTCHA_RETRY_DELAY_SECS).await {
             error!("mark_captcha {id}: {e}");
         }
-        // Hold the semaphore slot to throttle the overall fetch rate.
         tokio::time::sleep(Duration::from_secs(CAPTCHA_SLOT_HOLD_SECS)).await;
         return;
     }
 
-    let doc = ctx.parser.parse(&html, crate::data::model::DocumentId::new(id), url);
+    let doc = ctx
+        .parser
+        .parse(&html, crate::data::model::DocumentId::new(id), url);
     let title_preview: String = doc.title.chars().take(50).collect();
-    info!("Parsed {id}: '{title_preview}', {} refs, status={:?}", doc.references.len(), doc.status);
+    info!(
+        "Parsed {id}: '{title_preview}', {} refs, status={:?}",
+        doc.references.len(),
+        doc.status
+    );
 
     let refs = doc.references.clone();
     if let Err(e) = db.save_document(&doc).await {
@@ -148,6 +131,10 @@ async fn process_one(db: &Database, ctx: &FetchContext, id: &str, depth: usize) 
                 warn!("enqueue {} -> {}: {e}", id, ref_id.as_str());
             }
         }
-        info!("Enqueued {} refs from {id} at depth {}", refs.len(), depth + 1);
+        info!(
+            "Enqueued {} refs from {id} at depth {}",
+            refs.len(),
+            depth + 1
+        );
     }
 }

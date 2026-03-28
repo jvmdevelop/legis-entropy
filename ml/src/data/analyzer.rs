@@ -1,24 +1,15 @@
-//! Structural document analysis — pure Rust, no ML service needed.
-//!
-//! Detects:
-//!  - outdated references (active doc → outdated doc)
-//!  - circular reference cycles (Tarjan SCC)
-//!  - content duplicates (TF-IDF cosine similarity)
-//!  - amendment acts ("О внесении изменений…")
-
 use std::collections::{HashMap, HashSet};
 
 use petgraph::{algo::tarjan_scc, graph::NodeIndex, Graph};
 
 use super::{
-    model::{is_amendment_title, DocumentId, DocumentMeta, DocumentStatus, Issue, IssueKind, Severity},
+    model::{
+        is_amendment_title, DocumentId, DocumentMeta, DocumentStatus, Issue, IssueKind, Severity,
+    },
     tfidf,
 };
 
-/// Cosine-similarity threshold above which two documents are flagged as duplicates.
 const DUPLICATION_THRESHOLD: f32 = 0.70;
-
-// ── Public interface ──────────────────────────────────────────────────────────
 
 pub struct DocumentAnalyzer;
 
@@ -27,7 +18,6 @@ impl DocumentAnalyzer {
         Self
     }
 
-    /// Run all checks and return a de-duplicated list of issues.
     pub fn analyze(&self, docs: &[DocumentMeta]) -> Vec<Issue> {
         let status_map: HashMap<&DocumentId, &DocumentStatus> =
             docs.iter().map(|d| (&d.id, &d.status)).collect();
@@ -40,8 +30,6 @@ impl DocumentAnalyzer {
         issues
     }
 }
-
-// ── Check: outdated references ────────────────────────────────────────────────
 
 fn outdated_references(
     docs: &[DocumentMeta],
@@ -61,10 +49,7 @@ fn outdated_references(
                 .map(|ref_id| Issue {
                     kind: IssueKind::OutdatedReference,
                     severity: Severity::High,
-                    document_ids: vec![
-                        doc.id.as_str().to_owned(),
-                        ref_id.as_str().to_owned(),
-                    ],
+                    document_ids: vec![doc.id.as_str().to_owned(), ref_id.as_str().to_owned()],
                     explanation: format!(
                         "«{}» ссылается на утративший силу документ {}",
                         doc.title, ref_id
@@ -75,8 +60,6 @@ fn outdated_references(
         .collect()
 }
 
-// ── Check: circular references (Tarjan SCC) ───────────────────────────────────
-
 fn circular_references(docs: &[DocumentMeta]) -> Vec<Issue> {
     let mut graph: Graph<&str, ()> = Graph::new();
     let mut index: HashMap<&DocumentId, NodeIndex> = HashMap::new();
@@ -86,9 +69,13 @@ fn circular_references(docs: &[DocumentMeta]) -> Vec<Issue> {
         index.insert(&doc.id, node);
     }
     for doc in docs {
-        let Some(&src) = index.get(&doc.id) else { continue };
+        let Some(&src) = index.get(&doc.id) else {
+            continue;
+        };
         for ref_id in &doc.references {
-            let Some(&dst) = index.get(ref_id) else { continue };
+            let Some(&dst) = index.get(ref_id) else {
+                continue;
+            };
             graph.add_edge(src, dst, ());
         }
     }
@@ -112,8 +99,6 @@ fn circular_references(docs: &[DocumentMeta]) -> Vec<Issue> {
         .collect()
 }
 
-// ── Check: structural duplication via TF-IDF cosine similarity ────────────────
-
 fn duplications(docs: &[DocumentMeta]) -> Vec<Issue> {
     let active: Vec<&DocumentMeta> = docs
         .iter()
@@ -132,7 +117,7 @@ fn duplications(docs: &[DocumentMeta]) -> Vec<Issue> {
 
     for i in 0..active.len() {
         for j in (i + 1)..active.len() {
-            let key = (i, j); // i < j always, so no need for min/max
+            let key = (i, j);
             if seen.contains(&key) {
                 continue;
             }
@@ -165,8 +150,6 @@ fn duplications(docs: &[DocumentMeta]) -> Vec<Issue> {
 
     issues
 }
-
-// ── Check: amendment acts ("О внесении изменений…") ──────────────────────────
 
 fn amendments(docs: &[DocumentMeta]) -> Vec<Issue> {
     docs.iter()

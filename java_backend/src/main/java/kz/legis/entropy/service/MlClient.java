@@ -35,8 +35,6 @@ public class MlClient {
             .onErrorReturn(new SearchResponse(List.of()));
     }
 
-    // ── /compare ─────────────────────────────────────────────────────────────
-
     public Mono<CompareResponse> compare(GraphNode a, GraphNode b) {
         return client
             .post()
@@ -52,46 +50,79 @@ public class MlClient {
             .onErrorReturn(new CompareResponse(0f, "unknown"));
     }
 
-    // ── /review ──────────────────────────────────────────────────────────────
-
     public Mono<ReviewResponse> review(
-        GraphNode a, GraphNode b,
-        float similarity, String assessment,
+        GraphNode a,
+        GraphNode b,
+        float similarity,
+        String assessment,
         List<String> sharedIssueExplanations
     ) {
-        var docA = new DocMeta(a.title(), a.status(), a.refCount(), a.articleCount(), a.isAmendment());
-        var docB = new DocMeta(b.title(), b.status(), b.refCount(), b.articleCount(), b.isAmendment());
+        var docA = new DocMeta(
+            a.title(),
+            a.status(),
+            a.refCount(),
+            a.articleCount(),
+            a.isAmendment()
+        );
+        var docB = new DocMeta(
+            b.title(),
+            b.status(),
+            b.refCount(),
+            b.articleCount(),
+            b.isAmendment()
+        );
         return client
             .post()
             .uri("/review")
-            .bodyValue(new ReviewRequest(docA, docB, similarity, assessment, sharedIssueExplanations))
+            .bodyValue(
+                new ReviewRequest(
+                    docA,
+                    docB,
+                    similarity,
+                    assessment,
+                    sharedIssueExplanations
+                )
+            )
             .retrieve()
             .bodyToMono(ReviewResponse.class)
-            .onErrorReturn(new ReviewResponse("Сервис анализа недоступен.", false));
+            .onErrorReturn(
+                new ReviewResponse("Сервис анализа недоступен.", false)
+            );
     }
 
-    // ── /corpus-review ────────────────────────────────────────────────────────
-
     public Mono<CorpusReviewResponse> corpusReview(
-        int total, int active, int outdated, int withIssues,
+        int total,
+        int active,
+        int outdated,
+        int withIssues,
         java.util.Map<String, Integer> issueTypes,
         List<String> mostProblematic
     ) {
         return client
             .post()
             .uri("/corpus-review")
-            .bodyValue(new CorpusReviewRequest(total, active, outdated, withIssues, issueTypes, mostProblematic))
+            .bodyValue(
+                new CorpusReviewRequest(
+                    total,
+                    active,
+                    outdated,
+                    withIssues,
+                    issueTypes,
+                    mostProblematic
+                )
+            )
             .retrieve()
             .bodyToMono(CorpusReviewResponse.class)
-            .onErrorReturn(new CorpusReviewResponse("Сервис анализа недоступен.", false));
+            .onErrorReturn(
+                new CorpusReviewResponse("Сервис анализа недоступен.", false)
+            );
     }
-
-    // ── Wire types ────────────────────────────────────────────────────────────
 
     record MlDocument(String id, String title, String text, String status) {}
 
     record DocMeta(
-        String title, String status,
+        String title,
+        String status,
         @JsonProperty("ref_count") int refCount,
         @JsonProperty("article_count") int articleCount,
         @JsonProperty("is_amendment") boolean isAmendment
@@ -122,7 +153,10 @@ public class MlClient {
         @JsonProperty("shared_issues") List<String> sharedIssues
     ) {}
 
-    public record ReviewResponse(String review, @JsonProperty("model_ready") boolean modelReady) {}
+    public record ReviewResponse(
+        String review,
+        @JsonProperty("model_ready") boolean modelReady
+    ) {}
 
     record CorpusReviewRequest(
         @JsonProperty("total_docs") int totalDocs,
@@ -133,5 +167,8 @@ public class MlClient {
         @JsonProperty("most_problematic") List<String> mostProblematic
     ) {}
 
-    public record CorpusReviewResponse(String review, @JsonProperty("model_ready") boolean modelReady) {}
+    public record CorpusReviewResponse(
+        String review,
+        @JsonProperty("model_ready") boolean modelReady
+    ) {}
 }

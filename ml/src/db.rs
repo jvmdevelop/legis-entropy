@@ -1,13 +1,3 @@
-//! SQLite persistence layer.
-//!
-//! All public methods are async wrappers around blocking `rusqlite` calls via
-//! `tokio::task::spawn_blocking`. The inner `db_call` helper eliminates the
-//! repeated boilerplate of cloning the connection, spawning, and unwrapping
-//! the join handle.
-//!
-//! `Database` is cheaply cloneable (`Arc<Mutex<Connection>>` inside) and safe
-//! to share across Tokio tasks.
-
 use std::sync::{Arc, Mutex};
 
 use anyhow::{Context, Result};
@@ -16,8 +6,6 @@ use rusqlite::{params, Connection};
 use serde::Serialize;
 
 use crate::data::model::{DocumentId, DocumentMeta, DocumentStatus};
-
-// ── Schema ────────────────────────────────────────────────────────────────────
 
 const MIGRATIONS: &str = "
 PRAGMA journal_mode = WAL;
@@ -57,8 +45,6 @@ fn doc_url(id: &str) -> String {
     format!("{ADILET_DOC_URL}{id}")
 }
 
-// ── Public data types ─────────────────────────────────────────────────────────
-
 pub struct QueueItem {
     pub id: String,
     pub depth: usize,
@@ -72,8 +58,6 @@ pub struct WorkerStatus {
     pub captcha_blocked: i64,
 }
 
-// ── Handle ────────────────────────────────────────────────────────────────────
-
 #[derive(Clone)]
 pub struct Database {
     conn: Arc<Mutex<Connection>>,
@@ -83,21 +67,20 @@ impl Database {
     pub async fn open(path: &str) -> Result<Self> {
         let path = path.to_owned();
         let conn = tokio::task::spawn_blocking(move || -> Result<Connection> {
-            let conn = Connection::open(&path)
-                .with_context(|| format!("opening SQLite at {path}"))?;
-            conn.execute_batch(MIGRATIONS).context("running migrations")?;
+            let conn =
+                Connection::open(&path).with_context(|| format!("opening SQLite at {path}"))?;
+            conn.execute_batch(MIGRATIONS)
+                .context("running migrations")?;
             Ok(conn)
         })
         .await
         .context("spawn_blocking panicked")??;
 
-        Ok(Self { conn: Arc::new(Mutex::new(conn)) })
+        Ok(Self {
+            conn: Arc::new(Mutex::new(conn)),
+        })
     }
 
-    /// Run a blocking database closure on the thread pool.
-    ///
-    /// Eliminates the repeated pattern of cloning the Arc, spawning, and
-    /// double-unwrapping the `JoinError + Result` present in every DB method.
     async fn db_call<T, F>(&self, f: F) -> Result<T>
     where
         T: Send + 'static,
@@ -113,15 +96,11 @@ impl Database {
     }
 }
 
-// ── Seeding ───────────────────────────────────────────────────────────────────
-
 impl Database {
-    /// Insert seed documents and queue them if the DB is completely empty.
     pub async fn seed_if_empty(&self, seeds: &[&str]) -> Result<()> {
         let seeds: Vec<String> = seeds.iter().map(|&s| s.to_owned()).collect();
         self.db_call(move |conn| {
-            let count: i64 =
-                conn.query_row("SELECT COUNT(*) FROM documents", [], |r| r.get(0))?;
+            let count: i64 = conn.query_row("SELECT COUNT(*) FROM documents", [], |r| r.get(0))?;
             if count > 0 {
                 return Ok(());
             }
@@ -143,8 +122,6 @@ impl Database {
         .await
     }
 
-    /// On every startup: clear the captcha_blocked flag and re-enqueue seeds
-    /// so a service restart always unblocks the core documents.
     pub async fn reset_seeds(&self, seeds: &[&str]) -> Result<()> {
         let seeds: Vec<String> = seeds.iter().map(|&s| s.to_owned()).collect();
         self.db_call(move |conn| {
@@ -167,12 +144,7 @@ impl Database {
     }
 }
 
-// ── Queue operations ──────────────────────────────────────────────────────────
-
 impl Database {
-    /// Pop the next ready item from the queue (BFS order: lowest depth first,
-    /// oldest `added_at` first, `attempt_after` in the past).
-    /// Returns `None` if the queue is empty or all items are delayed.
     pub async fn dequeue(&self) -> Result<Option<QueueItem>> {
         self.db_call(|conn| {
             let now = Utc::now().timestamp();
@@ -183,7 +155,12 @@ impl Database {
                      ORDER BY depth ASC, added_at ASC
                      LIMIT 1",
                     params![now],
-                    |r| Ok(QueueItem { id: r.get(0)?, depth: r.get::<_, usize>(1)? }),
+                    |r| {
+                        Ok(QueueItem {
+                            id: r.get(0)?,
+                            depth: r.get::<_, usize>(1)?,
+                        })
+                    },
                 )
                 .ok();
 
@@ -195,8 +172,6 @@ impl Database {
         .await
     }
 
-    /// Enqueue a document for fetching (insert a stub row if it's new).
-    /// Silently ignored if the document is already in the queue.
     pub async fn enqueue(&self, id: &str, depth: usize) -> Result<()> {
         let id = id.to_owned();
         self.db_call(move |conn| {
@@ -215,7 +190,6 @@ impl Database {
         .await
     }
 
-    /// Re-enqueue seeds (called by the refresh endpoint).
     pub async fn enqueue_seeds(&self, seeds: &[&str]) -> Result<()> {
         let seeds: Vec<String> = seeds.iter().map(|&s| s.to_owned()).collect();
         self.db_call(move |conn| {
@@ -233,10 +207,7 @@ impl Database {
     }
 }
 
-// ── Freshness ─────────────────────────────────────────────────────────────────
-
 impl Database {
-    /// Returns `true` if the document was successfully fetched within `days`.
     pub async fn is_fresh(&self, id: &str, days: i64) -> Result<bool> {
         let id = id.to_owned();
         self.db_call(move |conn| {
@@ -254,17 +225,18 @@ impl Database {
     }
 }
 
-// ── Document writes ───────────────────────────────────────────────────────────
-
 impl Database {
-    /// Persist a successfully fetched document and replace its outgoing references.
     pub async fn save_document(&self, doc: &DocumentMeta) -> Result<()> {
         let id = doc.id.as_str().to_owned();
         let title = doc.title.clone();
         let url = doc.url.clone();
         let status = doc.status.to_string();
         let text = doc.text.clone();
-        let refs: Vec<String> = doc.references.iter().map(|r| r.as_str().to_owned()).collect();
+        let refs: Vec<String> = doc
+            .references
+            .iter()
+            .map(|r| r.as_str().to_owned())
+            .collect();
 
         self.db_call(move |conn| {
             let now = Utc::now().timestamp();
@@ -294,7 +266,6 @@ impl Database {
         .await
     }
 
-    /// Mark a document as CAPTCHA-blocked and schedule a retry after `retry_after_secs`.
     pub async fn mark_captcha(&self, id: &str, retry_after_secs: i64) -> Result<()> {
         let id = id.to_owned();
         self.db_call(move |conn| {
@@ -317,7 +288,6 @@ impl Database {
         .await
     }
 
-    /// Increment `fetch_attempts` for a non-CAPTCHA network or parsing error.
     pub async fn mark_failed(&self, id: &str) -> Result<()> {
         let id = id.to_owned();
         self.db_call(move |conn| {
@@ -331,10 +301,7 @@ impl Database {
     }
 }
 
-// ── Document reads ────────────────────────────────────────────────────────────
-
 impl Database {
-    /// Return all successfully fetched, non-CAPTCHA-blocked documents with their refs.
     pub async fn get_fetched_docs(&self) -> Result<Vec<DocumentMeta>> {
         self.db_call(|conn| {
             let mut stmt = conn.prepare(
@@ -344,11 +311,13 @@ impl Database {
             )?;
 
             let rows: Vec<(String, String, String, String, String)> = stmt
-                .query_map([], |r| Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?)))?
+                .query_map([], |r| {
+                    Ok((r.get(0)?, r.get(1)?, r.get(2)?, r.get(3)?, r.get(4)?))
+                })?
                 .collect::<std::result::Result<_, _>>()?;
 
-            let mut ref_stmt = conn
-                .prepare("SELECT target_id FROM doc_refs WHERE source_id = ?1")?;
+            let mut ref_stmt =
+                conn.prepare("SELECT target_id FROM doc_refs WHERE source_id = ?1")?;
 
             let mut docs = Vec::with_capacity(rows.len());
             for (id, title, url, status_str, text) in rows {
@@ -359,29 +328,42 @@ impl Database {
                     .map(DocumentId::from)
                     .collect();
 
-                docs.push(DocumentMeta { id: DocumentId::from(id), title, url, status, references: refs, text });
+                docs.push(DocumentMeta {
+                    id: DocumentId::from(id),
+                    title,
+                    url,
+                    status,
+                    references: refs,
+                    text,
+                });
             }
             Ok(docs)
         })
         .await
     }
 
-    /// Return aggregate counts for the status endpoint.
     pub async fn get_status(&self) -> Result<WorkerStatus> {
         self.db_call(|conn| {
             let total_docs: i64 =
                 conn.query_row("SELECT COUNT(*) FROM documents", [], |r| r.get(0))?;
             let fetched_docs: i64 = conn.query_row(
                 "SELECT COUNT(*) FROM documents WHERE fetched_at IS NOT NULL",
-                [], |r| r.get(0),
+                [],
+                |r| r.get(0),
             )?;
             let queued: i64 =
                 conn.query_row("SELECT COUNT(*) FROM fetch_queue", [], |r| r.get(0))?;
             let captcha_blocked: i64 = conn.query_row(
                 "SELECT COUNT(*) FROM documents WHERE captcha_blocked = 1",
-                [], |r| r.get(0),
+                [],
+                |r| r.get(0),
             )?;
-            Ok(WorkerStatus { total_docs, fetched_docs, queued, captcha_blocked })
+            Ok(WorkerStatus {
+                total_docs,
+                fetched_docs,
+                queued,
+                captcha_blocked,
+            })
         })
         .await
     }

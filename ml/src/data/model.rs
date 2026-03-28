@@ -1,7 +1,6 @@
-use std::{fmt, str::FromStr};
 use serde::{Deserialize, Serialize};
+use std::{fmt, str::FromStr};
 
-/// Newtype for document identifiers to prevent mixing with arbitrary strings.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
 pub struct DocumentId(pub String);
 
@@ -43,7 +42,6 @@ pub enum DocumentStatus {
 }
 
 impl DocumentStatus {
-    /// Returns the canonical lowercase string used in the database and API.
     pub fn as_str(&self) -> &'static str {
         match self {
             Self::Active => "active",
@@ -59,7 +57,6 @@ impl fmt::Display for DocumentStatus {
     }
 }
 
-/// Parsing is infallible: unrecognised strings map to `Unknown`.
 impl FromStr for DocumentStatus {
     type Err = std::convert::Infallible;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -71,7 +68,6 @@ impl FromStr for DocumentStatus {
     }
 }
 
-/// Parsed document — used by both the graph builder and the analyzer.
 #[derive(Debug, Clone)]
 pub struct DocumentMeta {
     pub id: DocumentId,
@@ -79,24 +75,16 @@ pub struct DocumentMeta {
     pub url: String,
     pub status: DocumentStatus,
     pub references: Vec<DocumentId>,
-    /// Body text, truncated to `TEXT_LIMIT` chars to keep memory bounded.
     pub text: String,
 }
-
-// ── Analysis types ────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum IssueKind {
-    /// Two active documents with heavily overlapping content (BERT similarity).
     Duplication,
-    /// Two documents with similar topic but opposing normative prescriptions (BERT + keywords).
     Contradiction,
-    /// An active document references a document that has lost legal force.
     OutdatedReference,
-    /// A group of documents reference each other in a cycle.
     CircularReference,
-    /// Document is an amendment act ("О внесении изменений") modifying another document.
     Amendment,
 }
 
@@ -112,12 +100,9 @@ pub enum Severity {
 pub struct Issue {
     pub kind: IssueKind,
     pub severity: Severity,
-    /// IDs of the documents involved in this issue.
     pub document_ids: Vec<String>,
     pub explanation: String,
 }
-
-// ── Graph serialization types ─────────────────────────────────────────────────
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GraphNode {
@@ -127,9 +112,7 @@ pub struct GraphNode {
     pub status: DocumentStatus,
     pub ref_count: usize,
     pub issue_count: usize,
-    /// Number of articles ("Статья N") found in the document body.
     pub article_count: usize,
-    /// True if this document is an amendment act ("О внесении изменений…").
     pub is_amendment: bool,
 }
 
@@ -149,8 +132,6 @@ impl GraphNode {
 }
 
 fn count_articles(text: &str) -> usize {
-    // Count "статья " occurrences (case-insensitive). Use match_indices for
-    // safety — avoids manual byte-offset arithmetic on multi-byte Cyrillic chars.
     text.to_lowercase().match_indices("статья ").count()
 }
 

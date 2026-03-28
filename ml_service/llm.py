@@ -1,5 +1,3 @@
-"""LLMService — thread-safe wrapper around a small causal language model."""
-
 import threading
 
 from config import LLM_MODEL_NAME
@@ -12,15 +10,11 @@ _SYSTEM_PROMPT = (
 
 _NOT_READY_MSG = "Модель анализа загружается, повторите через минуту."
 
-# Qwen2-0.5B has a 2048-token context window.
-# Reserve MAX_NEW_TOKENS headroom for output; cap input to the rest.
 _MAX_CONTEXT = 2048
 _MAX_INPUT_TOKENS = 1500
 
 
 class LLMService:
-    """Loads a causal LM in a background thread and exposes thread-safe text generation."""
-
     def __init__(self) -> None:
         self._model = None
         self._tokenizer = None
@@ -42,7 +36,9 @@ class LLMService:
 
             print(f"[LLM] Loading {LLM_MODEL_NAME}…")
             tok = AutoTokenizer.from_pretrained(LLM_MODEL_NAME)
-            mdl = AutoModelForCausalLM.from_pretrained(LLM_MODEL_NAME, torch_dtype=torch.float32)
+            mdl = AutoModelForCausalLM.from_pretrained(
+                LLM_MODEL_NAME, torch_dtype=torch.float32
+            )
             mdl.eval()
             with self._lock:
                 self._tokenizer = tok
@@ -53,13 +49,8 @@ class LLMService:
             print(f"[LLM] Failed to load: {e}")
 
     def generate(self, prompt: str, max_new_tokens: int = 180) -> tuple[str, bool]:
-        """Generate a review text. Returns (text, model_ready).
-
-        Truncates the input to _MAX_INPUT_TOKENS to prevent context-window
         overflow (OOM / RuntimeError) on Qwen2-0.5B.  Any generation error is
-        caught; the model is marked unready so the next call re-reports the
-        loading message instead of hanging.
-        """
+
         with self._lock:
             if not self._ready:
                 return _NOT_READY_MSG, False
@@ -72,13 +63,16 @@ class LLMService:
             {"role": "system", "content": _SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ]
-        text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        text = tok.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
         inputs = tok([text], return_tensors="pt")
 
-        # Truncate if the prompt exceeds the safe input budget.
         input_len = inputs["input_ids"].shape[1]
         if input_len > _MAX_INPUT_TOKENS:
-            print(f"[LLM] Prompt too long ({input_len} tokens) — truncating to {_MAX_INPUT_TOKENS}.")
+            print(
+                f"[LLM] Prompt too long ({input_len} tokens) — truncating to {_MAX_INPUT_TOKENS}."
+            )
             inputs = {k: v[:, -_MAX_INPUT_TOKENS:] for k, v in inputs.items()}
 
         try:
@@ -90,7 +84,7 @@ class LLMService:
                     do_sample=True,
                     pad_token_id=tok.eos_token_id,
                 )
-            generated = out[0][inputs["input_ids"].shape[1]:]
+            generated = out[0][inputs["input_ids"].shape[1] :]
             return tok.decode(generated, skip_special_tokens=True).strip(), True
         except Exception as e:
             print(f"[LLM] Generation failed: {e}")
@@ -98,6 +92,5 @@ class LLMService:
                 self._ready = False
                 self._model = None
                 self._tokenizer = None
-            # Reload asynchronously so the next request may succeed.
             self.load_in_background()
             return _NOT_READY_MSG, False

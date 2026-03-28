@@ -1,33 +1,43 @@
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
-from sentence_transformers import SentenceTransformer
-
 from config import (
-    COMPARE_DUPLICATE_THRESHOLD, COMPARE_HIGHLY_RELATED_THRESHOLD, COMPARE_RELATED_THRESHOLD,
-    CONTRADICTION_HIGH, CONTRADICTION_LOW,
+    COMPARE_DUPLICATE_THRESHOLD,
+    COMPARE_HIGHLY_RELATED_THRESHOLD,
+    COMPARE_RELATED_THRESHOLD,
+    CONTRADICTION_HIGH,
+    CONTRADICTION_LOW,
     DUPLICATE_THRESHOLD,
-    EMBED_TEXT_LIMIT, OPPOSING_PAIRS, SEARCH_TEXT_LIMIT,
+    EMBED_TEXT_LIMIT,
+    OPPOSING_PAIRS,
+    SEARCH_TEXT_LIMIT,
 )
 from llm import LLMService
 from models import (
-    CompareResponse, DocumentInput, DocumentStatus,
-    DocMeta, Issue, IssueKind, ReviewRequest, SearchResult, Severity,
+    CompareResponse,
+    DocMeta,
+    DocumentInput,
+    DocumentStatus,
+    Issue,
+    IssueKind,
+    ReviewRequest,
+    SearchResult,
+    Severity,
 )
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class DocumentAnalyzer:
-    """Semantic analysis of legal documents using BERT embeddings and an LLM reviewer."""
-
-    def __init__(self, model: SentenceTransformer, device: str, llm: LLMService) -> None:
+    def __init__(
+        self, model: SentenceTransformer, device: str, llm: LLMService
+    ) -> None:
         self._model = model
         self._device = device
         self._llm = llm
 
-    # ── Public API ────────────────────────────────────────────────────────────
-
     def analyze(self, docs: list[DocumentInput]) -> list[Issue]:
-        """Find duplications and contradictions in the active document corpus."""
-        active = [d for d in docs if d.status == DocumentStatus.active and d.text.strip()]
+        active = [
+            d for d in docs if d.status == DocumentStatus.active and d.text.strip()
+        ]
         if len(active) < 2:
             return []
 
@@ -47,13 +57,21 @@ class DocumentAnalyzer:
 
         return issues
 
-    def search(self, query: str, docs: list[DocumentInput], top_k: int) -> list[SearchResult]:
-        """Semantic search: return top-k documents most relevant to the query."""
+    def search(
+        self, query: str, docs: list[DocumentInput], top_k: int
+    ) -> list[SearchResult]:
         if not docs:
             return []
         texts = [f"{d.title}. {d.text[:SEARCH_TEXT_LIMIT]}" for d in docs]
-        query_emb = self._model.encode([query], device=self._device, normalize_embeddings=True)
-        doc_embs = self._model.encode(texts, device=self._device, normalize_embeddings=True, show_progress_bar=False)
+        query_emb = self._model.encode(
+            [query], device=self._device, normalize_embeddings=True
+        )
+        doc_embs = self._model.encode(
+            texts,
+            device=self._device,
+            normalize_embeddings=True,
+            show_progress_bar=False,
+        )
         scores = (query_emb @ doc_embs.T).flatten()
         top_indices = scores.argsort()[::-1][:top_k]
         return [
@@ -63,40 +81,45 @@ class DocumentAnalyzer:
         ]
 
     def compare(self, doc_a: DocumentInput, doc_b: DocumentInput) -> CompareResponse:
-        """Compute BERT similarity and classify the relationship between two documents."""
         texts = [
             f"{doc_a.title}. {doc_a.text[:SEARCH_TEXT_LIMIT]}",
             f"{doc_b.title}. {doc_b.text[:SEARCH_TEXT_LIMIT]}",
         ]
         embs = self._model.encode(texts, device=self._device, normalize_embeddings=True)
         similarity = float(embs[0] @ embs[1])
-        return CompareResponse(similarity=similarity, assessment=_classify_similarity(similarity))
+        return CompareResponse(
+            similarity=similarity, assessment=_classify_similarity(similarity)
+        )
 
     def review_compare(self, req: ReviewRequest) -> tuple[str, bool]:
-        """Generate an LLM review for a pair comparison."""
         return self._llm.generate(_build_compare_prompt(req))
 
     def review_corpus(
-        self, total: int, active: int, outdated: int, with_issues: int,
-        issue_types: dict, most_problematic: list[str],
+        self,
+        total: int,
+        active: int,
+        outdated: int,
+        with_issues: int,
+        issue_types: dict,
+        most_problematic: list[str],
     ) -> tuple[str, bool]:
-        """Generate an LLM review for the whole corpus."""
         return self._llm.generate(
-            _build_corpus_prompt(total, active, outdated, with_issues, issue_types, most_problematic),
+            _build_corpus_prompt(
+                total, active, outdated, with_issues, issue_types, most_problematic
+            ),
             max_new_tokens=220,
         )
-
-    # ── Private helpers ───────────────────────────────────────────────────────
 
     def _embed(self, docs: list[DocumentInput]) -> np.ndarray:
         texts = [f"{d.title}. {d.text[:EMBED_TEXT_LIMIT]}" for d in docs]
         return self._model.encode(
-            texts, device=self._device, batch_size=32,
-            normalize_embeddings=True, show_progress_bar=False,
+            texts,
+            device=self._device,
+            batch_size=32,
+            normalize_embeddings=True,
+            show_progress_bar=False,
         )
 
-
-# ── Pure functions ────────────────────────────────────────────────────────────
 
 def _classify_similarity(similarity: float) -> str:
     if similarity >= COMPARE_DUPLICATE_THRESHOLD:
@@ -155,10 +178,16 @@ def _build_compare_prompt(req: ReviewRequest) -> str:
 
 
 def _build_corpus_prompt(
-    total: int, active: int, outdated: int, with_issues: int,
-    issue_types: dict, most_problematic: list[str],
+    total: int,
+    active: int,
+    outdated: int,
+    with_issues: int,
+    issue_types: dict,
+    most_problematic: list[str],
 ) -> str:
-    issue_lines = ", ".join(f"{k}: {v}" for k, v in issue_types.items()) or "не обнаружено"
+    issue_lines = (
+        ", ".join(f"{k}: {v}" for k, v in issue_types.items()) or "не обнаружено"
+    )
     prob_titles = "; ".join(most_problematic[:3]) or "нет данных"
     return (
         f"Общий анализ корпуса НПА Республики Казахстан:\n"
@@ -174,7 +203,11 @@ def _build_corpus_prompt(
 
 def _duplication_issue(a: DocumentInput, b: DocumentInput, score: float) -> Issue:
     pct = round(score * 100)
-    severity = Severity.high if score >= 0.93 else (Severity.medium if score >= 0.87 else Severity.low)
+    severity = (
+        Severity.high
+        if score >= 0.93
+        else (Severity.medium if score >= 0.87 else Severity.low)
+    )
     return Issue(
         kind=IssueKind.duplication,
         severity=severity,

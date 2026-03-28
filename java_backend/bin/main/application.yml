@@ -5,10 +5,6 @@ spring:
   jackson:
     property-naming-strategy: SNAKE_CASE
     default-property-inclusion: non_null
-  cache:
-    type: caffeine
-    caffeine:
-      spec: maximumSize=10,expireAfterWrite=5m
 
 services:
   rust:
