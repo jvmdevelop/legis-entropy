@@ -102,7 +102,7 @@ export function ComparePanel({ nodeA, nodeB, onClose }: Props) {
       }}
     >
       {/* Top accent line */}
-      <div className="h-0.5 bg-gray-900 rounded-t-2xl shrink-0" />
+      <div className="h-0.5 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-t-2xl shrink-0" />
 
       {/* Header */}
       <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 shrink-0">

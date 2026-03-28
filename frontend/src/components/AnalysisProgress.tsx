@@ -12,7 +12,7 @@ export function AnalysisProgress({ state, onStop }: Props) {
     <div className="absolute inset-x-0 top-14 z-30 flex justify-center px-8 pointer-events-none">
       <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-white border border-gray-200 shadow-lg overflow-hidden">
         {/* Top line */}
-        <div className={`h-0.5 ${state.error ? 'bg-red-400' : 'bg-gray-900'}`} />
+        <div className={`h-0.5 ${state.error ? 'bg-red-400' : 'bg-gradient-to-r from-indigo-500 to-violet-500'}`} />
 
         <div className="p-8">
           <div className="flex items-center justify-between mb-6">
@@ -24,8 +24,8 @@ export function AnalysisProgress({ state, onStop }: Props) {
                   </svg>
                 </div>
               ) : (
-                <div className="w-6 h-6 rounded-lg bg-gray-100 flex items-center justify-center">
-                  <div className="w-3 h-3 border-2 border-gray-700 border-t-transparent rounded-full animate-spin" />
+                <div className="w-6 h-6 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center">
+                  <div className="w-3 h-3 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
                 </div>
               )}
               <span className="text-xs font-semibold text-gray-800">
@@ -50,7 +50,7 @@ export function AnalysisProgress({ state, onStop }: Props) {
               <div className="space-y-3">
                 <div className="w-full h-1 bg-gray-100 rounded-full overflow-hidden">
                   <div
-                    className="h-full rounded-full bg-gray-900 transition-all duration-500"
+                    className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-500"
                     style={{ width: `${state.progress}%` }}
                   />
                 </div>

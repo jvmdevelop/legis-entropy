@@ -81,7 +81,7 @@ function IssueCard({ issue }: { issue: Issue; index: number }) {
           {SEVERITY_LABEL[issue.severity]}
         </span>
       </div>
-      <p className="text-[10px] text-gray-500 leading-relaxed">{text}</p>
+      <p className="text-[11px] text-gray-500 leading-relaxed">{text}</p>
       {long && (
         <button
           onClick={() => setExpanded(e => !e)}
@@ -108,7 +108,10 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
 
       {/* Header */}
       <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between shrink-0">
-        <span className="text-xs font-semibold text-gray-900">Инспектор</span>
+        <div className="flex items-center gap-2.5">
+          <div className="w-1 h-4 rounded-full bg-gradient-to-b from-indigo-500 to-violet-500" />
+          <span className="text-xs font-bold text-gray-900 tracking-tight">Инспектор</span>
+        </div>
         {stats && (
           <span className="text-[10px] text-gray-400 tabular-nums">
             {stats.total_documents} НПА
@@ -177,7 +180,7 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
             {/* Issues */}
             {nodeIssues.length > 0 && (
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2 border-l-2 border-gray-200">
                   Почему помечен ({nodeIssues.length})
                 </p>
                 {nodeIssues.map((issue, i) => (
@@ -228,7 +231,7 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
 
             {issues.length > 0 ? (
               <div className="space-y-2">
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2 border-l-2 border-gray-200">
                   Обнаруженные проблемы ({issues.length})
                 </p>
                 {issues.map((issue, i) => (
@@ -247,18 +250,19 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
         {/* Corpus stats */}
         {stats && (
           <div className="px-8 pb-8 space-y-3 border-t border-gray-100 pt-8">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Состояние корпуса</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-2 border-l-2 border-gray-200">Состояние корпуса</p>
 
             <div className="grid grid-cols-2 gap-2">
               {[
-                { label: 'Действующих', value: stats.active_count, colorClass: 'text-emerald-600' },
-                { label: 'Утративших', value: stats.outdated_count, colorClass: 'text-red-500' },
-                { label: 'С проблемами', value: stats.with_issues, colorClass: 'text-orange-500' },
-                { label: 'Ср. ссылок', value: stats.avg_ref_count.toFixed(1), colorClass: 'text-gray-700' },
-              ].map(({ label, value, colorClass }) => (
-                <div key={label} className="rounded-lg border border-gray-100 bg-gray-50/50 p-5">
+                { label: 'Действующих', value: stats.active_count, colorClass: 'text-emerald-600', accentColor: '#34d399' },
+                { label: 'Утративших', value: stats.outdated_count, colorClass: 'text-red-500', accentColor: '#f87171' },
+                { label: 'С проблемами', value: stats.with_issues, colorClass: 'text-orange-500', accentColor: '#fb923c' },
+                { label: 'Ср. ссылок', value: stats.avg_ref_count.toFixed(1), colorClass: 'text-gray-700', accentColor: '#a5b4fc' },
+              ].map(({ label, value, colorClass, accentColor }) => (
+                <div key={label} className="rounded-lg border border-gray-100 bg-gray-50/50 p-4 overflow-hidden relative">
+                  <div className="absolute top-0 left-0 right-0 h-0.5" style={{ background: accentColor }} />
                   <div className={`text-lg font-bold font-mono leading-none ${colorClass}`}>{value}</div>
-                  <div className="text-[9px] text-gray-400 mt-1">{label}</div>
+                  <div className="text-[10px] text-gray-400 mt-1">{label}</div>
                 </div>
               ))}
             </div>

@@ -97,7 +97,7 @@ export default function App() {
           <div className="text-center space-y-4">
             <Logo size={32} className="mx-auto" />
             <div className="space-y-2">
-              <div className="w-5 h-5 border-2 border-gray-900 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-xs text-gray-400">Загрузка графа НПА…</p>
             </div>
           </div>
@@ -133,8 +133,8 @@ export default function App() {
         <div className="flex items-center h-10 rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden divide-x divide-gray-100">
           {/* Brand */}
           <div className="flex items-center gap-2 px-4 h-full">
-            <Logo size={15} />
-            <span className="text-[11px] font-bold text-gray-800 tracking-tight">Граф НПА</span>
+            <Logo size={17} />
+            <span className="text-[11px] font-bold text-gray-900 tracking-tight">Граф НПА</span>
           </div>
 
           {/* Анализ */}
@@ -213,7 +213,7 @@ export default function App() {
 
       {/* ── Legend — bottom center ── */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-        <div className="flex items-center gap-4 px-5 py-2.5 rounded-xl bg-white/95 backdrop-blur-sm border border-gray-200 shadow-sm pointer-events-auto">
+        <div className="flex items-center gap-4 px-5 py-2.5 rounded-xl bg-white/90 backdrop-blur-md border border-gray-200 shadow-md pointer-events-auto">
           {LEGEND_ITEMS.map(({ color, label }) => (
             <div key={label} className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />

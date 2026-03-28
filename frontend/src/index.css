@@ -12,6 +12,7 @@ body {
   font-family: 'Inter', system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04', 'cv09', 'ss01';
 }
 
 #root {
