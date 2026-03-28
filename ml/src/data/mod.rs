@@ -5,3 +5,4 @@ pub mod graph;
 pub mod ml_client;
 pub mod model;
 pub mod parser;
+pub mod tfidf;

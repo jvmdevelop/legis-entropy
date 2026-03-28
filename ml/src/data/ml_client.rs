@@ -1,6 +1,11 @@
+//! Async client for the Python ML service (`/analyze` endpoint).
+//!
+//! Returns an empty vec on any error so the server degrades gracefully when
+//! the ML service is unavailable or still warming up.
+
 use serde::{Deserialize, Serialize};
 
-use super::model::{DocumentMeta, DocumentStatus, Issue, IssueKind, Severity};
+use super::model::{DocumentMeta, Issue, IssueKind, Severity};
 
 // ── Wire types (mirror ml_service/models.py) ──────────────────────────────────
 
@@ -9,6 +14,7 @@ struct MlDocument<'a> {
     id: &'a str,
     title: &'a str,
     text: &'a str,
+    /// Serialised via `DocumentStatus::as_str()` — always a static string.
     status: &'static str,
 }
 
@@ -47,7 +53,8 @@ impl MlClient {
         }
     }
 
-    /// Sends documents to the ML service and returns semantic issues.
+    /// Send documents to the ML service and return semantic issues.
+    ///
     /// Returns an empty vec (with a warning) if the service is unavailable.
     pub async fn analyze(&self, docs: &[DocumentMeta]) -> Vec<Issue> {
         let payload = MlRequest {
@@ -58,7 +65,7 @@ impl MlClient {
                     id: d.id.as_str(),
                     title: &d.title,
                     text: &d.text,
-                    status: status_str(&d.status),
+                    status: d.status.as_str(),
                 })
                 .collect(),
         };
@@ -77,23 +84,15 @@ impl MlClient {
                     tracing::warn!("ML service returned invalid JSON: {e}");
                     vec![]
                 }
-                Ok(r) => r.issues.into_iter().filter_map(from_wire).collect(),
+                Ok(r) => r.issues.into_iter().filter_map(issue_from_wire).collect(),
             },
         }
     }
 }
 
-// ── Conversion helpers ────────────────────────────────────────────────────────
+// ── Wire → domain conversion ──────────────────────────────────────────────────
 
-fn status_str(s: &DocumentStatus) -> &'static str {
-    match s {
-        DocumentStatus::Active => "active",
-        DocumentStatus::Outdated => "outdated",
-        DocumentStatus::Unknown => "unknown",
-    }
-}
-
-fn from_wire(w: MlIssue) -> Option<Issue> {
+fn issue_from_wire(w: MlIssue) -> Option<Issue> {
     let kind = match w.kind.as_str() {
         "duplication" => IssueKind::Duplication,
         "contradiction" => IssueKind::Contradiction,

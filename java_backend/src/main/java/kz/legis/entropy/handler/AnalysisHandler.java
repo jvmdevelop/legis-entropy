@@ -8,6 +8,8 @@ import kz.legis.entropy.service.AnalysisStreamService;
 import kz.legis.entropy.service.MlClient;
 import kz.legis.entropy.service.RustClient;
 import kz.legis.entropy.service.StatsService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class AnalysisHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(AnalysisHandler.class);
 
     private final AnalysisStreamService streamService;
     private final RustClient rustClient;
@@ -86,10 +90,10 @@ public class AnalysisHandler {
 
                         long sharedIssueCount = sharedIssueExplanations.size();
 
-                        // Run BERT compare + LLM review in parallel
+                        // Run BERT compare then LLM review sequentially
                         return mlClient.compare(a, b)
                             .flatMap(mlResult -> {
-                                String assessment = CompareResult.assessmentFromScore(mlResult.similarity());
+                                String assessment = mlResult.assessment();
                                 String explanation = buildExplanation(a.title(), b.title(), mlResult.similarity(), sharedIssueCount);
 
                                 return mlClient.review(a, b, mlResult.similarity(), assessment, sharedIssueExplanations)

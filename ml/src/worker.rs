@@ -20,43 +20,52 @@ use crate::{
 /// Maximum simultaneous HTTP fetches.
 const MAX_CONCURRENT: usize = 2;
 
-/// Random delay range between requests (milliseconds).
+/// Random jitter between requests to avoid hammering the server.
 const DELAY_MIN_MS: u64 = 1_500;
 const DELAY_MAX_MS: u64 = 3_500;
 
-/// How long to back off after a CAPTCHA (seconds the doc is delayed in queue).
-const CAPTCHA_RETRY_DELAY_SECS: i64 = 60; // 1 minute
+/// How long the CAPTCHA'd document is delayed in the queue before retry.
+const CAPTCHA_RETRY_DELAY_SECS: i64 = 60;
 
-/// Extra sleep for the worker thread itself after detecting CAPTCHA,
-/// so we don't hammer the next queued document immediately.
-const CAPTCHA_WORKER_PAUSE_SECS: u64 = 5;
+/// After detecting a CAPTCHA, the spawned task sleeps to occupy a semaphore
+/// slot and naturally throttle the overall fetch rate.
+const CAPTCHA_SLOT_HOLD_SECS: u64 = 5;
 
 /// Maximum BFS depth to follow from seeds.
 const MAX_DEPTH: usize = 3;
 
-/// How many days before a successfully fetched doc is considered stale.
+/// Documents successfully fetched within this many days are considered fresh.
 const STALE_DAYS: i64 = 7;
 
-/// Sleep duration when the queue is empty.
+/// Sleep when the queue is empty.
 const IDLE_SLEEP_SECS: u64 = 30;
+
+/// Sleep after a dequeue error before retrying.
+const DEQUEUE_ERROR_SLEEP_SECS: u64 = 5;
+
+// ── FetchContext ──────────────────────────────────────────────────────────────
+
+/// Groups the HTTP fetcher and HTML parser so they can be shared as one unit.
+struct FetchContext {
+    fetcher: AdiletFetcher,
+    parser: DocumentParser,
+}
 
 // ── Entry point ───────────────────────────────────────────────────────────────
 
 pub async fn run(db: Arc<Database>) {
-    let fetcher = match AdiletFetcher::new() {
-        Ok(f) => Arc::new(f),
+    let ctx = match AdiletFetcher::new() {
+        Ok(fetcher) => Arc::new(FetchContext { fetcher, parser: DocumentParser }),
         Err(e) => {
             error!("Cannot create fetcher: {e}");
             return;
         }
     };
-    let parser = Arc::new(DocumentParser);
-    let sem = Arc::new(Semaphore::new(MAX_CONCURRENT));
 
+    let sem = Arc::new(Semaphore::new(MAX_CONCURRENT));
     info!("Worker started (max_depth={MAX_DEPTH}, max_concurrent={MAX_CONCURRENT})");
 
     loop {
-        // ── Dequeue next ready item ───────────────────────────────────────────
         let item = match db.dequeue().await {
             Ok(Some(i)) => i,
             Ok(None) => {
@@ -65,58 +74,44 @@ pub async fn run(db: Arc<Database>) {
             }
             Err(e) => {
                 error!("Dequeue failed: {e}");
-                tokio::time::sleep(Duration::from_secs(5)).await;
+                tokio::time::sleep(Duration::from_secs(DEQUEUE_ERROR_SLEEP_SECS)).await;
                 continue;
             }
         };
 
-        // ── Skip if still fresh ───────────────────────────────────────────────
         match db.is_fresh(&item.id, STALE_DAYS).await {
             Ok(true) => {
                 info!("Skip (fresh): {}", item.id);
                 continue;
             }
-            Err(e) => {
-                warn!("is_fresh check failed for {}: {e}", item.id);
-            }
+            Err(e) => warn!("is_fresh check failed for {}: {e}", item.id),
             _ => {}
         }
 
-        // ── Rate limiting: random jitter delay ────────────────────────────────
+        // Random jitter before acquiring a permit so bursts are spread out.
         let delay = rand::thread_rng().gen_range(DELAY_MIN_MS..DELAY_MAX_MS);
         tokio::time::sleep(Duration::from_millis(delay)).await;
 
-        // ── Acquire concurrency permit ────────────────────────────────────────
         let permit = sem.clone().acquire_owned().await.unwrap();
-
         let db2 = db.clone();
-        let fetcher2 = fetcher.clone();
-        let parser2 = parser.clone();
+        let ctx2 = ctx.clone();
         let id = item.id.clone();
         let depth = item.depth;
 
         tokio::spawn(async move {
             let _permit = permit; // released when this task completes
-
-            process_one(&db2, &fetcher2, &parser2, &id, depth).await;
+            process_one(&db2, &ctx2, &id, depth).await;
         });
     }
 }
 
-// ── Per-document logic ────────────────────────────────────────────────────────
+// ── Per-document fetch logic ──────────────────────────────────────────────────
 
-async fn process_one(
-    db: &Database,
-    fetcher: &AdiletFetcher,
-    parser: &DocumentParser,
-    id: &str,
-    depth: usize,
-) {
+async fn process_one(db: &Database, ctx: &FetchContext, id: &str, depth: usize) {
     let url = format!("https://adilet.zan.kz/rus/docs/{id}");
     info!("Fetching {id} (depth={depth})");
 
-    // ── HTTP fetch ────────────────────────────────────────────────────────────
-    let html = match fetcher.fetch_html(&url).await {
+    let html = match ctx.fetcher.fetch_html(&url).await {
         Ok(h) => h,
         Err(e) => {
             warn!("Fetch error {id}: {e}");
@@ -127,52 +122,32 @@ async fn process_one(
         }
     };
 
-    // ── CAPTCHA detection ─────────────────────────────────────────────────────
-    if parser.is_captcha(&html) {
-        warn!(
-            "CAPTCHA for {id} — scheduling retry in {}s",
-            CAPTCHA_RETRY_DELAY_SECS
-        );
+    if ctx.parser.is_captcha(&html) {
+        warn!("CAPTCHA for {id} — scheduling retry in {CAPTCHA_RETRY_DELAY_SECS}s");
         if let Err(e) = db.mark_captcha(id, CAPTCHA_RETRY_DELAY_SECS).await {
             error!("mark_captcha {id}: {e}");
         }
-        // Let the worker loop sleep a bit before processing the next item
-        tokio::time::sleep(Duration::from_secs(CAPTCHA_WORKER_PAUSE_SECS)).await;
+        // Hold the semaphore slot to throttle the overall fetch rate.
+        tokio::time::sleep(Duration::from_secs(CAPTCHA_SLOT_HOLD_SECS)).await;
         return;
     }
 
-    // ── Parse ─────────────────────────────────────────────────────────────────
-    let doc = parser.parse(
-        &html,
-        crate::data::model::DocumentId::new(id),
-        url,
-    );
-
+    let doc = ctx.parser.parse(&html, crate::data::model::DocumentId::new(id), url);
     let title_preview: String = doc.title.chars().take(50).collect();
-    info!(
-        "Parsed {id}: '{title_preview}', {} refs, status={:?}",
-        doc.references.len(),
-        doc.status
-    );
+    info!("Parsed {id}: '{title_preview}', {} refs, status={:?}", doc.references.len(), doc.status);
 
-    // ── Persist ───────────────────────────────────────────────────────────────
     let refs = doc.references.clone();
     if let Err(e) = db.save_document(&doc).await {
         error!("save_document {id}: {e}");
         return;
     }
 
-    // ── Enqueue discovered references ─────────────────────────────────────────
     if depth < MAX_DEPTH {
         for ref_id in &refs {
             if let Err(e) = db.enqueue(ref_id.as_str(), depth + 1).await {
                 warn!("enqueue {} -> {}: {e}", id, ref_id.as_str());
             }
         }
-        info!(
-            "Enqueued {} refs from {id} at depth {}",
-            refs.len(),
-            depth + 1
-        );
+        info!("Enqueued {} refs from {id} at depth {}", refs.len(), depth + 1);
     }
 }

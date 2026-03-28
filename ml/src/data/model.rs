@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{fmt, str::FromStr};
 use serde::{Deserialize, Serialize};
 
 /// Newtype for document identifiers to prevent mixing with arbitrary strings.
@@ -33,12 +33,42 @@ impl From<String> for DocumentId {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum DocumentStatus {
     Active,
     Outdated,
+    #[default]
     Unknown,
+}
+
+impl DocumentStatus {
+    /// Returns the canonical lowercase string used in the database and API.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Active => "active",
+            Self::Outdated => "outdated",
+            Self::Unknown => "unknown",
+        }
+    }
+}
+
+impl fmt::Display for DocumentStatus {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.as_str())
+    }
+}
+
+/// Parsing is infallible: unrecognised strings map to `Unknown`.
+impl FromStr for DocumentStatus {
+    type Err = std::convert::Infallible;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(match s {
+            "active" => Self::Active,
+            "outdated" => Self::Outdated,
+            _ => Self::Unknown,
+        })
+    }
 }
 
 /// Parsed document — used by both the graph builder and the analyzer.
@@ -51,19 +81,6 @@ pub struct DocumentMeta {
     pub references: Vec<DocumentId>,
     /// Body text, truncated to `TEXT_LIMIT` chars to keep memory bounded.
     pub text: String,
-}
-
-impl DocumentMeta {
-    pub fn placeholder(id: DocumentId, url: String) -> Self {
-        Self {
-            id,
-            url,
-            title: "Недоступен".to_owned(),
-            status: DocumentStatus::Unknown,
-            references: vec![],
-            text: String::new(),
-        }
-    }
 }
 
 // ── Analysis types ────────────────────────────────────────────────────────────

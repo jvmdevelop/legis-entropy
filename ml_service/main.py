@@ -5,33 +5,35 @@ import torch
 from fastapi import FastAPI
 from sentence_transformers import SentenceTransformer
 
-from analyzer import DocumentAnalyzer, start_llm_load
+from analyzer import DocumentAnalyzer
+from config import BERT_MODEL_NAME
+from llm import LLMService
 from models import (
     AnalyzeRequest, AnalyzeResponse,
+    CompareRequest, CompareResponse,
     CorpusReviewRequest, CorpusReviewResponse,
     ReviewRequest, ReviewResponse,
     SearchRequest, SearchResponse,
-    CompareRequest, CompareResponse,
 )
 
-MODEL_NAME = "cointegrated/rubert-tiny2"
-
 _analyzer: DocumentAnalyzer | None = None
+_llm: LLMService | None = None
 _device: str = "cpu"
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _analyzer, _device
+    global _analyzer, _llm, _device
 
     _device = "cuda" if torch.cuda.is_available() else "cpu"
-    print(f"Loading {MODEL_NAME} on {_device}...")
+    print(f"Loading {BERT_MODEL_NAME} on {_device}…")
 
-    model = SentenceTransformer(MODEL_NAME, device=_device)
-    _analyzer = DocumentAnalyzer(model, _device)
+    bert = SentenceTransformer(BERT_MODEL_NAME, device=_device)
+    _llm = LLMService()
+    _analyzer = DocumentAnalyzer(bert, _device, _llm)
 
-    print(f"BERT model ready on {_device}. Starting LLM load in background…")
-    start_llm_load()
+    print("BERT model ready. Starting LLM load in background…")
+    _llm.load_in_background()
 
     yield
 
@@ -49,7 +51,7 @@ async def analyze(request: AnalyzeRequest) -> AnalyzeResponse:
     t0 = time.monotonic()
     issues = _get_analyzer().analyze(request.documents)
     print(f"analyze: {len(request.documents)} docs → {len(issues)} issues ({round((time.monotonic()-t0)*1000)}ms)")
-    return AnalyzeResponse(issues=issues, model_name=MODEL_NAME, device=_device)
+    return AnalyzeResponse(issues=issues, model_name=BERT_MODEL_NAME, device=_device)
 
 
 @app.post("/search", response_model=SearchResponse)
@@ -93,5 +95,9 @@ async def corpus_review(request: CorpusReviewRequest) -> CorpusReviewResponse:
 
 @app.get("/health")
 async def health():
-    from analyzer import _llm_ready
-    return {"status": "ok", "device": _device, "model": MODEL_NAME, "llm_ready": _llm_ready}
+    return {
+        "status": "ok",
+        "device": _device,
+        "model": BERT_MODEL_NAME,
+        "llm_ready": _llm.ready if _llm else False,
+    }
