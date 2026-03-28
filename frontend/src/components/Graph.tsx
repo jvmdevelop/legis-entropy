@@ -1,4 +1,4 @@
-import { useRef, useCallback, useEffect, memo, useMemo } from 'react';
+import { useRef, useCallback, useEffect, memo, useMemo, useState } from 'react';
 import ForceGraph2D from 'react-force-graph-2d';
 import type { GraphData, GraphNode } from '../types';
 
@@ -55,6 +55,19 @@ function gridLayout(nodes: GraphNode[]): GraphNode[] {
 
 export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }: GraphProps) {
   const graphRef = useRef<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dims, setDims] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(entries => {
+      const { width, height } = entries[0].contentRect;
+      setDims({ width, height });
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const highlightSet = useMemo(
     () => (highlightIds?.length ? new Set(highlightIds) : null),
@@ -209,22 +222,28 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
   }, []);
 
   return (
-    <ForceGraph2D
-      ref={graphRef}
-      graphData={fullGraph as any}
-      nodeId="id"
-      nodeLabel={nodeLabel as any}
-      nodeCanvasObject={paintNode as any}
-      nodeCanvasObjectMode={() => 'replace'}
-      linkColor={() => 'rgba(120,120,160,0.35)'}
-      linkWidth={nodeCount > 1000 ? 0.5 : 1}
-      linkVisibility={linkVisibility as any}
-      linkDirectionalArrowLength={nodeCount > 500 ? 0 : 4}
-      linkDirectionalArrowRelPos={1}
-      linkDirectionalArrowColor={() => 'rgba(107,114,128,0.5)'}
-      onNodeClick={(node: any, event: any) => onNodeClick(node as GraphNode, event)}
-      backgroundColor="#1e1e1e"
-      cooldownTicks={0}
-    />
+    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
+      {dims.width > 0 && dims.height > 0 && (
+        <ForceGraph2D
+          ref={graphRef}
+          width={dims.width}
+          height={dims.height}
+          graphData={fullGraph as any}
+          nodeId="id"
+          nodeLabel={nodeLabel as any}
+          nodeCanvasObject={paintNode as any}
+          nodeCanvasObjectMode={() => 'replace'}
+          linkColor={() => 'rgba(120,120,160,0.35)'}
+          linkWidth={nodeCount > 1000 ? 0.5 : 1}
+          linkVisibility={linkVisibility as any}
+          linkDirectionalArrowLength={nodeCount > 500 ? 0 : 4}
+          linkDirectionalArrowRelPos={1}
+          linkDirectionalArrowColor={() => 'rgba(107,114,128,0.5)'}
+          onNodeClick={(node: any, event: any) => onNodeClick(node as GraphNode, event)}
+          backgroundColor="#1e1e1e"
+          cooldownTicks={0}
+        />
+      )}
+    </div>
   );
 });
