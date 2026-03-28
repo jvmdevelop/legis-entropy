@@ -14,6 +14,7 @@ public class WebClientConfig {
 
     /**
      * Rust service only does SQLite reads — 30 s is more than enough.
+     * Buffer sized to 32 MB: graph JSON grows as the corpus expands.
      */
     @Bean("rustWebClient")
     public WebClient rustWebClient(@Value("${services.rust.base-url}") String baseUrl) {
@@ -22,7 +23,7 @@ public class WebClientConfig {
                 .clientConnector(new ReactorClientHttpConnector(
                         HttpClient.create().responseTimeout(Duration.ofSeconds(30))
                 ))
-                .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024))
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(32 * 1024 * 1024))
                 .build();
     }
 

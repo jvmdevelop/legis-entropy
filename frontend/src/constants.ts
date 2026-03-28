@@ -7,15 +7,15 @@ export const STATUS_LABEL: Record<string, string> = {
 };
 
 export const STATUS_DOT: Record<string, string> = {
-  active: 'bg-gray-800',
-  outdated: 'bg-gray-600',
-  unknown: 'bg-gray-400',
+  active: 'bg-status-active',
+  outdated: 'bg-status-inactive',
+  unknown: 'bg-status-unknown',
 };
 
 export const STATUS_STYLE: Record<string, string> = {
-  active: 'text-gray-800 bg-gray-100 border-gray-300',
-  outdated: 'text-gray-700 bg-gray-100 border-gray-300',
-  unknown: 'text-gray-500 bg-gray-100 border-gray-200',
+  active: 'bg-status-active/20 text-status-active border-status-active/30',
+  outdated: 'bg-status-inactive/20 text-status-inactive border-status-inactive/30',
+  unknown: 'bg-status-unknown/20 text-status-unknown border-status-unknown/30',
 };
 
 // ── Issue kind ────────────────────────────────────────────────────────────────
@@ -45,9 +45,9 @@ export const SEVERITY_LABEL: Record<string, string> = {
 };
 
 export const SEVERITY_STYLE: Record<string, string> = {
-  high: 'text-gray-800 bg-gray-100 border-gray-300',
-  medium: 'text-gray-700 bg-gray-100 border-gray-300',
-  low: 'text-gray-600 bg-gray-100 border-gray-200',
+  high: 'bg-destructive/20 text-destructive border-destructive/30',
+  medium: 'bg-status-amendment/20 text-status-amendment border-status-amendment/30',
+  low: 'bg-secondary text-muted-foreground border-border',
 };
 
 // ── Compare assessment ────────────────────────────────────────────────────────
@@ -60,15 +60,15 @@ export const ASSESSMENT_LABEL: Record<string, string> = {
 };
 
 export const ASSESSMENT_STYLE: Record<string, string> = {
-  duplicate: 'text-gray-800 bg-gray-100 border-gray-300',
-  highly_related: 'text-gray-700 bg-gray-100 border-gray-300',
-  related: 'text-gray-600 bg-gray-100 border-gray-200',
-  independent: 'text-gray-500 bg-gray-100 border-gray-200',
+  duplicate: 'bg-destructive/20 text-destructive border-destructive/30',
+  highly_related: 'bg-status-amendment/20 text-status-amendment border-status-amendment/30',
+  related: 'bg-primary/20 text-primary border-primary/30',
+  independent: 'bg-secondary text-muted-foreground border-border',
 };
 
 export function similarityColor(score: number): string {
-  if (score >= 0.8) return '#000000';
-  if (score >= 0.6) return '#333333';
-  if (score >= 0.4) return '#666666';
-  return '#999999';
+  if (score >= 0.8) return 'var(--destructive)';
+  if (score >= 0.6) return 'var(--status-amendment)';
+  if (score >= 0.4) return 'var(--primary)';
+  return 'var(--muted-foreground)';
 }

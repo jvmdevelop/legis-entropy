@@ -10,15 +10,17 @@ interface GraphProps {
   highlightIds?: string[];
 }
 
+// Hex approximations of the OKLCH status colors from the design system
 const STATUS_COLOR: Record<string, string> = {
-  active: '#000000',
-  outdated: '#666666',
-  unknown: '#999999',
+  active: '#3cb371',   // oklch(0.7 0.18 145) — green
+  outdated: '#c4622a', // oklch(0.6 0.18 25)  — orange-red
+  unknown: '#8b6fd0',  // oklch(0.6 0.15 280) — purple
 };
+// Dimmed variants for dark background
 const STATUS_DIM: Record<string, string> = {
-  active: '#e5e5e5',
-  outdated: '#d4d4d4',
-  unknown: '#f5f5f5',
+  active: '#0d2016',
+  outdated: '#1f0e06',
+  unknown: '#120d1f',
 };
 
 /**
@@ -160,13 +162,14 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
 
       ctx.beginPath();
       ctx.arc(x, y, r, 0, 2 * Math.PI);
+      const AMENDMENT_COLOR = '#c8a845'; // oklch(0.75 0.15 50) — amber
       ctx.fillStyle = isHit
         ? '#f97316'
         : node.is_amendment && !isDimmed
-          ? '#333333'
+          ? AMENDMENT_COLOR
           : isDimmed
-            ? STATUS_DIM[node.status] ?? '#f5f5f5'
-            : STATUS_COLOR[node.status] ?? '#999999';
+            ? STATUS_DIM[node.status] ?? '#1a1a1a'
+            : STATUS_COLOR[node.status] ?? '#8b6fd0';
       ctx.fill();
 
       if (globalScale > 0.3) {
@@ -174,16 +177,16 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
           ctx.save();
           ctx.setLineDash([3 / globalScale, 2 / globalScale]);
           ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 2 * Math.PI);
-          ctx.strokeStyle = 'rgba(51,51,51,0.5)';
+          ctx.strokeStyle = 'rgba(200,168,69,0.5)';
           ctx.lineWidth = 1.5 / globalScale; ctx.stroke();
           ctx.restore();
         }
         if (node.issue_count > 0 && !isDimmed && !node.is_amendment) {
-          ctx.strokeStyle = '#666666';
+          ctx.strokeStyle = 'rgba(192,98,42,0.8)';
           ctx.lineWidth = 1.5 / globalScale; ctx.stroke();
         }
         if (isSelected || isCompare) {
-          ctx.strokeStyle = isCompare ? '#666666' : '#000000';
+          ctx.strokeStyle = isCompare ? '#8b6fd0' : '#ffffff';
           ctx.lineWidth = 2.5 / globalScale; ctx.stroke();
         }
       }
@@ -192,7 +195,7 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
         const label = node.title.length > 28 ? node.title.slice(0, 28) + '…' : node.title;
         const fontSize = Math.max(10, 12 / globalScale);
         ctx.font = `${fontSize}px Inter, system-ui, sans-serif`;
-        ctx.fillStyle = isDimmed ? 'rgba(156,163,175,0.5)' : 'rgba(17,24,39,0.85)';
+        ctx.fillStyle = isDimmed ? 'rgba(100,100,120,0.5)' : 'rgba(240,240,255,0.9)';
         ctx.textAlign = 'center';
         ctx.fillText(label, x, y + r + fontSize * 0.9);
       }
@@ -213,14 +216,14 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
       nodeLabel={nodeLabel as any}
       nodeCanvasObject={paintNode as any}
       nodeCanvasObjectMode={() => 'replace'}
-      linkColor={() => 'rgba(107,114,128,0.4)'}
+      linkColor={() => 'rgba(120,120,160,0.35)'}
       linkWidth={nodeCount > 1000 ? 0.5 : 1}
       linkVisibility={linkVisibility as any}
       linkDirectionalArrowLength={nodeCount > 500 ? 0 : 4}
       linkDirectionalArrowRelPos={1}
       linkDirectionalArrowColor={() => 'rgba(107,114,128,0.5)'}
       onNodeClick={(node: any, event: any) => onNodeClick(node as GraphNode, event)}
-      backgroundColor="#f9fafb"
+      backgroundColor="#1e1e1e"
       cooldownTicks={0}
     />
   );

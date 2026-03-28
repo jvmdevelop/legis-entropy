@@ -1,7 +1,5 @@
 import { Logo } from './Logo';
 
-// Sinusoidal ring: polar coordinates with radial sine wave modulation
-// r(θ) = R + A * sin(freq * θ)
 function SineRing({ size = 120 }: { size?: number }) {
   const cx = size / 2;
   const cy = size / 2;
@@ -20,26 +18,20 @@ function SineRing({ size = 120 }: { size?: number }) {
   }
   points.push('Z');
   const d = points.join(' ');
-
   const dashLen = 2 * Math.PI * R * 0.7;
   const gapLen = 2 * Math.PI * R * 0.3;
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ position: 'absolute', top: 0, left: 0 }}>
-      {/* Faint track */}
-      <path d={d} fill="none" stroke="#e5e7eb" strokeWidth="1.5" />
-      {/* Animated arc */}
+      <path d={d} fill="none" stroke="oklch(0.25 0 0)" strokeWidth="1.5" />
       <path
         d={d}
         fill="none"
-        stroke="#1f2937"
+        stroke="oklch(0.65 0.2 280)"
         strokeWidth="2"
         strokeLinecap="round"
         strokeDasharray={`${dashLen} ${gapLen}`}
-        style={{
-          animation: 'sineRotate 1.4s linear infinite',
-          transformOrigin: `${cx}px ${cy}px`,
-        }}
+        style={{ animation: 'sineRotate 1.4s linear infinite', transformOrigin: `${cx}px ${cy}px` }}
       />
       <style>{`
         @keyframes sineRotate {
@@ -56,17 +48,8 @@ export function LoadingOverlay() {
   const logoSize = 28;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/80 backdrop-blur-md">
-      <div
-        style={{
-          position: 'relative',
-          width: ringSize,
-          height: ringSize,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+    <div className="absolute inset-0 flex items-center justify-center z-20 bg-background/80 backdrop-blur-md">
+      <div style={{ position: 'relative', width: ringSize, height: ringSize, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <SineRing size={ringSize} />
         <Logo size={logoSize} />
       </div>

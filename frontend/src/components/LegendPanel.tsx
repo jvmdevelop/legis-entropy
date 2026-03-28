@@ -6,28 +6,33 @@ interface LegendPanelProps {
 }
 
 const LEGEND_ITEMS = [
-  { color: '#000000', label: 'Действующий' },
-  { color: '#666666', label: 'Утратил силу' },
-  { color: '#999999', label: 'Неизвестен' },
-  { color: '#333333', label: 'Акт изменений' },
+  { colorClass: 'bg-status-active', label: 'Действующий' },
+  { colorClass: 'bg-status-inactive', label: 'Утратил силу' },
+  { colorClass: 'bg-status-unknown', label: 'Неизвестен' },
+  { colorClass: 'bg-status-amendment', label: 'Акт изменений' },
 ];
 
 export function LegendPanel({ selectedNode, compareNode }: LegendPanelProps) {
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-      <div className="flex items-center gap-4 px-6 py-3.5 rounded-lg bg-white/90 backdrop-blur-md border border-white/20 elevation-2 pointer-events-auto">
-        {LEGEND_ITEMS.map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-2.5 group">
-            <span className="w-3 h-3 rounded-full shrink-0 ring-2 ring-white group-hover:ring-gray-200 transition-all duration-300 elevation-1" style={{ background: color }} />
-            <span className="text-[10px] text-gray-600 whitespace-nowrap group-hover:text-gray-900 transition-colors duration-300">{label}</span>
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+      <div className="flex items-center gap-1 rounded-full border border-border bg-card/90 backdrop-blur-sm px-4 py-2 shadow-lg pointer-events-auto">
+        {LEGEND_ITEMS.map((item, index) => (
+          <div key={item.label} className="flex items-center gap-2">
+            <div className="flex items-center gap-2 px-2 py-1 rounded-full hover:bg-secondary/50 transition-colors">
+              <span className={`h-3 w-3 rounded-full shrink-0 ${item.colorClass}`} />
+              <span className="text-xs text-foreground">{item.label}</span>
+            </div>
+            {index < LEGEND_ITEMS.length - 1 && (
+              <div className="h-4 w-px bg-border" />
+            )}
           </div>
         ))}
-        <div className="w-px h-5 bg-gradient-to-b from-transparent via-gray-300 to-transparent" />
-        <span className="text-[10px] text-gray-500 whitespace-nowrap">Размер — ссылки</span>
+        <div className="h-4 w-px bg-border mx-1" />
+        <span className="text-xs text-muted-foreground px-2">Размер — ссылки</span>
         {selectedNode && !compareNode && (
           <>
-            <div className="w-px h-5 bg-gradient-to-b from-transparent via-gray-300 to-transparent" />
-            <span className="text-[10px] text-gray-500 whitespace-nowrap">Ctrl+клик — сравнить</span>
+            <div className="h-4 w-px bg-border mx-1" />
+            <span className="text-xs text-muted-foreground px-2">Ctrl+клик — сравнить</span>
           </>
         )}
       </div>

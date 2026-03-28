@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Graph } from './components/Graph';
 import { InspectorPanel } from './components/InspectorPanel';
-import { SearchPanel } from './components/SearchPanel';
 import { AnalysisProgress } from './components/AnalysisProgress';
 import { ComparePanel } from './components/ComparePanel';
 import { NavigationBar } from './components/NavigationBar';
@@ -22,8 +21,8 @@ export default function App() {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [compareNode, setCompareNode] = useState<GraphNode | null>(null);
   const [searchHits, setSearchHits] = useState<string[]>([]);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
 
-  // Track Ctrl/Meta key state for compare selection via graph click
   const ctrlHeld = useRef(false);
   useEffect(() => {
     const down = (e: KeyboardEvent) => { if (e.key === 'Control' || e.key === 'Meta') ctrlHeld.current = true; };
@@ -55,50 +54,59 @@ export default function App() {
   }
 
   return (
-    <div className="relative h-full w-full bg-gradient-to-br from-slate-50 via-white to-slate-100">
-      {loading && !activeData && <LoadingOverlay />}
-
-      {activeData && (
-        <Graph
-          data={activeData}
-          onNodeClick={handleNodeClick}
-          selectedId={selectedNode?.id ?? null}
-          highlightIds={searchHits.length > 0 ? searchHits : undefined}
-          compareId={compareNode?.id ?? null}
-        />
-      )}
-
-      <AnalysisProgress state={stream} onStop={stopStream} />
-
+    <div className="flex h-screen flex-col bg-background text-foreground">
       <NavigationBar
         onStartAnalysis={startStream}
         onFetchCorpusReview={fetchCorpusReview}
         corpusReviewLoading={corpusReviewLoading}
         stream={stream}
+        onInspectorToggle={() => setInspectorOpen(o => !o)}
+        isInspectorOpen={inspectorOpen}
+        searchHits={searchHits}
+        onSearchResults={setSearchHits}
       />
 
-      <SearchPanel searchHits={searchHits} onSearchResults={setSearchHits} />
+      <div className="flex flex-1 overflow-hidden">
+        <main className="relative flex-1 overflow-hidden">
+          {loading && !activeData && <LoadingOverlay />}
 
-      <InspectorPanel
-        node={selectedNode}
-        issues={activeData?.issues ?? []}
-        stats={activeStats}
-        onNodeClose={() => setSelectedNode(null)}
-        onCompareSelect={handleCompareSelect}
-        compareNode={compareNode}
-      />
+          {activeData && (
+            <Graph
+              data={activeData}
+              onNodeClick={handleNodeClick}
+              selectedId={selectedNode?.id ?? null}
+              highlightIds={searchHits.length > 0 ? searchHits : undefined}
+              compareId={compareNode?.id ?? null}
+            />
+          )}
 
-      <CorpusReviewPanel corpusReview={corpusReview} onClose={closeCorpusReview} />
+          <AnalysisProgress state={stream} onStop={stopStream} />
 
-      {showCompare && (
-        <ComparePanel
-          nodeA={compareNode!}
-          nodeB={selectedNode!}
-          onClose={() => setCompareNode(null)}
-        />
-      )}
+          <CorpusReviewPanel corpusReview={corpusReview} onClose={closeCorpusReview} />
 
-      <LegendPanel selectedNode={selectedNode} compareNode={compareNode} />
+          {showCompare && (
+            <ComparePanel
+              nodeA={compareNode!}
+              nodeB={selectedNode!}
+              onClose={() => setCompareNode(null)}
+            />
+          )}
+
+          <LegendPanel selectedNode={selectedNode} compareNode={compareNode} />
+        </main>
+
+        {inspectorOpen && (
+          <InspectorPanel
+            node={selectedNode}
+            issues={activeData?.issues ?? []}
+            stats={activeStats}
+            onNodeClose={() => setSelectedNode(null)}
+            onCompareSelect={handleCompareSelect}
+            compareNode={compareNode}
+            onClose={() => setInspectorOpen(false)}
+          />
+        )}
+      </div>
     </div>
   );
 }
