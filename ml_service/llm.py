@@ -49,7 +49,7 @@ class LLMService:
             print(f"[LLM] Failed to load: {e}")
 
     def generate(self, prompt: str, max_new_tokens: int = 180) -> tuple[str, bool]:
-        overflow (OOM / RuntimeError) on Qwen2-0.5B.  Any generation error is
+        # Handles overflow (OOM / RuntimeError) on Qwen2-0.5B. Any generation error is
 
         with self._lock:
             if not self._ready:
