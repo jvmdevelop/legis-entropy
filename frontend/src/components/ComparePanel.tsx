@@ -96,9 +96,9 @@ export function ComparePanel({ nodeA, nodeB, onClose }: Props) {
       className="absolute z-20 rounded-lg bg-white border border-gray-200 shadow-xl flex flex-col"
       style={{
         left: 16,
-        right: 'calc(20rem + 16px)',
-        top: 64,
-        maxHeight: 'calc(100vh - 140px)',
+        right: 'calc(20rem + 24px)',
+        top: 'calc(1rem + 3.5rem)',
+        maxHeight: 'calc(100vh - 5rem)',
       }}
     >
       {/* Top accent line */}
