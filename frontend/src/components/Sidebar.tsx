@@ -15,23 +15,48 @@ const STATUS_LABEL: Record<string, string> = {
   unknown: 'Неизвестен',
 };
 
-const STATUS_COLOR: Record<string, string> = {
-  active: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
-  outdated: 'bg-red-500/20 text-red-300 border border-red-500/30',
-  unknown: 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
+const STATUS_DOT: Record<string, string> = {
+  active: 'bg-emerald-500',
+  outdated: 'bg-red-500',
+  unknown: 'bg-gray-400',
+};
+
+const STATUS_STYLE: Record<string, string> = {
+  active: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+  outdated: 'text-red-600 bg-red-50 border-red-200',
+  unknown: 'text-gray-500 bg-gray-100 border-gray-200',
 };
 
 const ISSUE_KIND_LABEL: Record<string, string> = {
   duplication: 'Дублирование',
   contradiction: 'Противоречие',
   outdated_reference: 'Устаревшая ссылка',
-  circular_reference: 'Цикл',
+  circular_reference: 'Циклические ссылки',
 };
 
-const SEVERITY_COLOR: Record<string, string> = {
-  high: 'text-red-400',
-  medium: 'text-orange-400',
-  low: 'text-yellow-400',
+const ISSUE_KIND_ICON: Record<string, string> = {
+  duplication: '⊙',
+  contradiction: '⚡',
+  outdated_reference: '🔗',
+  circular_reference: '↺',
+};
+
+const SEVERITY_STYLE: Record<string, string> = {
+  high: 'text-red-600 bg-red-50 border-red-200',
+  medium: 'text-orange-600 bg-orange-50 border-orange-200',
+  low: 'text-yellow-700 bg-yellow-50 border-yellow-200',
+};
+
+const SEVERITY_LABEL: Record<string, string> = {
+  high: 'Высокий',
+  medium: 'Средний',
+  low: 'Низкий',
+};
+
+const SEVERITY_ICON: Record<string, string> = {
+  high: '●',
+  medium: '●',
+  low: '●',
 };
 
 export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compareNode }: SidebarProps) {
@@ -40,116 +65,190 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
     : [];
 
   return (
-    <div className="absolute top-0 right-0 h-full w-80 bg-slate-900/95 backdrop-blur border-l border-slate-700 flex flex-col z-10">
+    <div className="absolute top-0 right-0 h-full w-80 flex flex-col z-10 pointer-events-none">
+    <div className="flex flex-col h-full bg-white border-l border-gray-200 pointer-events-auto">
+
       {/* Header */}
-      <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
-        <span className="text-sm font-semibold text-slate-200">legis-entropy</span>
+      <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between shrink-0">
+        <span className="text-xs font-semibold text-gray-900">Инспектор</span>
         {stats && (
-          <div className="flex items-center gap-3 text-xs text-slate-400">
-            <span>{stats.total_documents} НПА</span>
-            <span>{stats.total_links} связей</span>
+          <div className="flex items-center gap-2 text-[10px] text-gray-400">
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              {stats.active_count}
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+              {stats.outdated_count}
+            </span>
           </div>
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {/* Node details */}
+      <div className="flex-1 overflow-y-auto min-h-0">
         {node ? (
-          <div className="p-4 space-y-4">
+          <div className="p-8 space-y-6">
+            {/* Title + close */}
             <div className="flex items-start justify-between gap-2">
-              <h2 className="text-sm font-medium text-slate-100 leading-snug">{node.title}</h2>
-              <button onClick={onClose} className="shrink-0 text-slate-400 hover:text-slate-200 text-lg leading-none">×</button>
+              <h2 className="text-sm font-medium text-gray-900 leading-snug">{node.title}</h2>
+              <button
+                onClick={onClose}
+                className="shrink-0 w-5 h-5 flex items-center justify-center rounded-md text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
             </div>
 
-            <div className="space-y-2 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-slate-400 w-20 shrink-0">Статус</span>
-                <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLOR[node.status]}`}>
-                  {STATUS_LABEL[node.status]}
+            {/* Badges row */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className={`inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-[10px] font-medium border ${STATUS_STYLE[node.status]}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[node.status]}`} />
+                {STATUS_LABEL[node.status]}
+              </span>
+              {node.issue_count > 0 && (
+                <span className="inline-flex items-center gap-1 px-4 py-1 rounded-full text-[10px] font-medium text-orange-600 bg-orange-50 border border-orange-200">
+                  ⚠ {node.issue_count} проблем
                 </span>
+              )}
+            </div>
+
+            {/* Metadata table */}
+            <div className="rounded-lg border border-gray-100 divide-y divide-gray-100 bg-gray-50/50">
+              <div className="flex items-center justify-between px-6 py-4">
+                <span className="text-[10px] text-gray-400">ID</span>
+                <code className="text-[10px] text-gray-600 font-mono bg-gray-100 px-3 py-1 rounded">{node.id}</code>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-slate-400 w-20 shrink-0">ID</span>
-                <code className="text-slate-300 bg-slate-800 px-1.5 py-0.5 rounded font-mono">{node.id}</code>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-slate-400 w-20 shrink-0">Ссылки</span>
-                <span className="text-slate-300">{node.ref_count} документов</span>
+              <div className="flex items-center justify-between px-6 py-4">
+                <span className="text-[10px] text-gray-400">Ссылки</span>
+                <span className="text-[10px] text-gray-700 font-medium">{node.ref_count} <span className="font-normal text-gray-400">документов</span></span>
               </div>
             </div>
 
-            {/* Node issues */}
+            {/* Issues */}
             {nodeIssues.length > 0 && (
-              <div className="space-y-1.5">
-                <p className="text-xs text-slate-400 font-medium">Проблемы ({nodeIssues.length})</p>
+              <div className="space-y-3">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                  Проблемы ({nodeIssues.length})
+                </p>
                 {nodeIssues.map((issue, i) => (
-                  <div key={i} className="bg-slate-800 rounded p-2 text-xs space-y-0.5">
-                    <div className="flex items-center gap-2">
-                      <span className={`font-medium ${SEVERITY_COLOR[issue.severity]}`}>
+                  <div key={i} className="rounded-lg border border-gray-100 bg-gray-50/50 p-6 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-medium text-gray-700">
                         {ISSUE_KIND_LABEL[issue.kind]}
                       </span>
+                      <span className={`text-[9px] font-semibold px-3 py-1 rounded-full border ${SEVERITY_STYLE[issue.severity]}`}>
+                        {SEVERITY_LABEL[issue.severity]}
+                      </span>
                     </div>
-                    <p className="text-slate-400 leading-snug">{issue.explanation}</p>
+                    <p className="text-[10px] text-gray-500 leading-relaxed">{issue.explanation}</p>
                   </div>
                 ))}
               </div>
             )}
 
-            <div className="flex gap-2">
+            {/* Actions */}
+            <div className="flex gap-2 pt-2">
               <a
                 href={node.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 text-center text-xs py-2 px-3 rounded bg-violet-600 hover:bg-violet-500 text-white transition-colors"
+                className="flex-1 flex items-center justify-center gap-1.5 text-[11px] font-medium py-4 px-6 rounded-lg bg-gray-900 hover:bg-gray-700 text-white transition-colors"
               >
-                Открыть →
+                Открыть
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M2 8L8 2M8 2H4M8 2v4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
               </a>
               <button
                 onClick={() => onCompareSelect(node)}
-                className={`text-xs py-2 px-3 rounded border transition-colors ${
+                className={`flex items-center gap-1.5 text-[11px] font-medium py-4 px-6 rounded-lg border transition-all ${
                   compareNode?.id === node.id
-                    ? 'bg-violet-500/20 border-violet-500 text-violet-300'
-                    : 'border-slate-600 text-slate-400 hover:border-slate-500'
+                    ? 'bg-gray-900 border-gray-900 text-white'
+                    : 'border-gray-200 text-gray-600 hover:border-gray-300 hover:text-gray-900'
                 }`}
-                title="Выбрать для сравнения"
               >
-                {compareNode?.id === node.id ? 'Выбран' : 'Сравнить'}
+                {compareNode?.id === node.id ? (
+                  <>
+                    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                      <path d="M1.5 5l2.5 2.5 4.5-5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Выбран
+                  </>
+                ) : 'Сравнить'}
               </button>
             </div>
           </div>
         ) : (
-          <div className="p-4 text-slate-400 text-sm text-center mt-6 space-y-2">
-            <div className="text-2xl">⚖️</div>
-            <p className="text-xs">Нажмите на узел, чтобы увидеть детали НПА</p>
-            <p className="text-xs text-slate-500">Ctrl+клик — выбрать два для сравнения</p>
+          /* Issues overview */
+          <div className="p-8 space-y-6">
+            <div>
+              <p className="text-xs font-medium text-gray-500 mb-0.5">Выберите узел на графе</p>
+              <p className="text-[10px] text-gray-400">Ctrl+клик — сравнить два документа</p>
+            </div>
+
+            {issues.length > 0 ? (
+              <div className="space-y-3">
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                  Обнаруженные проблемы ({issues.length})
+                </p>
+                {issues.map((issue, i) => (
+                  <div key={i} className="rounded-lg border border-gray-100 bg-gray-50/50 p-5 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base leading-none">{ISSUE_KIND_ICON[issue.kind] ?? '⚠'}</span>
+                        <span className="text-[11px] font-semibold text-gray-800">
+                          {ISSUE_KIND_LABEL[issue.kind] ?? issue.kind}
+                        </span>
+                      </div>
+                      <span className={`text-[9px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${SEVERITY_STYLE[issue.severity]}`}>
+                        {SEVERITY_LABEL[issue.severity]}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-gray-500 leading-relaxed">{issue.explanation}</p>
+                    <div className="flex items-center gap-1.5 text-[9px] text-gray-400 pt-0.5">
+                      <span className={`${SEVERITY_STYLE[issue.severity].split(' ')[0]} text-[8px]`}>{SEVERITY_ICON[issue.severity]}</span>
+                      {issue.document_ids.length} документов затронуто
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="rounded-lg border border-emerald-100 bg-emerald-50/50 p-5">
+                <p className="text-[11px] font-medium text-emerald-700">Проблем не обнаружено</p>
+                <p className="text-[10px] text-emerald-600 mt-1">Корпус документов согласован</p>
+              </div>
+            )}
           </div>
         )}
 
         {/* Corpus stats */}
         {stats && (
-          <div className="px-4 pb-4 space-y-3 border-t border-slate-700/50 pt-4">
-            <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Состояние корпуса</p>
+          <div className="px-8 pb-8 space-y-3 border-t border-gray-100 pt-8">
+            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">Состояние корпуса</p>
+
             <div className="grid grid-cols-2 gap-2">
               {[
-                { label: 'Действующих', value: stats.active_count, color: 'text-emerald-400' },
-                { label: 'Утративших', value: stats.outdated_count, color: 'text-red-400' },
-                { label: 'С проблемами', value: stats.with_issues, color: 'text-orange-400' },
-                { label: 'Ср. ссылок', value: stats.avg_ref_count.toFixed(1), color: 'text-slate-300' },
-              ].map(({ label, value, color }) => (
-                <div key={label} className="bg-slate-800 rounded p-2">
-                  <div className={`text-sm font-mono font-semibold ${color}`}>{value}</div>
-                  <div className="text-xs text-slate-500">{label}</div>
+                { label: 'Действующих', value: stats.active_count, colorClass: 'text-emerald-600' },
+                { label: 'Утративших', value: stats.outdated_count, colorClass: 'text-red-500' },
+                { label: 'С проблемами', value: stats.with_issues, colorClass: 'text-orange-500' },
+                { label: 'Ср. ссылок', value: stats.avg_ref_count.toFixed(1), colorClass: 'text-gray-700' },
+              ].map(({ label, value, colorClass }) => (
+                <div key={label} className="rounded-lg border border-gray-100 bg-gray-50/50 p-5">
+                  <div className={`text-lg font-bold font-mono leading-none ${colorClass}`}>{value}</div>
+                  <div className="text-[9px] text-gray-400 mt-1">{label}</div>
                 </div>
               ))}
             </div>
 
             {stats.most_problematic.length > 0 && (
               <div className="space-y-1">
-                <p className="text-xs text-slate-500">Наиболее проблемные</p>
+                <p className="text-[10px] text-gray-400">Наиболее проблемные</p>
                 {stats.most_problematic.slice(0, 3).map(n => (
-                  <div key={n.id} className="flex items-center justify-between text-xs">
-                    <span className="text-slate-400 truncate flex-1 mr-2">{n.title}</span>
-                    <span className="text-orange-400 font-mono shrink-0">{n.issue_count}</span>
+                  <div key={n.id} className="flex items-center justify-between gap-2 py-3 border-b border-gray-100 last:border-0">
+                    <span className="text-[10px] text-gray-600 truncate flex-1">{n.title}</span>
+                    <span className="text-[10px] text-orange-500 font-semibold font-mono shrink-0">{n.issue_count}</span>
                   </div>
                 ))}
               </div>
@@ -159,22 +258,23 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
       </div>
 
       {/* Legend */}
-      <div className="px-4 py-3 border-t border-slate-700 space-y-2">
-        <p className="text-xs text-slate-400 font-medium uppercase tracking-wider">Легенда</p>
-        <div className="space-y-1">
+      <div className="px-8 py-6 border-t border-gray-100 shrink-0 bg-gray-50/50">
+        <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Легенда</p>
+        <div className="flex flex-wrap gap-x-3 gap-y-1.5">
           {[
-            { color: 'bg-emerald-400', label: 'Действующий' },
+            { color: 'bg-emerald-500', label: 'Действующий' },
             { color: 'bg-red-400', label: 'Утратил силу' },
-            { color: 'bg-slate-400', label: 'Статус неизвестен' },
+            { color: 'bg-gray-400', label: 'Неизвестен' },
           ].map(({ color, label }) => (
-            <div key={label} className="flex items-center gap-2 text-xs text-slate-300">
-              <span className={`w-2.5 h-2.5 rounded-full ${color}`} />
+            <div key={label} className="flex items-center gap-1.5 text-[10px] text-gray-500">
+              <span className={`w-2 h-2 rounded-full ${color} shrink-0`} />
               {label}
             </div>
           ))}
         </div>
-        <p className="text-xs text-slate-500 pt-1">Размер узла — кол-во ссылок</p>
+        <p className="text-[9px] text-gray-400 mt-1.5">Размер узла — кол-во ссылок</p>
       </div>
+    </div>
     </div>
   );
 }

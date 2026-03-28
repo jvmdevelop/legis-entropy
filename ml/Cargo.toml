@@ -4,16 +4,39 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-reqwest = { version = "0.12", features = ["json"] }
-tokio = { version = "1", features = ["full"] }
-scraper = "0.20"
-serde = { version = "1", features = ["derive"] }
-serde_json = "1"
-petgraph = "0.6"
+# HTTP server
 axum = { version = "0.8", features = ["json", "macros"] }
 tower-http = { version = "0.6", features = ["cors"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# HTTP client
+reqwest = { version = "0.12", features = ["json", "gzip", "deflate"] }
+
+# Async runtime
+tokio = { version = "1", features = ["full"] }
 futures = "0.3"
 async-trait = "0.1"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# HTML parsing
+scraper = "0.20"
+
+# Graph algorithms
+petgraph = "0.6"
+
+# SQLite — bundled compiles sqlite3 into the binary, no system deps needed
+rusqlite = { version = "0.31", features = ["bundled"] }
+
+# Error handling
+anyhow = "1"
 thiserror = "1"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Utilities
+rand = "0.8"
+chrono = "0.4"

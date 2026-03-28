@@ -1,149 +1,124 @@
+//! Axum HTTP server.
+//!
+//! All routes are non-blocking: they read from the persistent DB and return
+//! immediately. The background worker independently fills the DB over time.
+
 use std::{net::SocketAddr, sync::Arc};
 
-use axum::{
-    extract::{Query, State},
-    routing::get,
-    Json, Router,
-};
-use serde::Deserialize;
-use tokio::{net::TcpListener, sync::RwLock};
+use axum::{extract::State, routing::get, Json, Router};
+use serde::Serialize;
 use tower_http::cors::{Any, CorsLayer};
-use tracing_subscriber::EnvFilter;
 
-use crate::data::{
-    fetcher::AdiletFetcher,
-    graph::GraphBuilder,
-    model::{DocumentId, GraphData},
+use crate::{
+    data::{analyzer::DocumentAnalyzer, graph::assemble_graph, ml_client::MlClient},
+    db::Database,
 };
 
-const DEFAULT_SEED_IDS: &[&str] = &[
-    "K950001000_", // Гражданский кодекс РК
-    "K990000409_", // Гражданский кодекс РК
-    "K010000155_", // Уголовный кодекс РК
-    "K140000226_", // Кодекс об административных правонарушениях
-    "Z050000045_", // Закон о нормативных правовых актах
+const SEEDS: &[&str] = &[
+    "K950001000_",
+    "K990000409_",
+    "K010000155_",
+    "K140000226_",
+    "Z050000045_",
 ];
 
+// ── State ─────────────────────────────────────────────────────────────────────
+
+#[derive(Clone)]
 struct AppState {
-    builder: GraphBuilder<AdiletFetcher>,
-    cache: RwLock<Option<GraphData>>,
-    default_seeds: Vec<DocumentId>,
+    db: Arc<Database>,
+    ml: Arc<MlClient>,
+    analyzer: Arc<DocumentAnalyzer>,
 }
 
-impl AppState {
-    fn new() -> Result<Self, reqwest::Error> {
-        Ok(Self {
-            builder: GraphBuilder::new(AdiletFetcher::new()?)
-                .with_ml_service("http://localhost:8000"),
-            cache: RwLock::new(None),
-            default_seeds: DEFAULT_SEED_IDS
-                .iter()
-                .map(|&s| DocumentId::new(s))
-                .collect(),
-        })
-    }
+// ── Entry point ───────────────────────────────────────────────────────────────
 
-    async fn get_or_build(&self, seeds: Vec<DocumentId>, depth: usize) -> GraphData {
-        let is_default = seeds == self.default_seeds;
+pub async fn run(db: Arc<Database>, addr: SocketAddr) -> anyhow::Result<()> {
+    let ml_url = std::env::var("ML_SERVICE_URL")
+        .unwrap_or_else(|_| "http://localhost:8000".to_owned());
 
-        if is_default {
-            if let Some(cached) = self.cache.read().await.as_ref() {
-                return cached.clone();
-            }
-        }
+    let state = AppState {
+        db,
+        ml: Arc::new(MlClient::new(ml_url)),
+        analyzer: Arc::new(DocumentAnalyzer::new()),
+    };
 
-        tracing::info!("Building graph: {} seeds, depth={}", seeds.len(), depth);
-        let graph = self.builder.build(seeds, depth).await;
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
 
-        if is_default {
-            *self.cache.write().await = Some(graph.clone());
-        }
+    let app = Router::new()
+        .route("/api/graph", get(graph_handler))
+        .route("/api/graph/status", get(status_handler))
+        .route("/api/graph/refresh", get(refresh_handler))
+        .layer(cors)
+        .with_state(state);
 
-        graph
-    }
-
-    async fn invalidate_cache(&self) {
-        *self.cache.write().await = None;
-    }
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    axum::serve(listener, app).await?;
+    Ok(())
 }
-
-type SharedState = Arc<AppState>;
 
 // ── Handlers ──────────────────────────────────────────────────────────────────
 
-#[derive(Deserialize)]
-struct GraphQuery {
-    seeds: Option<String>,
-    depth: Option<usize>,
+/// Build and return `GraphData` from the current DB contents.
+///
+/// Always fast — reads from SQLite, no network I/O.
+async fn graph_handler(State(state): State<AppState>) -> Json<serde_json::Value> {
+    let docs = match state.db.get_fetched_docs().await {
+        Ok(d) => d,
+        Err(e) => {
+            tracing::error!("get_fetched_docs: {e}");
+            return Json(serde_json::json!({ "nodes": [], "links": [], "issues": [] }));
+        }
+    };
+
+    // Structural analysis (fast, in-process)
+    let structural_issues = state.analyzer.analyze(&docs);
+
+    // Semantic analysis (optional ML service, may be empty if unavailable)
+    let ml_issues = state.ml.analyze(&docs).await;
+
+    let all_issues: Vec<_> = structural_issues.into_iter().chain(ml_issues).collect();
+    let graph = assemble_graph(docs, all_issues);
+
+    Json(serde_json::to_value(graph).unwrap_or_default())
 }
 
-async fn get_graph(
-    Query(params): Query<GraphQuery>,
-    State(state): State<SharedState>,
-) -> Json<GraphData> {
-    let depth = params.depth.unwrap_or(1);
-    let seeds: Vec<DocumentId> = params
-        .seeds
-        .map(|s| s.split(',').map(|x| DocumentId::new(x.trim())).collect())
-        .unwrap_or_else(|| state.default_seeds.clone());
-
-    Json(state.get_or_build(seeds, depth).await)
+/// Return worker / DB statistics.
+#[derive(Serialize)]
+struct StatusResponse {
+    total_docs: i64,
+    fetched_docs: i64,
+    queued: i64,
+    captcha_blocked: i64,
 }
 
-async fn refresh_graph(State(state): State<SharedState>) -> Json<serde_json::Value> {
-    state.invalidate_cache().await;
+async fn status_handler(State(state): State<AppState>) -> Json<StatusResponse> {
+    let s = state
+        .db
+        .get_status()
+        .await
+        .unwrap_or(crate::db::WorkerStatus {
+            total_docs: 0,
+            fetched_docs: 0,
+            queued: 0,
+            captcha_blocked: 0,
+        });
 
-    tracing::info!("Cache cleared, rebuilding default graph...");
-    let graph = state.get_or_build(state.default_seeds.clone(), 1).await;
-
-    Json(serde_json::json!({
-        "status": "ok",
-        "nodes": graph.nodes.len(),
-        "links": graph.links.len(),
-    }))
+    Json(StatusResponse {
+        total_docs: s.total_docs,
+        fetched_docs: s.fetched_docs,
+        queued: s.queued,
+        captcha_blocked: s.captcha_blocked,
+    })
 }
 
-// ── Server ────────────────────────────────────────────────────────────────────
-
-pub struct Server {
-    state: SharedState,
-    addr: SocketAddr,
-}
-
-impl Server {
-    pub fn new(addr: SocketAddr) -> Result<Self, reqwest::Error> {
-        Self::init_tracing();
-        Ok(Self {
-            state: Arc::new(AppState::new()?),
-            addr,
-        })
-    }
-
-    pub async fn run(self) {
-        let app = Self::build_router(self.state);
-        let listener = TcpListener::bind(self.addr).await.unwrap();
-        tracing::info!("Server running on http://{}", self.addr);
-        axum::serve(listener, app).await.unwrap();
-    }
-
-    fn build_router(state: SharedState) -> Router {
-        let cors = CorsLayer::new()
-            .allow_origin(Any)
-            .allow_methods(Any)
-            .allow_headers(Any);
-
-        Router::new()
-            .route("/api/graph", get(get_graph))
-            .route("/api/graph/refresh", get(refresh_graph))
-            .with_state(state)
-            .layer(cors)
-    }
-
-    fn init_tracing() {
-        tracing_subscriber::fmt()
-            .with_env_filter(
-                EnvFilter::from_default_env().add_directive("legis_entropy=info".parse().unwrap()),
-            )
-            .init();
+/// Re-queue all seeds so the worker re-fetches them (and discovers new refs).
+async fn refresh_handler(State(state): State<AppState>) -> Json<serde_json::Value> {
+    match state.db.enqueue_seeds(SEEDS).await {
+        Ok(()) => Json(serde_json::json!({ "ok": true, "queued": SEEDS.len() })),
+        Err(e) => Json(serde_json::json!({ "ok": false, "error": e.to_string() })),
     }
 }

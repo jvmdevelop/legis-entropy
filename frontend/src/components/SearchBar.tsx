@@ -34,22 +34,33 @@ export function SearchBar({ onResults }: Props) {
   };
 
   return (
-    <div className="relative w-64">
+    <div className="relative w-56">
+      {/* Search icon */}
+      <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <circle cx="5" cy="5" r="3.5" stroke="#9ca3af" strokeWidth="1.3"/>
+          <path d="M8 8l2.5 2.5" stroke="#9ca3af" strokeWidth="1.3" strokeLinecap="round"/>
+        </svg>
+      </div>
+
       <input
         type="text"
         value={query}
         onChange={e => handleChange(e.target.value)}
-        placeholder="Семантический поиск..."
-        className="w-full text-xs bg-slate-800 border border-slate-600 text-slate-200 rounded px-3 py-1.5 pr-7 focus:outline-none focus:border-violet-500 placeholder-slate-500"
+        placeholder="Поиск по НПА…"
+        className="w-full text-xs bg-white border border-gray-200 text-gray-700 rounded-lg pl-14 pr-14 py-4 focus:outline-none focus:border-gray-400 focus:ring-0 placeholder-gray-400 transition-colors shadow-sm hover:border-gray-300"
       />
+
       {loading ? (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 border border-violet-400 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute right-5 top-1/2 -translate-y-1/2 w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
       ) : query ? (
         <button
           onClick={() => { setQuery(''); onResults([]); }}
-          className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-sm leading-none"
+          className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
         >
-          ×
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+            <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"/>
+          </svg>
         </button>
       ) : null}
     </div>

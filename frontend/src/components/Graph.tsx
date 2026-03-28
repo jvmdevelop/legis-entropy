@@ -1,4 +1,6 @@
 import { useRef, useCallback, useEffect } from 'react';
+// @ts-ignore — d3-force-3d is a transitive dep without typings
+import { forceCollide } from 'd3-force-3d';
 import ForceGraph2D from 'react-force-graph-2d';
 import type { GraphData, GraphNode } from '../types';
 
@@ -11,15 +13,16 @@ interface GraphProps {
 }
 
 const STATUS_COLOR: Record<string, string> = {
-  active: '#34d399',
-  outdated: '#f87171',
-  unknown: '#94a3b8',
+  active: '#10b981',
+  outdated: '#ef4444',
+  unknown: '#9ca3af',
 };
 
+// Dimmed versions for light background
 const STATUS_DIM: Record<string, string> = {
-  active: '#065f46',
-  outdated: '#7f1d1d',
-  unknown: '#1e293b',
+  active: '#d1fae5',
+  outdated: '#fee2e2',
+  unknown: '#f3f4f6',
 };
 
 export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }: GraphProps) {
@@ -27,7 +30,15 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
   const hasHighlight = highlightIds && highlightIds.length > 0;
 
   useEffect(() => {
-    if (graphRef.current) setTimeout(() => graphRef.current?.zoomToFit(400, 60), 500);
+    const fg = graphRef.current;
+    if (!fg) return;
+    // Strong repulsion + collision to prevent overlap
+    fg.d3Force('charge')?.strength(-400);
+    fg.d3Force('collision', forceCollide((node: any) =>
+      Math.max(4, Math.sqrt((node.ref_count ?? 0) + 1) * 3) + 12
+    ));
+    fg.d3Force('link')?.distance(80);
+    setTimeout(() => fg.zoomToFit(400, 60), 500);
   }, [data]);
 
   const paintNode = useCallback(
@@ -39,25 +50,25 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
       const isSelected = node.id === selectedId;
       const isCompare = node.id === compareId;
       const isHit = hasHighlight && highlightIds!.includes(node.id);
-      const isDimmed = (hasHighlight && !isHit) || (!isSelected && !isCompare && (selectedId !== null));
+      const isDimmed = (hasHighlight && !isHit) || (!isSelected && !isCompare && selectedId !== null);
 
-      // Glow rings
+      // Selection / highlight rings
       if (isSelected) {
         ctx.beginPath();
-        ctx.arc(x, y, r + 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(139,92,246,0.25)';
+        ctx.arc(x, y, r + 6, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(99,102,241,0.15)';
         ctx.fill();
       }
       if (isCompare) {
         ctx.beginPath();
-        ctx.arc(x, y, r + 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(251,146,60,0.25)';
+        ctx.arc(x, y, r + 6, 0, 2 * Math.PI);
+        ctx.fillStyle = 'rgba(249,115,22,0.15)';
         ctx.fill();
       }
       if (isHit) {
         ctx.beginPath();
         ctx.arc(x, y, r + 4, 0, 2 * Math.PI);
-        ctx.fillStyle = 'rgba(250,204,21,0.2)';
+        ctx.fillStyle = 'rgba(234,179,8,0.15)';
         ctx.fill();
       }
 
@@ -65,20 +76,21 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
       ctx.beginPath();
       ctx.arc(x, y, r, 0, 2 * Math.PI);
       ctx.fillStyle = isDimmed
-        ? STATUS_DIM[node.status] ?? '#1e293b'
-        : STATUS_COLOR[node.status] ?? '#94a3b8';
+        ? STATUS_DIM[node.status] ?? '#f3f4f6'
+        : STATUS_COLOR[node.status] ?? '#9ca3af';
       ctx.fill();
 
-      // Issue ring
+      // Issue ring (orange border)
       if (node.issue_count > 0 && !isDimmed) {
-        ctx.strokeStyle = '#fb923c';
+        ctx.strokeStyle = '#f97316';
         ctx.lineWidth = 1.5 / globalScale;
         ctx.stroke();
       }
 
+      // Selection / compare border
       if (isSelected || isCompare) {
-        ctx.strokeStyle = isCompare ? '#fb923c' : '#a78bfa';
-        ctx.lineWidth = 2 / globalScale;
+        ctx.strokeStyle = isCompare ? '#f97316' : '#6366f1';
+        ctx.lineWidth = 2.5 / globalScale;
         ctx.stroke();
       }
 
@@ -86,8 +98,8 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
       if (r > 6 || isSelected || isHit) {
         const label = node.title.length > 28 ? node.title.slice(0, 28) + '…' : node.title;
         const fontSize = Math.max(10, 12 / globalScale);
-        ctx.font = `${fontSize}px system-ui`;
-        ctx.fillStyle = isDimmed ? 'rgba(148,163,184,0.3)' : 'rgba(226,232,240,0.9)';
+        ctx.font = `${fontSize}px Inter, system-ui, sans-serif`;
+        ctx.fillStyle = isDimmed ? 'rgba(156,163,175,0.5)' : 'rgba(17,24,39,0.85)';
         ctx.textAlign = 'center';
         ctx.fillText(label, x, y + r + fontSize * 0.9);
       }
@@ -108,12 +120,13 @@ export function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }
       nodeLabel={nodeLabel as any}
       nodeCanvasObject={paintNode as any}
       nodeCanvasObjectMode={() => 'replace'}
-      linkColor={() => 'rgba(148,163,184,0.15)'}
+      linkColor={() => 'rgba(107,114,128,0.2)'}
       linkWidth={1}
       linkDirectionalArrowLength={4}
       linkDirectionalArrowRelPos={1}
+      linkDirectionalArrowColor={() => 'rgba(107,114,128,0.4)'}
       onNodeClick={(node: any, event: any) => onNodeClick(node as GraphNode, event)}
-      backgroundColor="#0f1117"
+      backgroundColor="#f9fafb"
       cooldownTicks={100}
     />
   );
