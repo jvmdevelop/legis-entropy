@@ -114,11 +114,10 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
     : [];
 
   return (
-    <div className="absolute top-0 right-0 h-full w-80 flex flex-col z-10 pointer-events-none">
-    <div className="flex flex-col h-full bg-white/95 backdrop-blur-md border-l border-white/20 elevation-3 pointer-events-auto">
+    <div className="flex flex-col">
 
       {/* Header */}
-      <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between shrink-0">
+      <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-2 h-4 rounded-full bg-gradient-to-b from-gray-700 to-gray-800 elevation-1" />
           <span className="text-xs font-bold text-gray-900 tracking-tight">Инспектор</span>
@@ -130,7 +129,7 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0">
+      <div>
         {node ? (
           <div className="p-8 space-y-6">
             {/* Title + close */}
@@ -302,7 +301,6 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
         )}
       </div>
 
-    </div>
     </div>
   );
 }
