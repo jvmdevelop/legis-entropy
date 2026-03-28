@@ -1,7 +1,6 @@
 """LLMService — thread-safe wrapper around a small causal language model."""
 
 import threading
-from typing import Optional
 
 from config import LLM_MODEL_NAME
 
@@ -12,6 +11,11 @@ _SYSTEM_PROMPT = (
 )
 
 _NOT_READY_MSG = "Модель анализа загружается, повторите через минуту."
+
+# Qwen2-0.5B has a 2048-token context window.
+# Reserve MAX_NEW_TOKENS headroom for output; cap input to the rest.
+_MAX_CONTEXT = 2048
+_MAX_INPUT_TOKENS = 1500
 
 
 class LLMService:
@@ -49,7 +53,13 @@ class LLMService:
             print(f"[LLM] Failed to load: {e}")
 
     def generate(self, prompt: str, max_new_tokens: int = 180) -> tuple[str, bool]:
-        """Generate a review text. Returns (text, model_ready)."""
+        """Generate a review text. Returns (text, model_ready).
+
+        Truncates the input to _MAX_INPUT_TOKENS to prevent context-window
+        overflow (OOM / RuntimeError) on Qwen2-0.5B.  Any generation error is
+        caught; the model is marked unready so the next call re-reports the
+        loading message instead of hanging.
+        """
         with self._lock:
             if not self._ready:
                 return _NOT_READY_MSG, False
@@ -64,13 +74,30 @@ class LLMService:
         ]
         text = tok.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
         inputs = tok([text], return_tensors="pt")
-        with torch.no_grad():
-            out = mdl.generate(
-                **inputs,
-                max_new_tokens=max_new_tokens,
-                temperature=0.7,
-                do_sample=True,
-                pad_token_id=tok.eos_token_id,
-            )
-        generated = out[0][inputs["input_ids"].shape[1]:]
-        return tok.decode(generated, skip_special_tokens=True).strip(), True
+
+        # Truncate if the prompt exceeds the safe input budget.
+        input_len = inputs["input_ids"].shape[1]
+        if input_len > _MAX_INPUT_TOKENS:
+            print(f"[LLM] Prompt too long ({input_len} tokens) — truncating to {_MAX_INPUT_TOKENS}.")
+            inputs = {k: v[:, -_MAX_INPUT_TOKENS:] for k, v in inputs.items()}
+
+        try:
+            with torch.no_grad():
+                out = mdl.generate(
+                    **inputs,
+                    max_new_tokens=max_new_tokens,
+                    temperature=0.7,
+                    do_sample=True,
+                    pad_token_id=tok.eos_token_id,
+                )
+            generated = out[0][inputs["input_ids"].shape[1]:]
+            return tok.decode(generated, skip_special_tokens=True).strip(), True
+        except Exception as e:
+            print(f"[LLM] Generation failed: {e}")
+            with self._lock:
+                self._ready = False
+                self._model = None
+                self._tokenizer = None
+            # Reload asynchronously so the next request may succeed.
+            self.load_in_background()
+            return _NOT_READY_MSG, False
