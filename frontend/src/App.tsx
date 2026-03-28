@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { Graph } from './components/Graph';
 import { Sidebar } from './components/Sidebar';
 import { SearchPanel } from './components/SearchPanel';
@@ -45,14 +45,14 @@ export default function App() {
   const activeData = stream.graph ?? data;
   const activeStats = stream.stats ?? null;
 
-  const handleNodeClick = (node: GraphNode, event?: MouseEvent) => {
+  const handleNodeClick = useCallback((node: GraphNode, event?: MouseEvent) => {
     const isCtrl = event?.ctrlKey || event?.metaKey || ctrlHeld.current;
     if (isCtrl) {
       setCompareNode(prev => prev?.id === node.id ? null : node);
       return;
     }
     setSelectedNode(prev => prev?.id === node.id ? null : node);
-  };
+  }, []);
 
   const handleCompareSelect = (node: GraphNode) => {
     setCompareNode(prev => prev?.id === node.id ? null : node);
