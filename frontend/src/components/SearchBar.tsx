@@ -35,7 +35,7 @@ export function SearchBar({ onResults, embedded }: Props) {
   };
 
   return (
-    <div className="relative w-44">
+    <div className={`relative ${embedded ? 'w-48' : 'w-56'}`}>
       {/* Search icon */}
       <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

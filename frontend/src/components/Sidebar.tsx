@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { CorpusStats, GraphNode, Issue } from '../types';
 
 interface SidebarProps {
@@ -55,11 +56,46 @@ const SEVERITY_LABEL: Record<string, string> = {
   low: 'Низкий',
 };
 
-const SEVERITY_ICON: Record<string, string> = {
-  high: '●',
-  medium: '●',
-  low: '●',
-};
+
+const EXPLANATION_LIMIT = 160;
+
+function IssueCard({ issue }: { issue: Issue; index: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const long = issue.explanation.length > EXPLANATION_LIMIT;
+  const text = !expanded && long
+    ? issue.explanation.slice(0, EXPLANATION_LIMIT) + '…'
+    : issue.explanation;
+
+  return (
+    <div className={`rounded-xl border p-4 space-y-2 ${
+      issue.kind === 'amendment' ? 'border-blue-100 bg-blue-50/50' : 'border-gray-100 bg-gray-50/50'
+    }`}>
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <span className="text-base leading-none shrink-0">{ISSUE_KIND_ICON[issue.kind] ?? '⚠'}</span>
+          <span className="text-[11px] font-semibold text-gray-800 truncate">
+            {ISSUE_KIND_LABEL[issue.kind] ?? issue.kind}
+          </span>
+        </div>
+        <span className={`text-[9px] font-semibold px-2 py-0.5 rounded-full border shrink-0 ${SEVERITY_STYLE[issue.severity]}`}>
+          {SEVERITY_LABEL[issue.severity]}
+        </span>
+      </div>
+      <p className="text-[10px] text-gray-500 leading-relaxed">{text}</p>
+      {long && (
+        <button
+          onClick={() => setExpanded(e => !e)}
+          className="text-[9px] font-medium text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          {expanded ? '↑ Свернуть' : '↓ Подробнее'}
+        </button>
+      )}
+      <div className="text-[9px] text-gray-400">
+        Затронуто документов: {issue.document_ids.length}
+      </div>
+    </div>
+  );
+}
 
 export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compareNode }: SidebarProps) {
   const nodeIssues = node
@@ -140,32 +176,12 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
 
             {/* Issues */}
             {nodeIssues.length > 0 && (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
                   Почему помечен ({nodeIssues.length})
                 </p>
                 {nodeIssues.map((issue, i) => (
-                  <div key={i} className={`rounded-lg border p-5 space-y-2.5 ${
-                    issue.kind === 'amendment'
-                      ? 'border-blue-100 bg-blue-50/50'
-                      : 'border-gray-100 bg-gray-50/50'
-                  }`}>
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm leading-none">{ISSUE_KIND_ICON[issue.kind] ?? '⚠'}</span>
-                        <span className="text-[11px] font-semibold text-gray-800">
-                          {ISSUE_KIND_LABEL[issue.kind] ?? issue.kind}
-                        </span>
-                      </div>
-                      <span className={`text-[9px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${SEVERITY_STYLE[issue.severity]}`}>
-                        {SEVERITY_LABEL[issue.severity]}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-gray-500 leading-relaxed">{issue.explanation}</p>
-                    <div className="text-[9px] text-gray-400">
-                      Затронуто документов: {issue.document_ids.length}
-                    </div>
-                  </div>
+                  <IssueCard key={i} issue={issue} index={i} />
                 ))}
               </div>
             )}
@@ -211,29 +227,12 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
             </div>
 
             {issues.length > 0 ? (
-              <div className="space-y-3">
+              <div className="space-y-2">
                 <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
                   Обнаруженные проблемы ({issues.length})
                 </p>
                 {issues.map((issue, i) => (
-                  <div key={i} className="rounded-lg border border-gray-100 bg-gray-50/50 p-5 space-y-2.5">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base leading-none">{ISSUE_KIND_ICON[issue.kind] ?? '⚠'}</span>
-                        <span className="text-[11px] font-semibold text-gray-800">
-                          {ISSUE_KIND_LABEL[issue.kind] ?? issue.kind}
-                        </span>
-                      </div>
-                      <span className={`text-[9px] font-semibold px-2.5 py-1 rounded-full border shrink-0 ${SEVERITY_STYLE[issue.severity]}`}>
-                        {SEVERITY_LABEL[issue.severity]}
-                      </span>
-                    </div>
-                    <p className="text-[10px] text-gray-500 leading-relaxed">{issue.explanation}</p>
-                    <div className="flex items-center gap-1.5 text-[9px] text-gray-400 pt-0.5">
-                      <span className={`${SEVERITY_STYLE[issue.severity].split(' ')[0]} text-[8px]`}>{SEVERITY_ICON[issue.severity]}</span>
-                      {issue.document_ids.length} документов затронуто
-                    </div>
-                  </div>
+                  <IssueCard key={i} issue={issue} index={i} />
                 ))}
               </div>
             ) : (
@@ -279,24 +278,6 @@ export function Sidebar({ node, issues, stats, onClose, onCompareSelect, compare
         )}
       </div>
 
-      {/* Legend */}
-      <div className="px-8 py-6 border-t border-gray-100 shrink-0 bg-gray-50/50">
-        <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-2">Легенда</p>
-        <div className="flex flex-wrap gap-x-3 gap-y-1.5">
-          {[
-            { color: 'bg-emerald-500', label: 'Действующий' },
-            { color: 'bg-red-400', label: 'Утратил силу' },
-            { color: 'bg-gray-400', label: 'Неизвестен' },
-            { color: 'bg-blue-500', label: 'Акт изменений' },
-          ].map(({ color, label }) => (
-            <div key={label} className="flex items-center gap-1.5 text-[10px] text-gray-500">
-              <span className={`w-2 h-2 rounded-full ${color} shrink-0`} />
-              {label}
-            </div>
-          ))}
-        </div>
-        <p className="text-[9px] text-gray-400 mt-1.5">Размер узла — кол-во ссылок</p>
-      </div>
     </div>
     </div>
   );

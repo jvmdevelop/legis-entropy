@@ -9,6 +9,13 @@ import { useGraphData } from './hooks/useGraphData';
 import { useAnalysisStream } from './hooks/useAnalysisStream';
 import type { GraphNode } from './types';
 
+const LEGEND_ITEMS = [
+  { color: '#10b981', label: 'Действующий' },
+  { color: '#ef4444', label: 'Утратил силу' },
+  { color: '#9ca3af', label: 'Неизвестен' },
+  { color: '#3b82f6', label: 'Акт изменений' },
+];
+
 export default function App() {
   const { data, loading, error, refetch } = useGraphData();
   const { state: stream, start: startStream, stop: stopStream } = useAnalysisStream();
@@ -58,7 +65,7 @@ export default function App() {
   if (error && !activeData) {
     return (
       <div className="h-full flex items-center justify-center bg-white">
-        <div className="text-center space-y-4 p-16 rounded-xl border border-gray-200">
+        <div className="text-center space-y-4 p-16 rounded-2xl border border-gray-200 shadow-sm">
           <div className="w-10 h-10 rounded-full bg-red-50 border border-red-100 flex items-center justify-center mx-auto">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M9 6v3m0 3h.01M17 9A8 8 0 111 9a8 8 0 0116 0z" stroke="#ef4444" strokeWidth="1.5" strokeLinecap="round"/>
@@ -70,7 +77,7 @@ export default function App() {
           </div>
           <button
             onClick={refetch}
-            className="px-8 py-4 text-xs font-medium bg-gray-900 hover:bg-gray-700 text-white rounded-lg transition-colors"
+            className="px-8 py-3 text-xs font-medium bg-gray-900 hover:bg-gray-700 text-white rounded-xl transition-colors"
           >
             Повторить
           </button>
@@ -79,8 +86,11 @@ export default function App() {
     );
   }
 
+  const showCompare = !!(compareNode && selectedNode && compareNode.id !== selectedNode.id);
+
   return (
-    <div className="relative h-full w-full bg-gray-50">
+    <div className="relative h-full w-full bg-slate-50">
+
       {/* Loading overlay */}
       {loading && !activeData && (
         <div className="absolute inset-0 flex items-center justify-center z-20 bg-white/90 backdrop-blur-sm">
@@ -94,6 +104,7 @@ export default function App() {
         </div>
       )}
 
+      {/* Graph canvas */}
       {activeData && (
         <Graph
           data={activeData}
@@ -104,16 +115,10 @@ export default function App() {
         />
       )}
 
+      {/* Analysis progress */}
       <AnalysisProgress state={stream} onStop={stopStream} />
 
-      {compareNode && selectedNode && compareNode.id !== selectedNode.id && (
-        <ComparePanel
-          nodeA={compareNode}
-          nodeB={selectedNode}
-          onClose={() => setCompareNode(null)}
-        />
-      )}
-
+      {/* Sidebar */}
       <Sidebar
         node={selectedNode}
         issues={activeData?.issues ?? []}
@@ -123,20 +128,20 @@ export default function App() {
         compareNode={compareNode}
       />
 
-      {/* Top bar — single unified card */}
+      {/* ── Top-left brand bar ── */}
       <div className="absolute top-3 left-3 z-10">
-        <div className="flex items-center rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden divide-x divide-gray-100">
+        <div className="flex items-center h-10 rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden divide-x divide-gray-100">
           {/* Brand */}
-          <div className="flex items-center gap-2 px-5 py-3">
-            <Logo size={16} />
-            <span className="text-xs font-semibold text-gray-700">Граф НПА</span>
+          <div className="flex items-center gap-2 px-4 h-full">
+            <Logo size={15} />
+            <span className="text-[11px] font-bold text-gray-800 tracking-tight">Граф НПА</span>
           </div>
 
           {/* Анализ */}
           <button
             onClick={startStream}
             disabled={stream.running}
-            className="flex items-center gap-1.5 px-5 py-3 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+            className="h-full flex items-center gap-1.5 px-4 text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 disabled:opacity-40 transition-colors"
           >
             {stream.running ? (
               <div className="w-3 h-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
@@ -153,50 +158,78 @@ export default function App() {
           <button
             onClick={fetchCorpusReview}
             disabled={corpusReviewLoading}
-            className="flex items-center gap-1.5 px-5 py-3 text-xs font-medium text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 disabled:opacity-40 transition-colors"
+            className="h-full flex items-center gap-1.5 px-4 text-[11px] font-medium text-violet-600 hover:text-violet-800 hover:bg-violet-50 disabled:opacity-40 transition-colors"
           >
             {corpusReviewLoading ? (
-              <div className="w-3 h-3 border border-indigo-400 border-t-transparent rounded-full animate-spin" />
+              <div className="w-3 h-3 border border-violet-400 border-t-transparent rounded-full animate-spin" />
             ) : (
               <span className="text-sm leading-none">✦</span>
             )}
             {corpusReviewLoading ? 'AI анализ…' : 'AI обзор'}
           </button>
-
-          {/* Search */}
-          <div className="flex items-center gap-2 px-2">
-            <SearchBar onResults={setSearchHits} embedded />
-            {searchHits.length > 0 && (
-              <span className="px-2.5 py-0.5 text-[10px] font-semibold rounded-full bg-gray-900 text-white">
-                {searchHits.length}
-              </span>
-            )}
-          </div>
         </div>
       </div>
 
-      {/* Corpus AI review panel */}
-      {corpusReview && !compareNode && (
-        <div className="absolute top-16 left-3 z-20 w-80 rounded-xl bg-white border border-indigo-200 shadow-lg overflow-hidden">
-          <div className="h-0.5 bg-indigo-500" />
+      {/* ── Search bar — top center ── */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20">
+        <div className="flex items-center h-10 rounded-xl bg-white border border-gray-200 shadow-sm">
+          <SearchBar onResults={setSearchHits} embedded />
+          {searchHits.length > 0 && (
+            <span className="mr-3 px-2.5 py-0.5 text-[10px] font-bold rounded-full bg-gray-900 text-white tabular-nums">
+              {searchHits.length}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* ── Corpus AI review panel — below topbar ── */}
+      {corpusReview && !showCompare && (
+        <div className="absolute top-[52px] left-3 z-20 w-80 rounded-2xl bg-white border border-violet-200 shadow-lg overflow-hidden">
+          <div className="h-0.5 bg-violet-500" />
           <div className="p-5 space-y-2.5">
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-indigo-600">
+              <span className="text-[9px] font-bold uppercase tracking-widest text-violet-600">
                 {corpusReview.llm_ready ? '✦ AI-обзор корпуса (Qwen2)' : '⏳ AI-обзор'}
               </span>
-              <button onClick={() => setCorpusReview(null)} className="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+              <button onClick={() => setCorpusReview(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                  <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </button>
             </div>
-            <p className="text-[11px] text-indigo-900 leading-relaxed">{corpusReview.review}</p>
+            <p className="text-[11px] text-violet-900 leading-relaxed">{corpusReview.review}</p>
           </div>
         </div>
       )}
 
-      {/* Ctrl hint — показываем когда нода выбрана но compareNode не выбран */}
-      {selectedNode && !compareNode && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10 px-4 py-2 rounded-full bg-white border border-gray-200 shadow-sm text-[10px] text-gray-400 pointer-events-none">
-          Ctrl+клик по другому узлу для сравнения
-        </div>
+      {/* ── Compare panel — center canvas area ── */}
+      {showCompare && (
+        <ComparePanel
+          nodeA={compareNode!}
+          nodeB={selectedNode!}
+          onClose={() => setCompareNode(null)}
+        />
       )}
+
+      {/* ── Legend — bottom center ── */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+        <div className="flex items-center gap-4 px-5 py-2.5 rounded-xl bg-white/95 backdrop-blur-sm border border-gray-200 shadow-sm pointer-events-auto">
+          {LEGEND_ITEMS.map(({ color, label }) => (
+            <div key={label} className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
+              <span className="text-[10px] text-gray-500 whitespace-nowrap">{label}</span>
+            </div>
+          ))}
+          <div className="w-px h-3 bg-gray-200" />
+          <span className="text-[10px] text-gray-400 whitespace-nowrap">Размер — ссылки</span>
+          {selectedNode && !compareNode && (
+            <>
+              <div className="w-px h-3 bg-gray-200" />
+              <span className="text-[10px] text-gray-400 whitespace-nowrap">Ctrl+клик — сравнить</span>
+            </>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
