@@ -1,7 +1,8 @@
-import { LayoutGrid, RefreshCw, Sparkles } from 'lucide-react';
+import { LayoutGrid, RefreshCw, Sparkles, Sun, Moon } from 'lucide-react';
 import { Logo } from './Logo';
 import { SearchBar } from './SearchBar';
 import type { useAnalysisStream } from '../hooks/useAnalysisStream';
+import type { Theme } from '../hooks/useTheme';
 
 interface NavigationBarProps {
   onStartAnalysis: () => void;
@@ -12,6 +13,8 @@ interface NavigationBarProps {
   isInspectorOpen: boolean;
   searchHits: string[];
   onSearchResults: (ids: string[]) => void;
+  theme: Theme;
+  onThemeToggle: () => void;
 }
 
 export function NavigationBar({
@@ -23,13 +26,15 @@ export function NavigationBar({
   isInspectorOpen,
   searchHits,
   onSearchResults,
+  theme,
+  onThemeToggle,
 }: NavigationBarProps) {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-border bg-card px-4 z-20">
       {/* Left: brand + actions */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
-          <Logo size={20} />
+          <Logo size={20} theme={theme} />
         </div>
 
         <div className="flex items-center gap-1">
@@ -65,8 +70,19 @@ export function NavigationBar({
         </div>
       </div>
 
-      {/* Right: inspector toggle */}
-      <div className="flex items-center gap-2">
+      {/* Right: theme toggle + inspector toggle */}
+      <div className="flex items-center gap-1">
+        <button
+          onClick={onThemeToggle}
+          title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+          className="flex items-center justify-center h-8 w-8 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+        >
+          {theme === 'dark'
+            ? <Sun className="h-4 w-4" />
+            : <Moon className="h-4 w-4" />
+          }
+        </button>
+
         <button
           onClick={onInspectorToggle}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition-colors ${

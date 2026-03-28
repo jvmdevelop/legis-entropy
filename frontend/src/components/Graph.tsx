@@ -8,6 +8,7 @@ interface GraphProps {
   selectedId: string | null;
   compareId: string | null;
   highlightIds?: string[];
+  theme?: 'dark' | 'light';
 }
 
 // Hex approximations of the OKLCH status colors from the design system
@@ -16,11 +17,17 @@ const STATUS_COLOR: Record<string, string> = {
   outdated: '#c4622a', // oklch(0.6 0.18 25)  — orange-red
   unknown: '#8b6fd0',  // oklch(0.6 0.15 280) — purple
 };
-// Dimmed variants for dark background
-const STATUS_DIM: Record<string, string> = {
+// Dimmed variants — dark background
+const STATUS_DIM_DARK: Record<string, string> = {
   active: '#0d2016',
   outdated: '#1f0e06',
   unknown: '#120d1f',
+};
+// Dimmed variants — light background
+const STATUS_DIM_LIGHT: Record<string, string> = {
+  active: '#d4f0e0',
+  outdated: '#f5ddd4',
+  unknown: '#e4d8f5',
 };
 
 /**
@@ -53,7 +60,7 @@ function gridLayout(nodes: GraphNode[]): GraphNode[] {
   return sorted;
 }
 
-export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compareId, highlightIds }: GraphProps) {
+export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compareId, highlightIds, theme = 'dark' }: GraphProps) {
   const graphRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dims, setDims] = useState({ width: 0, height: 0 });
@@ -175,13 +182,14 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
 
       ctx.beginPath();
       ctx.arc(x, y, r, 0, 2 * Math.PI);
-      const AMENDMENT_COLOR = '#c8a845'; // oklch(0.75 0.15 50) — amber
+      const AMENDMENT_COLOR = '#c8a845';
+      const STATUS_DIM = theme === 'light' ? STATUS_DIM_LIGHT : STATUS_DIM_DARK;
       ctx.fillStyle = isHit
         ? '#f97316'
         : node.is_amendment && !isDimmed
           ? AMENDMENT_COLOR
           : isDimmed
-            ? STATUS_DIM[node.status] ?? '#1a1a1a'
+            ? STATUS_DIM[node.status] ?? (theme === 'light' ? '#e0e0e0' : '#1a1a1a')
             : STATUS_COLOR[node.status] ?? '#8b6fd0';
       ctx.fill();
 
@@ -199,7 +207,7 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
           ctx.lineWidth = 1.5 / globalScale; ctx.stroke();
         }
         if (isSelected || isCompare) {
-          ctx.strokeStyle = isCompare ? '#8b6fd0' : '#ffffff';
+          ctx.strokeStyle = isCompare ? '#8b6fd0' : (theme === 'light' ? '#1a1a1a' : '#ffffff');
           ctx.lineWidth = 2.5 / globalScale; ctx.stroke();
         }
       }
@@ -208,12 +216,14 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
         const label = node.title.length > 28 ? node.title.slice(0, 28) + '…' : node.title;
         const fontSize = Math.max(10, 12 / globalScale);
         ctx.font = `${fontSize}px Inter, system-ui, sans-serif`;
-        ctx.fillStyle = isDimmed ? 'rgba(100,100,120,0.5)' : 'rgba(240,240,255,0.9)';
+        ctx.fillStyle = isDimmed
+          ? (theme === 'light' ? 'rgba(100,100,120,0.4)' : 'rgba(100,100,120,0.5)')
+          : (theme === 'light' ? 'rgba(20,20,40,0.85)' : 'rgba(240,240,255,0.9)');
         ctx.textAlign = 'center';
         ctx.fillText(label, x, y + r + fontSize * 0.9);
       }
     },
-    [selectedId, compareId, highlightSet, hasHighlight],
+    [selectedId, compareId, highlightSet, hasHighlight, theme],
   );
 
   const nodeLabel = useCallback((node: GraphNode) => {
@@ -240,7 +250,7 @@ export const Graph = memo(function Graph({ data, onNodeClick, selectedId, compar
           linkDirectionalArrowRelPos={1}
           linkDirectionalArrowColor={() => 'rgba(107,114,128,0.5)'}
           onNodeClick={(node: any, event: any) => onNodeClick(node as GraphNode, event)}
-          backgroundColor="#1e1e1e"
+          backgroundColor={theme === 'light' ? '#f8fafc' : '#1e1e1e'}
           cooldownTicks={0}
         />
       )}

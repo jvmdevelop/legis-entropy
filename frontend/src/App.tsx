@@ -11,12 +11,14 @@ import { ErrorState } from './components/ErrorState';
 import { useGraphData } from './hooks/useGraphData';
 import { useAnalysisStream } from './hooks/useAnalysisStream';
 import { useCorpusReview } from './hooks/useCorpusReview';
+import { useTheme } from './hooks/useTheme';
 import type { GraphNode } from './types';
 
 export default function App() {
   const { data, loading, error, refetch } = useGraphData();
   const { state: stream, start: startStream, stop: stopStream } = useAnalysisStream();
   const { data: corpusReview, loading: corpusReviewLoading, load: fetchCorpusReview, dismiss: closeCorpusReview } = useCorpusReview();
+  const { theme, toggle: toggleTheme } = useTheme();
 
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [compareNode, setCompareNode] = useState<GraphNode | null>(null);
@@ -64,6 +66,8 @@ export default function App() {
         isInspectorOpen={inspectorOpen}
         searchHits={searchHits}
         onSearchResults={setSearchHits}
+        theme={theme}
+        onThemeToggle={toggleTheme}
       />
 
       <div className="flex flex-1 overflow-hidden">
@@ -77,6 +81,7 @@ export default function App() {
               selectedId={selectedNode?.id ?? null}
               highlightIds={searchHits.length > 0 ? searchHits : undefined}
               compareId={compareNode?.id ?? null}
+              theme={theme}
             />
           )}
 
