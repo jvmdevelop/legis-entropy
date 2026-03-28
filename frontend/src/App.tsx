@@ -84,10 +84,11 @@ export default function App() {
 
       {/* Inspector button — same level as search, top-right */}
       <div className="absolute top-4 right-4 z-20">
-        <div className="flex items-center h-12 rounded-lg bg-white/90 backdrop-blur-md border border-white/20 elevation-2 overflow-hidden">
+        <div className="flex items-center h-8 rounded-lg bg-white/90 backdrop-blur-md border border-white/20 elevation-2 overflow-hidden">
           <button
             onClick={() => setSidebarOpen(o => !o)}
-            className="h-full flex items-center gap-2 px-5 text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 transition-all duration-300 relative group ripple"
+            className="h-full flex items-center gap-2 text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 transition-all duration-300 relative group ripple"
+            style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem' }}
           >
             <svg width="13" height="13" viewBox="0 0 12 12" fill="none" className="transition-transform duration-300" style={{ transform: sidebarOpen ? 'rotate(180deg)' : 'none' }}>
               <rect x="1" y="1" width="4" height="10" rx="1" stroke="currentColor" strokeWidth="1.3"/>
@@ -100,7 +101,7 @@ export default function App() {
         </div>
 
         {sidebarOpen && (
-          <div className="absolute top-14 right-0 w-80 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-lg bg-white/95 backdrop-blur-md border border-white/20 elevation-3">
+          <div className="absolute top-12 right-0 w-80 max-h-[calc(100vh-5rem)] overflow-y-auto rounded-lg bg-white/95 backdrop-blur-md border border-white/20 elevation-3">
             <Sidebar
               node={selectedNode}
               issues={activeData?.issues ?? []}

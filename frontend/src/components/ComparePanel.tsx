@@ -97,7 +97,7 @@ export function ComparePanel({ nodeA, nodeB, onClose }: Props) {
       style={{
         left: 16,
         right: 'calc(20rem + 24px)',
-        top: 'calc(1rem + 3.5rem)',
+        top: 'calc(1rem + 3rem)',
         maxHeight: 'calc(100vh - 5rem)',
       }}
     >

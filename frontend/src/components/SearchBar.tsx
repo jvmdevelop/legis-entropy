@@ -56,7 +56,7 @@ export function SearchBar({ onResults, embedded }: Props) {
         value={query}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="Поиск по НПА…"
-        className={`w-full text-xs text-gray-700 pl-9 pr-9 py-3 focus:outline-none placeholder-gray-400 transition-all duration-300 ${
+        className={`w-full text-xs text-gray-700 pl-9 pr-9 py-0 h-full focus:outline-none placeholder-gray-400 transition-all duration-300 ${
           embedded
             ? "bg-transparent border-0 focus:ring-0"
             : "bg-white/80 backdrop-blur-sm border border-white/20 rounded-lg hover:border-gray-400 focus:border-gray-600 focus:ring-2 focus:ring-gray-100"

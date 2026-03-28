@@ -11,9 +11,9 @@ interface NavigationBarProps {
 export function NavigationBar({ onStartAnalysis, onFetchCorpusReview, corpusReviewLoading, stream }: NavigationBarProps) {
   return (
     <div className="absolute top-4 left-4 z-10">
-      <div className="flex items-center h-12 rounded-lg bg-white/90 backdrop-blur-md border border-white/20 elevation-2 overflow-hidden divide-x divide-gray-100">
+      <div className="flex items-center h-8 rounded-lg bg-white/90 backdrop-blur-md border border-white/20 elevation-2 overflow-hidden divide-x divide-gray-100">
         {/* Brand */}
-        <div className="flex items-center gap-3 px-5 h-full bg-gradient-to-r from-gray-50 to-slate-50">
+        <div className="flex items-center gap-3 h-full bg-gradient-to-r from-gray-50 to-slate-50" style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
           <Logo size={20} />
         </div>
 
@@ -21,7 +21,8 @@ export function NavigationBar({ onStartAnalysis, onFetchCorpusReview, corpusRevi
         <button
           onClick={onStartAnalysis}
           disabled={stream.running}
-          className="h-full flex items-center gap-2 px-5 text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 disabled:opacity-40 transition-all duration-300 relative group ripple"
+          className="h-full flex items-center gap-2 text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 disabled:opacity-40 transition-all duration-300 relative group ripple"
+          style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem' }}
         >
           {stream.running ? (
             <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
@@ -38,7 +39,8 @@ export function NavigationBar({ onStartAnalysis, onFetchCorpusReview, corpusRevi
         <button
           onClick={onFetchCorpusReview}
           disabled={corpusReviewLoading}
-          className="h-full flex items-center gap-2 px-5 text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 disabled:opacity-40 transition-all duration-300 relative group ripple"
+          className="h-full flex items-center gap-2 text-[11px] font-medium text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-50 hover:to-slate-50 disabled:opacity-40 transition-all duration-300 relative group ripple"
+          style={{ paddingLeft: '1.5rem', paddingRight: '1.5rem' }}
         >
           {corpusReviewLoading ? (
             <div className="w-4 h-4 border-2 border-gray-600 border-t-transparent rounded-full animate-spin" />
