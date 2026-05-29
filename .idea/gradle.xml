@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/backend" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/backend" />
+            <option value="$PROJECT_DIR$/backend/auth-service" />
+            <option value="$PROJECT_DIR$/backend/chat-service" />
+            <option value="$PROJECT_DIR$/backend/documents-manager-service" />
+            <option value="$PROJECT_DIR$/backend/eureka-server" />
+            <option value="$PROJECT_DIR$/backend/gateway-service" />
+            <option value="$PROJECT_DIR$/backend/graphs-service" />
+            <option value="$PROJECT_DIR$/backend/law-service" />
+            <option value="$PROJECT_DIR$/backend/llm-brain-service" />
+            <option value="$PROJECT_DIR$/backend/user-service" />
+            <option value="$PROJECT_DIR$/backend/workspace-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/backend/eureka-server" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/backend/eureka-server" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/backend/graphs-service" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/backend/graphs-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/backend/llm-brain-service" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/backend/llm-brain-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/backend/user-service" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/backend/user-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

@@ -1,0 +1,30 @@
+package com.jvmd.dms.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/documents/**").permitAll()
+                        .requestMatchers("/api/user-documents/**").permitAll()
+                        .requestMatchers("/api/laws/**").permitAll()
+                        .requestMatchers("/api/templates/**").permitAll()
+                        .requestMatchers("/api/generated-documents/**").permitAll()
+                        .requestMatchers("/api/voice-messages/**").permitAll()
+                        .requestMatchers("/api/evidence-pack/**").permitAll()
+                        .requestMatchers("/actuator/**").permitAll()
+                        .anyRequest().authenticated()
+                );
+        return http.build();
+    }
+}

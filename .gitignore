@@ -1,0 +1,33 @@
+
+
+# Gradle
+.gradle/
+build/
+**/build/
+out/
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Compiled
+*.class
+*.jar
+!**/gradle-wrapper.jar
+
+# Logs
+*.log
+logs/
+
+# Secrets
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Spring Boot
+/backend/**/embeddings-cache/

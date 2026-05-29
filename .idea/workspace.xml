@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="04af6dd3-68a3-46ff-8738-65da20ac8a47" name="Changes" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExternalProjectsData">
+    <projectState path="$PROJECT_DIR$/backend">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/auth-service">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/chat-service">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/documents-manager-service">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/eureka-server">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/gateway-service">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/graphs-service">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/llm-brain-service">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/load-balancer">
+      <ProjectState />
+    </projectState>
+    <projectState path="$PROJECT_DIR$/backend/user-service">
+      <ProjectState />
+    </projectState>
+  </component>
+  <component name="ExternalProjectsManager">
+    <system id="GRADLE">
+      <state>
+        <projects_view>
+          <tree_state>
+            <expand />
+            <select />
+          </tree_state>
+        </projects_view>
+      </state>
+    </system>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="package-info" />
+        <option value="Enum" />
+        <option value="Interface" />
+        <option value="Kotlin Script Gradle.gradle" />
+        <option value="Class" />
+        <option value="com.haulmont.ampsbb.Component" />
+        <option value="Exception" />
+        <option value="com.haulmont.ampjpb.JpaRepository" />
+        <option value="GitHub Workflow" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GradleModuleStateConfig" initialized="true">
+    <option name="configPaths">
+      <map>
+        <entry key="$PROJECT_DIR$/backend/analysis-service" value="$PROJECT_DIR$/backend/analysis-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/auth-service" value="$PROJECT_DIR$/backend/auth-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/chat-service" value="$PROJECT_DIR$/backend/chat-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/documents-manager-service" value="$PROJECT_DIR$/backend/documents-manager-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/eureka-server" value="$PROJECT_DIR$/backend/eureka-server/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/gateway-service" value="$PROJECT_DIR$/backend/gateway-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/graphs-service" value="$PROJECT_DIR$/backend/graphs-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/law-service" value="$PROJECT_DIR$/backend/law-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/llm-brain-service" value="$PROJECT_DIR$/backend/llm-brain-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/load-balancer" value="$PROJECT_DIR$/backend/load-balancer/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/user-service" value="$PROJECT_DIR$/backend/user-service/build.gradle.kts" />
+        <entry key="$PROJECT_DIR$/backend/workspace-service" value="$PROJECT_DIR$/backend/workspace-service/build.gradle.kts" />
+      </map>
+    </option>
+  </component>
+  <component name="McpProjectServerCommands">
+    <commands />
+    <urls />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6,
+  &quot;fromUser&quot;: false
+}</component>
+  <component name="ProjectId" id="3DLdg8XjdRCOBbFvDL8QAhXNLUF" />
+  <component name="ProjectViewState">
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Gradle.Build backend.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build eureka-server.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build user-service.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.backend:documents-manager-service [build].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.EurekaServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.LoadBalancerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/dieno/projects/legis-entropy-&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/dieno/.local/share/JetBrains/Toolbox/apps/intellij-idea/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="com.jvmd.dms.law.parser" />
+      <recent name="com.jvmd.dms.document.model" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice" />
+      <recent name="$PROJECT_DIR$/backend/eureka-server" />
+      <recent name="$PROJECT_DIR$/backend/user-service" />
+      <recent name="$PROJECT_DIR$" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/frontend" />
+      <recent name="$PROJECT_DIR$/frontend/public/features" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.jvmd.userservice.model" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="configurationTypes">
+      <set>
+        <option value="KtorApplicationConfigurationType" />
+        <option value="MicronautRunConfigurationType" />
+        <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
+      </set>
+    </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="EurekaServerApplication" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="RunManager" selected="Spring Boot.AuthServiceApplication">
+    <configuration default="true" type="JetRunConfigurationType">
+      <module name="user-service" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="user-service" />
+      <option name="filePath" />
+      <method v="2" />
+    </configuration>
+    <configuration name="AnalysisServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.analysis-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.analysisservice.AnalysisServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AuthServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.auth-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.authservice.AuthServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BackendApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.backend.BackendApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ChatServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.chat-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.chatservice.ChatServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="DocumentsManagerServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.documents-manager-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.dms.DocumentsManagerServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServerApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="eureka-server.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.eurekaserver.EurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServerApplication (2)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="backend.eureka-server.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.eurekaserver.EurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServerApplication (3)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="gateway-server.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.eurekaserver.EurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="EurekaServerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="backend.eureka-server.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.eurekaserver.EurekaServerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GatewayServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="backend.gateway-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.gatewayservice.GatewayServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GraphsServiceApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="backend.graphs-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.graphsservice.GraphsServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GraphsServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="graphs-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.graphsservice.GraphsServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LawServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.law-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.lawservice.LawServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LlmBrainServiceApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="backend.llm-brain-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.llmbrainservice.LlmBrainServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LlmBrainServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="llm-brain-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.llmbrainservice.LlmBrainServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LoadBalancerApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <module name="backend.load-balancer.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.loadbalancer.LoadBalancerApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.user-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.userservice.UserServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="user-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.userservice.UserServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="WorkspaceServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
+      <module name="backend.workspace-service.main" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.workspaceservice.WorkspaceServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="04af6dd3-68a3-46ff-8738-65da20ac8a47" name="Changes" comment="" />
+      <created>1778065391236</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1778065391236</updated>
+      <workItem from="1778065392422" duration="8448000" />
+      <workItem from="1778080542730" duration="545000" />
+      <workItem from="1778081526722" duration="1218000" />
+      <workItem from="1778090406036" duration="10710000" />
+      <workItem from="1778141551182" duration="9007000" />
+      <workItem from="1778254081991" duration="11000" />
+      <workItem from="1778258679902" duration="4029000" />
+      <workItem from="1778310235181" duration="5589000" />
+      <workItem from="1778320126692" duration="205000" />
+      <workItem from="1778325026653" duration="4543000" />
+      <workItem from="1778330586454" duration="1700000" />
+      <workItem from="1778332478012" duration="172000" />
+      <workItem from="1778335079736" duration="25000" />
+      <workItem from="1778335160219" duration="1044000" />
+      <workItem from="1778336726440" duration="7617000" />
+      <workItem from="1778345984061" duration="375000" />
+      <workItem from="1778349976067" duration="103000" />
+      <workItem from="1778350478897" duration="567000" />
+      <workItem from="1778351075601" duration="696000" />
+      <workItem from="1778394726972" duration="1711000" />
+      <workItem from="1778396451375" duration="618000" />
+      <workItem from="1778398535290" duration="324000" />
+      <workItem from="1778398981330" duration="874000" />
+      <workItem from="1778399944176" duration="12815000" />
+      <workItem from="1778414088856" duration="7960000" />
+      <workItem from="1778425962462" duration="5618000" />
+      <workItem from="1778432846854" duration="7983000" />
+      <workItem from="1778477294448" duration="27720000" />
+      <workItem from="1778584640802" duration="11274000" />
+      <workItem from="1778601104069" duration="1780000" />
+      <workItem from="1778604066292" duration="1242000" />
+      <workItem from="1778680179852" duration="307000" />
+      <workItem from="1779008013372" duration="9480000" />
+      <workItem from="1779020126731" duration="1124000" />
+      <workItem from="1779261499119" duration="11207000" />
+      <workItem from="1779289880179" duration="792000" />
+      <workItem from="1779293126782" duration="2732000" />
+      <workItem from="1779726004210" duration="365000" />
+      <workItem from="1779814878139" duration="83000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnknownFeatures">
+    <option featureType="dependencySupport" implementationName="java:org.springframework.security:spring-security-core" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-core" />
+    <option featureType="dependencySupport" implementationName="executable:docker" />
+    <option featureType="dependencySupport" implementationName="java:jakarta.persistence:jakarta.persistence-api" />
+    <option featureType="dependencySupport" implementationName="java:io.projectreactor:reactor-core" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.data:spring-data-commons" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-messaging" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework.boot:spring-boot" />
+    <option featureType="dependencySupport" implementationName="java:org.springframework:spring-webmvc" />
+    <option featureType="dependencySupport" implementationName="java:org.projectlombok:lombok" />
+  </component>
+</project>

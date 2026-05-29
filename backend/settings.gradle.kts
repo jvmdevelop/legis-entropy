@@ -1,0 +1,11 @@
+rootProject.name = "backend"
+include("auth-service")
+include("chat-service")
+include("documents-manager-service")
+include("gateway-service")
+include("eureka-server")
+include("user-service")
+include("llm-brain-service")
+include("law-service")
+include("workspace-service")
+include("graphs-service")
