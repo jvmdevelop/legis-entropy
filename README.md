@@ -12,4 +12,16 @@
 
 <br>
 
-**legis-entropy** is an advanced legal document management and analysis platform powered by a microservices architecture, Spring AI, and modern web technologies. It features intelligent document classification, graph-based legal relationship visualization, and AI-driven workspace management.
+**legis-entropy** is laws manager and analysis platform based on microservices architecture.
+
+This project displays my skills to design microservice architecture and opportunity of usage Spring AI.
+
+FEATURES:
+document classification;
+graph visualization of laws and ur documents;
+AI context vizualization;
+workspaces management;
+grapviews management;
+AI tooling(context, templates, ur s3 documents)
+templates management;
+
