@@ -266,26 +266,6 @@ services:
       retries: 5
       start_period: 180s
 
-  intent-service:
-    build:
-      context: ./intent-service
-      dockerfile: Dockerfile
-    container_name: intent-service
-    ports:
-      - "${INTENT_SERVICE_PORT:-8090}:8090"
-    networks:
-      - legis-entropy-network
-    healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          'python -c "import urllib.request; urllib.request.urlopen(''http://localhost:8090/health'')" || exit 1',
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-
   llm-brain-service:
     build:
       context: ./backend/llm-brain-service
@@ -301,7 +281,6 @@ services:
       LLM_MODEL: ${LLM_MODEL:-qwen2.5:7b}
       LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.2}
       GRAPH_SERVICE_URL: http://graphs-service:8086
-      INTENT_SERVICE_URL: http://intent-service:8090
       DEEP_ANALYSIS_MAX_LAWS_TOTAL: ${DEEP_ANALYSIS_MAX_LAWS_TOTAL:-25}
       DEEP_ANALYSIS_MAX_ARTICLES_TOTAL: ${DEEP_ANALYSIS_MAX_ARTICLES_TOTAL:-75}
       DEEP_ANALYSIS_MAX_CONFLICTS: ${DEEP_ANALYSIS_MAX_CONFLICTS:-10}
@@ -318,8 +297,6 @@ services:
       eureka-server:
         condition: service_started
       documents-manager-service:
-        condition: service_healthy
-      intent-service:
         condition: service_healthy
     healthcheck:
       test:
@@ -370,7 +347,7 @@ services:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       NEO4J_URI: neo4j://neo4j:7687
       NEO4J_USER: neo4j
-      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
       ELASTICSEARCH_URI: http://elasticsearch:9200
       DMS_BASE_URL: http://documents-manager-service:8083
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/

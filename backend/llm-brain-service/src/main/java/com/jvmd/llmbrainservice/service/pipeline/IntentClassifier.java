@@ -1,16 +1,11 @@
 package com.jvmd.llmbrainservice.service.pipeline;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 
 @Component
 public class IntentClassifier {
@@ -18,56 +13,8 @@ public class IntentClassifier {
     private static final Logger log = LoggerFactory.getLogger(
         IntentClassifier.class
     );
-    private static final double CONFIDENCE_THRESHOLD = 0.70;
-
-    private final RestClient intentClient;
-
-    public IntentClassifier(
-        @Value(
-            "${intent.service.url:http://intent-service:8090}"
-        ) String intentServiceUrl
-    ) {
-        this.intentClient = RestClient.builder()
-            .baseUrl(intentServiceUrl)
-            .build();
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record IntentResponse(String intent, double confidence) {}
 
     public ContextPlan classify(BrainRequest request) {
-        if (
-            !request.hasDocumentId() &&
-            !request.hasSituationId() &&
-            !request.hasVoiceId()
-        ) {
-            try {
-                IntentResponse resp = intentClient
-                    .post()
-                    .uri("/classify")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(Map.of("text", request.message(), "lang", "ru"))
-                    .retrieve()
-                    .body(IntentResponse.class);
-                if (resp != null && resp.confidence() >= CONFIDENCE_THRESHOLD) {
-                    ContextPlan plan = mlIntentToPlan(resp.intent());
-                    if (plan != null) {
-                        log.debug(
-                            "intent-service: {} ({:.2f})",
-                            resp.intent(),
-                            resp.confidence()
-                        );
-                        return plan;
-                    }
-                }
-            } catch (Exception e) {
-                log.warn(
-                    "intent-service unavailable, using keyword fallback: {}",
-                    e.getMessage()
-                );
-            }
-        }
-
         String message = normalize(request.message());
         boolean hasDocument = request.hasDocumentId();
 
@@ -221,36 +168,6 @@ public class IntentClassifier {
             BrainTaskType.GENERAL_LEGAL_ADVICE,
             RetrievalMode.NONE
         );
-    }
-
-    private ContextPlan mlIntentToPlan(String intent) {
-        return switch (intent) {
-            case "LAW_SEARCH" -> new ContextPlan(
-                BrainTaskType.LAW_SEARCH,
-                RetrievalMode.LAW
-            );
-            case "SUMMARY" -> new ContextPlan(
-                BrainTaskType.SUMMARY,
-                RetrievalMode.NONE
-            );
-            case "GENERAL_LEGAL_ADVICE" -> new ContextPlan(
-                BrainTaskType.GENERAL_LEGAL_ADVICE,
-                RetrievalMode.NONE
-            );
-            case "GRAPH_DEEP_ANALYSIS" -> new ContextPlan(
-                BrainTaskType.GRAPH_DEEP_ANALYSIS,
-                RetrievalMode.NONE
-            );
-            case "GRAPH_ADD_LAWS" -> new ContextPlan(
-                BrainTaskType.GRAPH_ADD_LAWS,
-                RetrievalMode.NONE
-            );
-            case "DOCUMENT_DRAFT" -> new ContextPlan(
-                BrainTaskType.DOCUMENT_DRAFT,
-                RetrievalMode.LAW
-            );
-            default -> null;
-        };
     }
 
     private RetrievalMode retrievalForLawOnly(boolean lawRelated) {
