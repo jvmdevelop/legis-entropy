@@ -1,6 +1,7 @@
 package com.jvmd.llmbrainservice.service.graph.primary;
 
-import com.jvmd.llmbrainservice.client.GraphServiceClient.LawInfo;
+
+import com.jvmd.llmbrainservice.dto.LawInfo;
 
 import java.util.List;
 

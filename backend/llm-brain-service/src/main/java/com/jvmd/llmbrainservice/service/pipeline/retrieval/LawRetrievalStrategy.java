@@ -2,6 +2,7 @@ package com.jvmd.llmbrainservice.service.pipeline.retrieval;
 
 import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
+import com.jvmd.llmbrainservice.dto.LawInfo;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import com.jvmd.llmbrainservice.model.RetrievalChunkResponse;
 import com.jvmd.llmbrainservice.service.context.DocumentContext;
@@ -83,16 +84,16 @@ public class LawRetrievalStrategy implements RetrievalStrategy {
         for (String code : primaryCodes) {
             if (hops >= MAX_GRAPH_HOPS) break;
             try {
-                List<GraphServiceClient.LawInfo> related =
+                List<LawInfo> related =
                     graphServiceClient.findRelatedLaws(code, country);
-                for (GraphServiceClient.LawInfo law : related) {
+                for (LawInfo law : related) {
                     if (
-                        law.getCode() == null || seen.contains(law.getCode())
+                        law.code() == null || seen.contains(law.code())
                     ) continue;
-                    seen.add(law.getCode());
-                    sb.append("• ").append(law.getCode());
-                    if (law.getTitle() != null) sb.append(" — ").append(
-                        law.getTitle()
+                    seen.add(law.code());
+                    sb.append("• ").append(law.code());
+                    if (law.title() != null) sb.append(" — ").append(
+                        law.title()
                     );
                     sb.append("\n");
                 }

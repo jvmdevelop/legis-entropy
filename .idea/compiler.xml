@@ -9,17 +9,17 @@
         </processorPath>
         <module name="backend.chat-service.main" />
         <module name="backend.gateway-service.main" />
-        <module name="backend.workspace-service.main" />
         <module name="backend.documents-manager-service.main" />
         <module name="backend.user-service.test" />
         <module name="backend.user-service.main" />
         <module name="backend.graphs-service.test" />
-        <module name="backend.graphs-service.main" />
+        <module name="com.jvmd.backend.workspace-service.main" />
         <module name="backend.documents-manager-service.test" />
         <module name="backend.chat-service.test" />
         <module name="backend.auth-service.main" />
+        <module name="com.jvmd.backend.graphs-service.main" />
         <module name="backend.llm-brain-service.main" />
-        <module name="backend.law-service.main" />
+        <module name="com.jvmd.backend.law-service.main" />
         <module name="backend.llm-brain-service.test" />
         <module name="backend.auth-service.test" />
       </profile>
@@ -72,6 +72,10 @@
       <module name="backend.workspace-service" options="-parameters" />
       <module name="backend.workspace-service.main" options="-parameters" />
       <module name="backend.workspace-service.test" options="-parameters" />
+      <module name="com.jvmd.backend.graphs-service.main" options="-parameters" />
+      <module name="com.jvmd.backend.law-service.main" options="-parameters" />
+      <module name="com.jvmd.backend.workspace-service.main" options="-parameters" />
+      <module name="com.jvmd.graphs-service.main" options="-parameters" />
       <module name="eureka-server" options="-parameters" />
       <module name="eureka-server.main" options="-parameters" />
       <module name="eureka-server.test" options="-parameters" />

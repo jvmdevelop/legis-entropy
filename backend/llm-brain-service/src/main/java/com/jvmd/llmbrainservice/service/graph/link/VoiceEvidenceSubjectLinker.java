@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
 import com.jvmd.llmbrainservice.model.BrainRequest;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -42,60 +44,66 @@ public class VoiceEvidenceSubjectLinker implements SubjectLinker {
     public Optional<LinkableSubject> resolve(BrainRequest request) {
         if (!canHandle(request)) return Optional.empty();
         String label = fetchVoiceMap(request.voiceId())
-            .map(m -> {
-                Object fn = m.get("fileName");
-                return fn == null ? null : fn.toString();
-            })
-            .orElse(null);
+                .map(m -> {
+                    Object fn = m.get("fileName");
+                    return fn == null ? null : fn.toString();
+                })
+                .orElse(null);
         return Optional.of(
-            LinkableSubject.voice(
-                request.voiceId(),
-                request.userId() == null ? "" : request.userId(),
-                label
-            )
+                LinkableSubject.voice(
+                        request.voiceId(),
+                        request.userId() == null ? "" : request.userId(),
+                        label
+                )
         );
     }
 
     @Override
     public String fetchSearchableText(LinkableSubject subject, String graphId) {
         return fetchVoiceMap(subject.id())
-            .map(m -> {
-                Object transcript = m.get("transcript");
-                if (transcript != null && !transcript.toString().isBlank()) {
-                    return transcript.toString();
-                }
-                Object analysisJson = m.get("analysisJson");
-                return analysisJson == null ? "" : analysisJson.toString();
-            })
-            .orElse("");
+                .map(m -> {
+                    Object transcript = m.get("transcript");
+                    if (transcript != null && !transcript.toString().isBlank()) {
+                        return transcript.toString();
+                    }
+                    Object analysisJson = m.get("analysisJson");
+                    return analysisJson == null ? "" : analysisJson.toString();
+                })
+                .orElse("");
     }
 
     @Override
     public boolean linkToLaw(
-        String graphId,
-        LinkableSubject subject,
-        String lawCode,
-        String country
+            String graphId,
+            LinkableSubject subject,
+            String lawCode,
+            String country
     ) {
-        return graphServiceClient.linkVoiceEvidenceToLaw(
-            graphId,
-            subject.id(),
-            lawCode,
-            country,
-            "Suggested by AI from voice analysis"
-        );
+        try {
+            graphServiceClient.linkVoiceEvidenceToLaw(
+                    graphId,
+                    subject.id(),
+                    lawCode,
+                    country,
+                    "Suggested by AI from voice analysis"
+            );
+            return true;
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public List<String> suggestedLawCodes(
-        LinkableSubject subject,
-        String graphId
+            LinkableSubject subject,
+            String graphId
     ) {
         return fetchVoiceMap(subject.id())
-            .map(m -> m.get("analysisJson"))
-            .map(Object::toString)
-            .map(this::extractLawCodes)
-            .orElseGet(List::of);
+                .map(m -> m.get("analysisJson"))
+                .map(Object::toString)
+                .map(this::extractLawCodes)
+                .orElseGet(List::of);
     }
 
     private List<String> extractLawCodes(String analysisJson) {
@@ -117,8 +125,8 @@ public class VoiceEvidenceSubjectLinker implements SubjectLinker {
             return codes;
         } catch (Exception e) {
             log.debug(
-                "Failed to parse analysisJson for voice seed codes: {}",
-                e.getMessage()
+                    "Failed to parse analysisJson for voice seed codes: {}",
+                    e.getMessage()
             );
             return List.of();
         }
@@ -145,9 +153,9 @@ public class VoiceEvidenceSubjectLinker implements SubjectLinker {
             return Optional.ofNullable(map);
         } catch (Exception e) {
             log.debug(
-                "getVoiceMessage failed for {}: {}",
-                voiceId,
-                e.getMessage()
+                    "getVoiceMessage failed for {}: {}",
+                    voiceId,
+                    e.getMessage()
             );
             return Optional.empty();
         }

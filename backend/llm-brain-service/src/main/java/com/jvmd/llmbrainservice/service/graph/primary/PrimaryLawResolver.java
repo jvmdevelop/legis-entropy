@@ -1,7 +1,7 @@
 package com.jvmd.llmbrainservice.service.graph.primary;
 
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
-import com.jvmd.llmbrainservice.client.GraphServiceClient.LawInfo;
+import com.jvmd.llmbrainservice.dto.LawInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,19 +49,19 @@ public class PrimaryLawResolver {
     }
 
     private void mergeLaw(LinkedHashMap<String, LawInfo> hits, LawInfo law, String country) {
-        if (law == null || law.getCode() == null || law.getCode().isBlank()) return;
-        String key = law.getCode();
+        if (law == null || law.code() == null || law.code().isBlank()) return;
+        String key = law.code();
         if (hits.containsKey(key)) return;
         LawInfo resolved = law;
-        boolean hasMetadata = law.getTitle() != null && !law.getTitle().equalsIgnoreCase(law.getCode());
+        boolean hasMetadata = law.title() != null && !law.title().equalsIgnoreCase(law.code());
         if (!hasMetadata) {
             try {
-                resolved = graphServiceClient.searchLaws(law.getCode(), country).stream()
-                        .filter(l -> law.getCode().equalsIgnoreCase(l.getCode()))
+                resolved = graphServiceClient.searchLaws(law.code(), country).stream()
+                        .filter(l -> law.code().equalsIgnoreCase(l.code()))
                         .findFirst()
                         .orElse(law);
             } catch (Exception e) {
-                log.debug("metadata lookup failed for {}: {}", law.getCode(), e.getMessage());
+                log.debug("metadata lookup failed for {}: {}", law.code(), e.getMessage());
             }
         }
         hits.put(canonicalize(key), resolved);

@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 public class BrainPromptBuilder {
 
     private final AssistantInstructions instructions;
-    private final ProfessionInstructions professionInstructions;
     private final SubjectLinkerRegistry linkerRegistry;
 
     public String buildUserPrompt(
@@ -233,9 +232,7 @@ public class BrainPromptBuilder {
     }
 
     private String buildProfessionBlock(ProfessionProfile profile) {
-        String instruction = professionInstructions.getInstruction(profile);
-        if (instruction == null || instruction.isBlank()) return "";
-        return "Профиль специализации:\n" + instruction + "\n";
+        return "Профиль специализации:\n" + profile.getInstruction() + "\n";
     }
 
     private String buildContextAwareInstruction(
@@ -247,7 +244,7 @@ public class BrainPromptBuilder {
             plan.retrievalMode() == RetrievalMode.HYBRID_LEGAL;
 
         if (hasContext && isLawTask) {
-            return "⚠️ Выше уже предоставлен контекст нормативной базы. Используй searchLaws() ТОЛЬКО если нужна информация, которой нет в предоставленном контексте — другие статьи или связанные законы.\n\n";
+            return "Выше уже предоставлен контекст нормативной базы. Используй searchLaws() ТОЛЬКО если нужна информация, которой нет в предоставленном контексте — другие статьи или связанные законы.\n\n";
         }
 
         return "";

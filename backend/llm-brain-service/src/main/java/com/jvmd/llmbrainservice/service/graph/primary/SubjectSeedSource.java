@@ -1,8 +1,9 @@
 package com.jvmd.llmbrainservice.service.graph.primary;
 
-import com.jvmd.llmbrainservice.client.GraphServiceClient.LawInfo;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.jvmd.llmbrainservice.dto.LawInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +36,8 @@ public class SubjectSeedSource implements PrimaryLawSource {
         for (String code : seeds) {
             if (code == null || code.isBlank()) continue;
             LawInfo law = new LawInfo();
-            law.setCode(code);
-            law.setTitle(code);
+            law.code(code);
+            law.title(code);
             out.add(law);
         }
         return out;

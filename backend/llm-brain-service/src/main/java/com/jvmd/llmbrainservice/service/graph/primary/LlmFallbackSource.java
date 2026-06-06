@@ -2,7 +2,7 @@ package com.jvmd.llmbrainservice.service.graph.primary;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jvmd.llmbrainservice.client.GraphServiceClient.LawInfo;
+import com.jvmd.llmbrainservice.dto.LawInfo;
 import com.jvmd.llmbrainservice.util.RateLimitRetry;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -94,8 +94,8 @@ public class LlmFallbackSource implements PrimaryLawSource {
             List<LawInfo> out = new ArrayList<>(codes.size());
             for (String code : codes) {
                 LawInfo law = new LawInfo();
-                law.setCode(code);
-                law.setTitle(code);
+                law.code(code);
+                law.title(code);
                 out.add(law);
             }
             return out;

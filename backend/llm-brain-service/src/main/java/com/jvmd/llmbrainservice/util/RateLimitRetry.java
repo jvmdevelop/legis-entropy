@@ -27,7 +27,6 @@ public final class RateLimitRetry {
                     throw new RuntimeException(e2.getMessage(), e2);
                 }
             }
-            if (e instanceof RuntimeException re) throw re;
             throw new RuntimeException(e.getMessage(), e);
         }
     }

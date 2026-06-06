@@ -1,6 +1,6 @@
 package com.jvmd.llmbrainservice.service.graph.primary;
 
-import com.jvmd.llmbrainservice.client.GraphServiceClient.LawInfo;
+import com.jvmd.llmbrainservice.dto.LawInfo;
 import com.jvmd.llmbrainservice.service.graph.link.LinkableSubject;
 import com.jvmd.llmbrainservice.service.graph.link.SubjectLinker;
 

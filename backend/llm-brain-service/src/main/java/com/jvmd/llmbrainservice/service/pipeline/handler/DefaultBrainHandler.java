@@ -102,7 +102,7 @@ public class DefaultBrainHandler implements BrainTaskHandler {
                                     String redacted = hallucinationDetector.redactUngroundedArticles(finalAnswer, ungrounded);
                                     String list = ungrounded.stream().map(String::valueOf)
                                             .collect(Collectors.joining(", "));
-                                    String footer = "\n\n> ⚠️ Не удалось подтвердить номера статей по retrieval-контексту: **"
+                                    String footer = "\n\n> Не удалось подтвердить номера статей по retrieval-контексту: **"
                                             + list + "**. Перепроверьте по официальному источнику — модель могла перепутать раздел кодекса.";
                                     try {
                                         emitter.send(SseEmitter.event().name("redaction").data(redacted + footer));

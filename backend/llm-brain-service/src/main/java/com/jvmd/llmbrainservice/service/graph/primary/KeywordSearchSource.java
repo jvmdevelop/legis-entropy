@@ -1,7 +1,7 @@
 package com.jvmd.llmbrainservice.service.graph.primary;
 
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
-import com.jvmd.llmbrainservice.client.GraphServiceClient.LawInfo;
+import com.jvmd.llmbrainservice.dto.LawInfo;
 import com.jvmd.llmbrainservice.service.graph.LawSignalFilter;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -42,7 +42,7 @@ public class KeywordSearchSource implements PrimaryLawSource {
                     q,
                     ctx.country()
                 )) {
-                    if (law.getCode() == null) continue;
+                    if (law.code() == null) continue;
                     if (LawSignalFilter.isLowSignal(law)) continue;
                     out.add(law);
                 }

@@ -27,7 +27,7 @@ public class BrainPipeline {
     private ContextPlan resolvePlan(BrainRequest request) {
         ContextPlan plan = intentClassifier.classify(request);
         if (plan.taskType().requiresGraphId() && !request.hasGraphId()) {
-            log.warn("Task {} requires graphId but none provided — falling back to GENERAL_LEGAL_ADVICE", plan.taskType());
+            log.warn("Task {} requires graphId but none provided - falling back to GENERAL_LEGAL_ADVICE", plan.taskType());
             return new ContextPlan(BrainTaskType.GENERAL_LEGAL_ADVICE, RetrievalMode.NONE);
         }
         return plan;

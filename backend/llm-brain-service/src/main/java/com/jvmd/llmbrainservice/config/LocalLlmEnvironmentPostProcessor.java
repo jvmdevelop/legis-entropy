@@ -2,6 +2,8 @@ package com.jvmd.llmbrainservice.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -16,8 +18,8 @@ public class LocalLlmEnvironmentPostProcessor
 
     @Override
     public void postProcessEnvironment(
-        ConfigurableEnvironment env,
-        SpringApplication application
+            ConfigurableEnvironment env,
+            @NonNull SpringApplication application
     ) {
         String enabled = env.getProperty("LOCAL_LLM_ENABLED", "false");
         if (!"true".equalsIgnoreCase(enabled)) return;

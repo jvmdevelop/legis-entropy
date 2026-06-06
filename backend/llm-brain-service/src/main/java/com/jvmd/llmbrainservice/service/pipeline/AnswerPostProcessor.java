@@ -30,7 +30,7 @@ public class AnswerPostProcessor {
             log.warn("Redacting {} ungrounded article number(s): {}", ungrounded.size(), ungrounded);
             String redacted = hallucinationDetector.redactUngroundedArticles(stripped, ungrounded);
             String list = ungrounded.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            return redacted + "\n\n> ⚠️ Не удалось подтвердить номера статей по retrieval-контексту: **"
+            return redacted + "\n\n> Не удалось подтвердить номера статей по retrieval-контексту: **"
                     + list + "**. Перепроверьте по официальному источнику — модель могла перепутать раздел кодекса.";
         }
 
