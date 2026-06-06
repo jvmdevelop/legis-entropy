@@ -34,13 +34,7 @@ dms:
   base-url: ${DMS_BASE_URL:http://localhost:8083}
 
 parser:
-  # Skip persisting laws marked EXPIRED / INVALID / PARSE_ERROR.
-  # Default true so the graph holds only the currently-in-force redaction
-  # of every law and article. Flip to false for one-off historical backfills.
   skip-expired: true
   kz:
-    # Primary source: Эталонный контрольный банк НПА (Минюст РК).
-    # Replaces adilet.zan.kz which has been unstable; zan.gov.kz exposes a
-    # clean JSON API at /api/documents/{code}/{lang} with structured content.
     base-url: https://zan.gov.kz
     search-path: /api/documents/search

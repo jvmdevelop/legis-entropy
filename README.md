@@ -22,6 +22,9 @@ graph visualization of laws and ur documents;
 AI context vizualization;
 workspaces management;
 grapviews management;
-AI tooling(context, templates, ur s3 documents)
+AI tooling(context, templates, ur s3 documents);
 templates management;
-
+voice memos transcription;
+contract risk analysis;
+legal situations and conflict tracking;
+law knowledge base with article-level search;
