@@ -2,6 +2,8 @@ package com.jvmd.llmbrainservice.service.graph.link;
 
 import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
+import com.jvmd.llmbrainservice.client.SituationClient;
+import com.jvmd.llmbrainservice.dto.FlagDocumentArticleConflictRequest;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import com.jvmd.llmbrainservice.model.RetrievalChunkResponse;
 
@@ -20,6 +22,7 @@ public class DocumentSubjectLinker implements SubjectLinker {
 
     private final DmsClient dmsClient;
     private final GraphServiceClient graphServiceClient;
+    private final SituationClient situationClient;
 
     @Override
     public SubjectKind kind() {
@@ -146,16 +149,22 @@ public class DocumentSubjectLinker implements SubjectLinker {
             String reason,
             double confidence
     ) {
-        return graphServiceClient.flagDocumentArticleConflict(
-                graphId,
-                subject.id(),
-                lawCode,
-                country,
-                articleNumber,
-                clauseRef,
-                reason,
-                confidence
-        );
+        try {
+            situationClient.flagDocumentArticleConflict(new FlagDocumentArticleConflictRequest(
+                    graphId,
+                    subject.id(),
+                    lawCode,
+                    country,
+                    articleNumber,
+                    clauseRef,
+                    reason,
+                    confidence
+            ));
+            return true;
+        } catch (Exception e) {
+            log.warn("Failed to flag document-article conflict: {}", e.getMessage());
+            return false;
+        }
     }
 
     @Override

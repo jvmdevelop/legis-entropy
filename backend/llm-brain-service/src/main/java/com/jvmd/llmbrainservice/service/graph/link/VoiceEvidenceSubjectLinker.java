@@ -2,8 +2,8 @@ package com.jvmd.llmbrainservice.service.graph.link;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
+import com.jvmd.llmbrainservice.client.VoiceClient;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class VoiceEvidenceSubjectLinker implements SubjectLinker {
 
-    private final DmsClient dmsClient;
+    private final VoiceClient voiceClient;
     private final GraphServiceClient graphServiceClient;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -149,7 +149,7 @@ public class VoiceEvidenceSubjectLinker implements SubjectLinker {
 
     private Optional<Map<String, Object>> fetchVoiceMap(String voiceId) {
         try {
-            Map<String, Object> map = dmsClient.getVoiceMessage(voiceId);
+            Map<String, Object> map = voiceClient.getVoiceMessage(voiceId);
             return Optional.ofNullable(map);
         } catch (Exception e) {
             log.debug(

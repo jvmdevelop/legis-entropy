@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(
-        name = "graph-service",
-        url = "${graph.service.url:http://localhost:8086}"
-)
+@FeignClient(name = "graphs-service")
 public interface GraphServiceClient {
 
     @GetMapping("/api/graph/laws/{code}")
@@ -55,13 +52,6 @@ public interface GraphServiceClient {
     void linkDocumentClauseToArticle(@RequestBody LinkClauseRequest request);
 
 
-    @PostMapping(value = "/api/graph/conflicts/article-article", consumes = MediaType.APPLICATION_JSON_VALUE)
-    void flagArticleConflict(@RequestBody FlagArticleConflictRequest request);
-
-    @PostMapping(value = "/api/graph/conflicts/document-article", consumes = MediaType.APPLICATION_JSON_VALUE)
-    void flagDocumentArticleConflict(@RequestBody FlagDocumentArticleConflictRequest request);
-
-
     @PostMapping("/api/v1/user-graphs/{graphId}/laws/{code}")
     void addLawToUserGraph(
             @PathVariable("graphId") String graphId,
@@ -78,15 +68,6 @@ public interface GraphServiceClient {
             @RequestParam("kind") String kind
     );
 
-    @PostMapping("/api/v1/user-graphs/{graphId}/situations/{situationId}/laws/{lawCode}")
-    void linkSituationToLaw(
-            @PathVariable("graphId") String graphId,
-            @PathVariable("situationId") String situationId,
-            @PathVariable("lawCode") String lawCode,
-            @RequestParam("country") String country,
-            @RequestParam("kind") String kind
-    );
-
     @PostMapping("/api/v1/user-graphs/{graphId}/voice-evidence/{voiceId}/laws/{lawCode}")
     void linkVoiceEvidenceToLaw(
             @PathVariable("graphId") String graphId,
@@ -94,26 +75,6 @@ public interface GraphServiceClient {
             @PathVariable("lawCode") String lawCode,
             @RequestParam("country") String country,
             @RequestParam("reason") String reason
-    );
-
-    @PostMapping(value = "/api/v1/user-graphs/{graphId}/situations", consumes = MediaType.APPLICATION_JSON_VALUE)
-    IdResponse createSituation(
-            @PathVariable("graphId") String graphId,
-            @RequestHeader("X-User-Id") String userId,
-            @RequestBody CreateSituationRequest request
-    );
-
-    @PostMapping(value = "/api/v1/user-graphs/{graphId}/situations/{situationId}/generated-doc", consumes = MediaType.APPLICATION_JSON_VALUE)
-    void updateSituationGeneratedDoc(
-            @PathVariable("graphId") String graphId,
-            @PathVariable("situationId") String situationId,
-            @RequestBody UpdateGeneratedDocRequest request
-    );
-
-    @GetMapping("/api/v1/user-graphs/{graphId}/situations/{situationId}")
-    Map<String, Object> getSituation(
-            @PathVariable("graphId") String graphId,
-            @PathVariable("situationId") String situationId
     );
 
     @PostMapping(value = "/api/v1/user-graphs/{graphId}/comments", consumes = MediaType.APPLICATION_JSON_VALUE)

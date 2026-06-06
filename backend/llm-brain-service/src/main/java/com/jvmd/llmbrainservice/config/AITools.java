@@ -2,6 +2,8 @@ package com.jvmd.llmbrainservice.config;
 
 import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
+import com.jvmd.llmbrainservice.client.LawClient;
+import com.jvmd.llmbrainservice.client.SituationClient;
 import com.jvmd.llmbrainservice.dto.*;
 import com.jvmd.llmbrainservice.model.RetrievalChunkResponse;
 import com.jvmd.llmbrainservice.service.graph.GraphActionService;
@@ -20,10 +22,10 @@ public class AITools {
 
     @Bean
     @Description("Поиск в базе нормативно-правовых актов (законов) Казахстана и РФ")
-    public Function<LawSearchRequest, List<RetrievalChunkResponse>> searchLaws(DmsClient dmsClient) {
+    public Function<LawSearchRequest, List<RetrievalChunkResponse>> searchLaws(LawClient lawClient) {
         return request -> {
             log.info("Tool searchLaws called with query: {}", request.query());
-            return dmsClient.searchLaws(request.query());
+            return lawClient.searchLaws(request.query());
         };
     }
 
@@ -260,14 +262,13 @@ public class AITools {
             "Используй когда обнаружил противоречие или коллизию норм между двумя статьями. " +
             "graphId — активный граф, codeA/numberA — первая статья (закон+номер), codeB/numberB — вторая, " +
             "reason — краткое объяснение конфликта на русском, confidence — уверенность 0..1.")
-    public Function<FlagArticleConflictRequest, String> flagArticleConflict(GraphServiceClient graphServiceClient) {
+    public Function<FlagArticleConflictRequest, String> flagArticleConflict(SituationClient situationClient) {
         return request -> {
             log.info("Tool flagArticleConflict: {}ст.{} vs {}ст.{} graph={}",
                     request.codeA(), request.numberA(), request.codeB(), request.numberB(), request.graphId());
             String country = request.country() == null ? "RK" : request.country();
 
             try {
-                // Используем конструктор рекорда со значением по умолчанию "llm-brain" для поля extractedBy
                 FlagArticleConflictRequest body = new FlagArticleConflictRequest(
                         request.graphId(),
                         country,
@@ -278,7 +279,7 @@ public class AITools {
                         request.reason(),
                         request.confidence()
                 );
-                graphServiceClient.flagArticleConflict(body);
+                situationClient.flagArticleConflict(body);
                 return "Конфликт зафиксирован: " + request.codeA() + " ст." + request.numberA() +
                         " ↔ " + request.codeB() + " ст." + request.numberB() +
                         (request.reason() != null ? " — " + request.reason() : "");
@@ -294,14 +295,13 @@ public class AITools {
             "Используй когда обнаружил, что пункт договора/иска противоречит конкретной статье закона. " +
             "graphId — активный граф, documentId — ID документа, lawCode + articleNumber — статья, " +
             "clauseRef — например 'п. 3.2', reason — объяснение конфликта, confidence — 0..1.")
-    public Function<FlagDocumentArticleConflictRequest, String> flagDocumentArticleConflict(GraphServiceClient graphServiceClient) {
+    public Function<FlagDocumentArticleConflictRequest, String> flagDocumentArticleConflict(SituationClient situationClient) {
         return request -> {
             log.info("Tool flagDocumentArticleConflict: doc={} clause={} -> {}ст.{} graph={}",
                     request.documentId(), request.clauseRef(), request.lawCode(), request.articleNumber(), request.graphId());
             String country = request.country() == null ? "RK" : request.country();
 
             try {
-                // Используем кастомный конструктор рекорда с дефолтным "llm-brain"
                 FlagDocumentArticleConflictRequest body = new FlagDocumentArticleConflictRequest(
                         request.graphId(),
                         request.documentId(),
@@ -312,7 +312,7 @@ public class AITools {
                         request.reason(),
                         request.confidence()
                 );
-                graphServiceClient.flagDocumentArticleConflict(body);
+                situationClient.flagDocumentArticleConflict(body);
                 return "Конфликт зафиксирован: документ (" + (request.clauseRef() == null ? "?" : request.clauseRef()) +
                         ") ↔ " + request.lawCode() + " ст." + request.articleNumber() +
                         (request.reason() != null ? " — " + request.reason() : "");

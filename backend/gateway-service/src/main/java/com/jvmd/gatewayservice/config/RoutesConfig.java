@@ -71,18 +71,65 @@ public class RoutesConfig {
     }
 
     @Bean
+    public RouterFunction<ServerResponse> userDocumentsRoutes() {
+        return GatewayRouterFunctions.route("document-service")
+                .route(GatewayRequestPredicates.path("/api/user-documents/**"), HandlerFunctions.http())
+                .filter(LoadBalancerFilterFunctions.lb("document-service"))
+                .before(injectUserHeaders())
+                .build();
+    }
+
+    @Bean
     public RouterFunction<ServerResponse> documentsRoutes() {
         return GatewayRouterFunctions.route("documents-service")
                 .route(GatewayRequestPredicates.path(
                                 "/api/documents/**",
-                                "/api/user-documents/**",
-                                "/api/laws/**",
-                                "/api/templates/**",
-                                "/api/generated-documents/**",
-                                "/api/voice-messages/**",
                                 "/api/evidence-pack/**"),
                         HandlerFunctions.http())
                 .filter(LoadBalancerFilterFunctions.lb("documents-manager-service"))
+                .before(injectUserHeaders())
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> lawRoutes() {
+        return GatewayRouterFunctions.route("law-service")
+                .route(GatewayRequestPredicates.path("/api/v1/kz-laws/**", "/api/laws/**"),
+                        HandlerFunctions.http())
+                .filter(LoadBalancerFilterFunctions.lb("law-service"))
+                .before(injectUserHeaders())
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> voiceRoutes() {
+        return GatewayRouterFunctions.route("voice-service")
+                .route(GatewayRequestPredicates.path("/api/voice-messages/**"),
+                        HandlerFunctions.http())
+                .filter(LoadBalancerFilterFunctions.lb("voice-service"))
+                .before(injectUserHeaders())
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> templateRoutes() {
+        return GatewayRouterFunctions.route("template-service")
+                .route(GatewayRequestPredicates.path("/api/templates/**", "/api/generated-documents/**"),
+                        HandlerFunctions.http())
+                .filter(LoadBalancerFilterFunctions.lb("template-service"))
+                .before(injectUserHeaders())
+                .build();
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> situationRoutes() {
+        return GatewayRouterFunctions.route("situation-service")
+                .route(GatewayRequestPredicates.path(
+                                "/api/graph/conflicts/**",
+                                "/api/v1/user-graphs/*/situations/**",
+                                "/api/v1/user-graphs/*/situations"),
+                        HandlerFunctions.http())
+                .filter(LoadBalancerFilterFunctions.lb("situation-service"))
                 .before(injectUserHeaders())
                 .build();
     }

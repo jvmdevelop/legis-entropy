@@ -2,12 +2,17 @@ package com.jvmd.llmbrainservice.service.draft;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
+import com.jvmd.llmbrainservice.client.SituationClient;
+import com.jvmd.llmbrainservice.dto.LawInfo;
+import com.jvmd.llmbrainservice.client.TemplateClient;
+import com.jvmd.llmbrainservice.dto.CreateSituationRequest;
 import com.jvmd.llmbrainservice.dto.CreateTemplateResponse;
 import com.jvmd.llmbrainservice.dto.DraftResult;
 import com.jvmd.llmbrainservice.dto.DraftStepNotification;
+import com.jvmd.llmbrainservice.dto.IdResponse;
 import com.jvmd.llmbrainservice.dto.RenderTemplateRequest;
+import com.jvmd.llmbrainservice.dto.UpdateGeneratedDocRequest;
 import com.jvmd.llmbrainservice.dto.UserTemplate;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import com.jvmd.llmbrainservice.model.BrainResponse;
@@ -33,8 +38,9 @@ public class DocumentDraftService {
 
     private final BrainModelClient modelClient;
     private final GraphServiceClient graphServiceClient;
-    private final DmsClient dmsClient;
-    private final ObjectMapper objectMapper; // Встроенный бин Spring Boot для работы с JSON
+    private final SituationClient situationClient;
+    private final TemplateClient templateClient;
+    private final ObjectMapper objectMapper;
 
     public BrainResponse draft(BrainRequest request) {
         try {
@@ -104,7 +110,7 @@ public class DocumentDraftService {
 
         if (templateId != null) {
             emitThinking(emitter, new DraftStepNotification("draft-save", "Сохраняю документ..."));
-            generatedDocId = Optional.ofNullable(dmsClient.renderTemplate(
+            generatedDocId = Optional.ofNullable(templateClient.renderTemplate(
                     templateId,
                     request.userId(),
                     new RenderTemplateRequest(docTitle, request.graphId(), situationId)
@@ -112,11 +118,10 @@ public class DocumentDraftService {
         }
 
         if (generatedDocId != null && situationId != null && request.hasGraphId()) {
-            graphServiceClient.updateSituationGeneratedDoc(
+            situationClient.updateSituationGeneratedDoc(
                     request.graphId(),
                     situationId,
-                    generatedDocId,
-                    docTitle
+                    new UpdateGeneratedDocRequest(generatedDocId, docTitle)
             );
         }
 
@@ -128,7 +133,7 @@ public class DocumentDraftService {
                 .searchLaws(message, "RK")
                 .stream()
                 .limit(5)
-                .map(GraphServiceClient.LawInfo::getCode)
+                .map(LawInfo::code)
                 .toList();
     }
 
@@ -137,15 +142,23 @@ public class DocumentDraftService {
         String plain = request.message().length() > 500
                 ? request.message().substring(0, 500)
                 : request.message();
-        return graphServiceClient
-                .createSituation(request.graphId(), request.userId(), title, plain)
-                .orElse(null);
+        try {
+            IdResponse resp = situationClient.createSituation(
+                    request.graphId(),
+                    request.userId(),
+                    new CreateSituationRequest(title, plain)
+            );
+            return resp != null ? resp.id() : null;
+        } catch (Exception e) {
+            log.warn("Failed to create situation in graph {}: {}", request.graphId(), e.getMessage());
+            return null;
+        }
     }
 
     private void linkLawsToSituation(String graphId, String situationId, List<String> lawCodes) {
         for (String code : lawCodes) {
             graphServiceClient.addLawToUserGraph(graphId, code, "RK");
-            graphServiceClient.linkSituationToLaw(graphId, situationId, code, "RK", "SEMANTIC");
+            situationClient.linkSituationToLaw(graphId, situationId, code, "RK", "SEMANTIC");
         }
     }
 
@@ -159,12 +172,12 @@ public class DocumentDraftService {
                 Составь юридический документ строго по запросу пользователя.
                 Используй актуальное законодательство РК.
                 Ответь ТОЛЬКО текстом самого документа в формате markdown — без вступлений, объяснений и комментариев.
-                
+
                 ВАЖНО: Все поля, которые пользователь должен заполнить (ФИО, дата, адрес, сумма, наименование суда и т.д.),
                 обозначай токеном в формате {{название_поля}}, например:
                 {{фио_истца}}, {{дата}}, {{адрес_ответчика}}, {{сумма_ущерба}}, {{наименование_суда}}.
                 Не вставляй реальные имена и данные — только токены.
-                
+
                 %s
                 Запрос пользователя:
                 %s
@@ -190,7 +203,7 @@ public class DocumentDraftService {
             suggestedLawCodesJson = "[]";
         }
 
-        return dmsClient.createTemplate(
+        return templateClient.createTemplate(
                 userId,
                 new UserTemplate(code, title, description, "USER", docContent, suggestedLawCodesJson, "MANUAL", false)
         );

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/auth-service/backend.auth-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/auth-service/backend.auth-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/chat-service/backend.chat-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/chat-service/backend.chat-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/documents-manager-service/backend.documents-manager-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/documents-manager-service/backend.documents-manager-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/gateway-service/backend.gateway-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/gateway-service/backend.gateway-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/graphs-service/backend.graphs-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/graphs-service/backend.graphs-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/law-service/backend.law-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/law-service/backend.law-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/llm-brain-service/backend.llm-brain-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/llm-brain-service/backend.llm-brain-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/user-service/backend.user-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/user-service/backend.user-service.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/workspace-service/backend.workspace-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/workspace-service/backend.workspace-service.main.iml" />
+    </modules>
+  </component>
+</project>

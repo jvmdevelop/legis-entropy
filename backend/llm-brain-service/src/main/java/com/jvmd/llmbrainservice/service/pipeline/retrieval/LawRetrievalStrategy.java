@@ -1,7 +1,7 @@
 package com.jvmd.llmbrainservice.service.pipeline.retrieval;
 
-import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
+import com.jvmd.llmbrainservice.client.LawClient;
 import com.jvmd.llmbrainservice.dto.LawInfo;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import com.jvmd.llmbrainservice.model.RetrievalChunkResponse;
@@ -25,7 +25,7 @@ public class LawRetrievalStrategy implements RetrievalStrategy {
     private static final String DEFAULT_COUNTRY = "RK";
     private static final int MAX_GRAPH_HOPS = 2;
 
-    private final DmsClient dmsClient;
+    private final LawClient lawClient;
     private final GraphServiceClient graphServiceClient;
     private final DocumentContextFormatter formatter;
     private final LegalQueryRewriter queryRewriter;
@@ -40,13 +40,13 @@ public class LawRetrievalStrategy implements RetrievalStrategy {
         try {
             String optimizedQuery = queryRewriter.rewrite(request.message());
 
-            List<RetrievalChunkResponse> chunks = dmsClient.searchLawsByCountry(
+            List<RetrievalChunkResponse> chunks = lawClient.searchLawsByCountry(
                 DEFAULT_COUNTRY,
                 optimizedQuery
             );
 
             if (chunks.isEmpty()) {
-                chunks = dmsClient.searchLaws(optimizedQuery);
+                chunks = lawClient.searchLaws(optimizedQuery);
             }
 
             DocumentContext primary = formatter.format(chunks);

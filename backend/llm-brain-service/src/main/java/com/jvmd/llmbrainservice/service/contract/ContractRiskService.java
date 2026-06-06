@@ -2,7 +2,7 @@ package com.jvmd.llmbrainservice.service.contract;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jvmd.llmbrainservice.client.DmsClient;
+import com.jvmd.llmbrainservice.client.LawClient;
 import com.jvmd.llmbrainservice.dto.ClauseRiskResult;
 import com.jvmd.llmbrainservice.dto.MissingClauseResult;
 import com.jvmd.llmbrainservice.dto.RiskScanResponse;
@@ -31,7 +31,7 @@ public class ContractRiskService {
     private static final int BATCH_SIZE = 15;
 
     private final ClauseExtractor clauseExtractor;
-    private final DmsClient dmsClient;
+    private final LawClient lawClient;
     private final BrainModelClient modelClient;
     private final List<ContractTypeDetector> contractTypeDetectors;
     private final ObjectMapper objectMapper;
@@ -104,7 +104,7 @@ public class ContractRiskService {
         for (String q : queries) {
             try {
                 List<RetrievalChunkResponse> found =
-                    dmsClient.searchLawsByCountry(country, q);
+                    lawClient.searchLawsByCountry(country, q);
                 for (RetrievalChunkResponse r : found) {
                     if (articles.size() >= 20) break;
                     articles.add(r);

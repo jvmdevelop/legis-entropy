@@ -1,6 +1,6 @@
 package com.jvmd.llmbrainservice.service.graph.link;
 
-import com.jvmd.llmbrainservice.client.GraphServiceClient;
+import com.jvmd.llmbrainservice.client.SituationClient;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +14,7 @@ import java.util.Optional;
 @Slf4j
 public class SituationSubjectLinker implements SubjectLinker {
 
-    private final GraphServiceClient graphServiceClient;
+    private final SituationClient situationClient;
 
     @Override
     public SubjectKind kind() {
@@ -35,7 +35,7 @@ public class SituationSubjectLinker implements SubjectLinker {
     public Optional<LinkableSubject> resolve(BrainRequest request) {
         if (!canHandle(request)) return Optional.empty();
         try {
-            Map<String, Object> situation = graphServiceClient.getSituation(request.graphId(), request.situationId());
+            Map<String, Object> situation = situationClient.getSituation(request.graphId(), request.situationId());
             if (situation == null) return Optional.empty();
 
             String label = stringFromMap(situation, "title");
@@ -53,7 +53,7 @@ public class SituationSubjectLinker implements SubjectLinker {
     public String fetchSearchableText(LinkableSubject subject, String graphId) {
         if (graphId == null || graphId.isBlank()) return "";
         try {
-            Map<String, Object> map = graphServiceClient.getSituation(graphId, subject.id());
+            Map<String, Object> map = situationClient.getSituation(graphId, subject.id());
             if (map == null) return "";
 
             String plain = stringFromMap(map, "plainText");
@@ -70,7 +70,7 @@ public class SituationSubjectLinker implements SubjectLinker {
     @Override
     public boolean linkToLaw(String graphId, LinkableSubject subject, String lawCode, String country) {
         try {
-            graphServiceClient.linkSituationToLaw(graphId, subject.id(), lawCode, country, "SEMANTIC");
+            situationClient.linkSituationToLaw(graphId, subject.id(), lawCode, country, "SEMANTIC");
             return true;
         } catch (Exception e) {
             log.warn("Failed to link situation {} to law {}: {}", subject.id(), lawCode, e.getMessage());
