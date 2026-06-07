@@ -1,7 +1,7 @@
 package com.jvmd.dms.template.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jvmd.dms.template.entity.GeneratedDocument;
+import com.jvmd.dms.template.model.GeneratedDocument;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

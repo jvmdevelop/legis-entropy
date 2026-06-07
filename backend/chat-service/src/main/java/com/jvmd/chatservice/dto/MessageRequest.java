@@ -1,6 +1,6 @@
 package com.jvmd.chatservice.dto;
 
-import com.jvmd.chatservice.entity.MessageRole;
+import com.jvmd.chatservice.model.MessageRole;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

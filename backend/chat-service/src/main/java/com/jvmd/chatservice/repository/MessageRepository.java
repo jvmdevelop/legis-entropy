@@ -1,6 +1,6 @@
 package com.jvmd.chatservice.repository;
 
-import com.jvmd.chatservice.entity.Message;
+import com.jvmd.chatservice.model.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

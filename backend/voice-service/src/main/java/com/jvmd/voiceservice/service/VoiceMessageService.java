@@ -2,8 +2,8 @@ package com.jvmd.voiceservice.service;
 
 import com.jvmd.voiceservice.config.MinioProperties;
 import com.jvmd.voiceservice.dto.VoiceMessageDTO;
-import com.jvmd.voiceservice.entity.VoiceMessage;
-import com.jvmd.voiceservice.entity.VoiceMessageStatus;
+import com.jvmd.voiceservice.model.VoiceMessage;
+import com.jvmd.voiceservice.model.VoiceMessageStatus;
 import com.jvmd.voiceservice.repository.VoiceMessageRepository;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;

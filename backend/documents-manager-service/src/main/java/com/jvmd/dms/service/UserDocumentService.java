@@ -1,7 +1,7 @@
 package com.jvmd.dms.service;
 
 import com.jvmd.dms.dto.DocumentStatusResponse;
-import com.jvmd.dms.entity.UserDocument;
+import com.jvmd.dms.model.UserDocument;
 import com.jvmd.dms.repository.UserDocumentRepository;
 import java.util.Comparator;
 import java.util.List;

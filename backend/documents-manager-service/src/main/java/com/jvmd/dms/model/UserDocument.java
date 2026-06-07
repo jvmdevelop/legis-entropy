@@ -1,4 +1,4 @@
-package com.jvmd.dms.entity;
+package com.jvmd.dms.model;
 
 import com.jvmd.dms.service.DocumentProcessingStatus;
 import jakarta.persistence.Column;

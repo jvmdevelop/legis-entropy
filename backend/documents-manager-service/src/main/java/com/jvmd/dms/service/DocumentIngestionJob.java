@@ -1,6 +1,6 @@
 package com.jvmd.dms.service;
 
-import com.jvmd.dms.entity.UserDocument;
+import com.jvmd.dms.model.UserDocument;
 import com.jvmd.dms.repository.UserDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

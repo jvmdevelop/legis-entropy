@@ -1,10 +1,10 @@
 package com.jvmd.dms.evidence;
 
 import com.jvmd.dms.config.MinioProperties;
-import com.jvmd.dms.template.entity.GeneratedDocument;
+import com.jvmd.dms.template.model.GeneratedDocument;
 import com.jvmd.dms.template.repository.GeneratedDocumentRepository;
-import com.jvmd.dms.voice.entity.VoiceMessage;
-import com.jvmd.dms.voice.entity.VoiceMessageStatus;
+import com.jvmd.dms.voice.model.VoiceMessage;
+import com.jvmd.dms.voice.model.VoiceMessageStatus;
 import com.jvmd.dms.voice.repository.VoiceMessageRepository;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;

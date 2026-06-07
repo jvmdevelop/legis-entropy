@@ -1,6 +1,6 @@
 package com.jvmd.chatservice.dto;
 
-import com.jvmd.chatservice.entity.MessageRole;
+import com.jvmd.chatservice.model.MessageRole;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

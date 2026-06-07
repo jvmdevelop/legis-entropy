@@ -1,4 +1,4 @@
-package com.jvmd.chatservice.entity;
+package com.jvmd.chatservice.model;
 
 public enum MessageRole {
     USER, ASSISTANT, SYSTEM

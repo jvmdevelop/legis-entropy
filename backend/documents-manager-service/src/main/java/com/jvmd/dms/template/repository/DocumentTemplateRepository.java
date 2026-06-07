@@ -1,6 +1,6 @@
 package com.jvmd.dms.template.repository;
 
-import com.jvmd.dms.template.entity.DocumentTemplate;
+import com.jvmd.dms.template.model.DocumentTemplate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

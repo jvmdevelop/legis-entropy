@@ -1,6 +1,6 @@
 package com.jvmd.dms.service;
 
-import com.jvmd.dms.entity.UserDocument;
+import com.jvmd.dms.model.UserDocument;
 import com.jvmd.dms.repository.UserDocumentRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.document.Document;

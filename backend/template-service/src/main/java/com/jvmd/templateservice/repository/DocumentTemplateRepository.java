@@ -1,6 +1,6 @@
 package com.jvmd.templateservice.repository;
 
-import com.jvmd.templateservice.entity.DocumentTemplate;
+import com.jvmd.templateservice.model.DocumentTemplate;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,6 +1,6 @@
 package com.jvmd.dms.voice.repository;
 
-import com.jvmd.dms.voice.entity.VoiceMessage;
+import com.jvmd.dms.voice.model.VoiceMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

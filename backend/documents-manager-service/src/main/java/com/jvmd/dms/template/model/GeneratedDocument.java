@@ -1,4 +1,4 @@
-package com.jvmd.dms.template.entity;
+package com.jvmd.dms.template.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

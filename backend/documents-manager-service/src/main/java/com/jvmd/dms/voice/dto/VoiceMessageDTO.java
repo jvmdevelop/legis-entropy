@@ -1,7 +1,7 @@
 package com.jvmd.dms.voice.dto;
 
-import com.jvmd.dms.voice.entity.VoiceMessage;
-import com.jvmd.dms.voice.entity.VoiceMessageStatus;
+import com.jvmd.dms.voice.model.VoiceMessage;
+import com.jvmd.dms.voice.model.VoiceMessageStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

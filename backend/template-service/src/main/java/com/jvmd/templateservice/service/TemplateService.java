@@ -5,8 +5,8 @@ import com.jvmd.templateservice.config.MinioProperties;
 import com.jvmd.templateservice.dto.GeneratedDocumentDTO;
 import com.jvmd.templateservice.dto.RenderTemplateRequest;
 import com.jvmd.templateservice.dto.TemplateDTO;
-import com.jvmd.templateservice.entity.DocumentTemplate;
-import com.jvmd.templateservice.entity.GeneratedDocument;
+import com.jvmd.templateservice.model.DocumentTemplate;
+import com.jvmd.templateservice.model.GeneratedDocument;
 import com.jvmd.templateservice.model.Slot;
 import com.jvmd.templateservice.repository.DocumentTemplateRepository;
 import com.jvmd.templateservice.repository.GeneratedDocumentRepository;
@@ -149,7 +149,7 @@ public class TemplateService {
     private GeneratedDocumentDTO doRender(DocumentTemplate template, String userId, RenderTemplateRequest req) {
         Map<String, String> vars = req.getVariables() == null ? Map.of()
                 : req.getVariables().entrySet().stream()
-                        .collect(java.util.stream.Collectors.toMap(
+                        .collect(Collectors.toMap(
                                 Map.Entry::getKey,
                                 e -> e.getValue() == null ? "" : e.getValue().toString()));
         TemplateRenderer.RenderResult result = renderer.render(template.getBody(), vars);
@@ -261,26 +261,7 @@ public class TemplateService {
 
     private String serializeVars(Map<String, String> vars) {
         if (vars == null || vars.isEmpty()) return "{}";
-        return vars.entrySet().stream()
-                .map(e -> "\"" + jsonEscape(e.getKey()) + "\":\"" + jsonEscape(e.getValue()) + "\"")
-                .collect(Collectors.joining(",", "{", "}"));
-    }
-
-    private static String jsonEscape(String s) {
-        if (s == null) return "";
-        StringBuilder sb = new StringBuilder(s.length() + 2);
-        for (int i = 0; i < s.length(); i++) {
-            char c = s.charAt(i);
-            switch (c) {
-                case '"' -> sb.append("\\\"");
-                case '\\' -> sb.append("\\\\");
-                case '\n' -> sb.append("\\n");
-                case '\r' -> sb.append("\\r");
-                case '\t' -> sb.append("\\t");
-                default -> { if (c < 0x20) sb.append(String.format("\\u%04x", (int) c)); else sb.append(c); }
-            }
-        }
-        return sb.toString();
+        try { return objectMapper.writeValueAsString(vars); } catch (Exception e) { return "{}"; }
     }
 
     private static String stripExtension(String name) {

@@ -2,8 +2,8 @@ package com.jvmd.dms.voice.service;
 
 import com.jvmd.dms.config.MinioProperties;
 import com.jvmd.dms.voice.dto.VoiceMessageDTO;
-import com.jvmd.dms.voice.entity.VoiceMessage;
-import com.jvmd.dms.voice.entity.VoiceMessageStatus;
+import com.jvmd.dms.voice.model.VoiceMessage;
+import com.jvmd.dms.voice.model.VoiceMessageStatus;
 import com.jvmd.dms.voice.repository.VoiceMessageRepository;
 import io.minio.BucketExistsArgs;
 import io.minio.GetObjectArgs;

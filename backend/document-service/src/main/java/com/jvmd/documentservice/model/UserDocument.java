@@ -1,4 +1,4 @@
-package com.jvmd.documentservice.entity;
+package com.jvmd.documentservice.model;
 
 import com.jvmd.documentservice.service.DocumentProcessingStatus;
 import jakarta.persistence.*;

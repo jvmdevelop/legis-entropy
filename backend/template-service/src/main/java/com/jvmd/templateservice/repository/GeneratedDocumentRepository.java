@@ -1,6 +1,6 @@
 package com.jvmd.templateservice.repository;
 
-import com.jvmd.templateservice.entity.GeneratedDocument;
+import com.jvmd.templateservice.model.GeneratedDocument;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

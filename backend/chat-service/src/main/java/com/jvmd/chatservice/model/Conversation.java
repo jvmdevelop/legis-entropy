@@ -1,4 +1,4 @@
-package com.jvmd.chatservice.entity;
+package com.jvmd.chatservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

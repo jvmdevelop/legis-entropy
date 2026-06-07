@@ -1,6 +1,6 @@
 package com.jvmd.documentservice.repository;
 
-import com.jvmd.documentservice.entity.UserDocument;
+import com.jvmd.documentservice.model.UserDocument;
 import com.jvmd.documentservice.service.DocumentProcessingStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

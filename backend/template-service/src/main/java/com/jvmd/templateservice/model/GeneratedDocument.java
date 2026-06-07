@@ -1,4 +1,4 @@
-package com.jvmd.templateservice.entity;
+package com.jvmd.templateservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

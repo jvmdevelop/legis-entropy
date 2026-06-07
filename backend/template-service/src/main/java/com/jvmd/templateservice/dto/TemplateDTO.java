@@ -1,6 +1,6 @@
 package com.jvmd.templateservice.dto;
 
-import com.jvmd.templateservice.entity.DocumentTemplate;
+import com.jvmd.templateservice.model.DocumentTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

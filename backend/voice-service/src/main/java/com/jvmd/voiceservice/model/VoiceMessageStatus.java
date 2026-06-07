@@ -1,4 +1,4 @@
-package com.jvmd.dms.voice.entity;
+package com.jvmd.voiceservice.model;
 
 public enum VoiceMessageStatus {
     UPLOADED,
