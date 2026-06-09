@@ -28,6 +28,14 @@ public class UserController {
         return new PagedModel<>(users);
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<User> getMe(@RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        if (userId == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        return userService.findById(userId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/exists-by-username")
     public boolean existsByUsername(@RequestParam String username) {
         return userService.existsByUsername(username);

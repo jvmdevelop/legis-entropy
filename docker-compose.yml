@@ -266,6 +266,43 @@ services:
       retries: 5
       start_period: 180s
 
+  template-service:
+    build:
+      context: ./backend/template-service
+      dockerfile: Dockerfile
+    container_name: template-service
+    ports:
+      - "${TEMPLATE_SERVICE_PORT:-8091}:8091"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_URL: jdbc:postgresql://postgres-documents:5432/${DOCUMENTS_DB_NAME}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-user-documents}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - legis-entropy-network
+    depends_on:
+      postgres-documents:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:8091/actuator/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
   llm-brain-service:
     build:
       context: ./backend/llm-brain-service
@@ -402,6 +439,148 @@ services:
       retries: 5
       start_period: 40s
 
+  document-service:
+    build:
+      context: ./backend/document-service
+      dockerfile: Dockerfile
+    container_name: document-service
+    ports:
+      - "${DOCUMENT_SERVICE_PORT:-8093}:8093"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_URL: jdbc:postgresql://postgres-documents:5432/${DOCUMENTS_DB_NAME}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-user-documents}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    volumes:
+      - document-embeddings-cache:/app/embeddings-cache
+    networks:
+      - legis-entropy-network
+    depends_on:
+      postgres-documents:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:8093/actuator/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  law-service:
+    build:
+      context: ./backend/law-service
+      dockerfile: Dockerfile
+    container_name: law-service
+    ports:
+      - "${LAW_SERVICE_PORT:-8087}:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-documents:5432/${DOCUMENTS_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - legis-entropy-network
+    depends_on:
+      postgres-documents:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:8087/actuator/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  situation-service:
+    build:
+      context: ./backend/situation-service
+      dockerfile: Dockerfile
+    container_name: situation-service
+    ports:
+      - "${SITUATION_SERVICE_PORT:-8092}:8092"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      NEO4J_URI: neo4j://neo4j:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - legis-entropy-network
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:8092/actuator/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  voice-service:
+    build:
+      context: ./backend/voice-service
+      dockerfile: Dockerfile
+    container_name: voice-service
+    ports:
+      - "${VOICE_SERVICE_PORT:-8090}:8090"
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      DB_URL: jdbc:postgresql://postgres-documents:5432/${DOCUMENTS_DB_NAME}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: ${MINIO_BUCKET:-user-documents}
+      VOICE_STT_PROVIDER: ${VOICE_STT_PROVIDER:-whisper}
+      VOICE_STT_BASE_URL: ${VOICE_STT_BASE_URL:-http://whisper:8000/v1}
+      VOICE_STT_MODEL: ${VOICE_STT_MODEL:-Systran/faster-whisper-base}
+      VOICE_STT_API_KEY: ${VOICE_STT_API_KEY:-}
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    networks:
+      - legis-entropy-network
+    depends_on:
+      postgres-documents:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      eureka-server:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:8090/actuator/health || exit 1",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
   gateway-service:
     build:
       context: ./backend/gateway-service
@@ -431,6 +610,16 @@ services:
       graphs-service:
         condition: service_healthy
       workspace-service:
+        condition: service_healthy
+      template-service:
+        condition: service_healthy
+      document-service:
+        condition: service_healthy
+      law-service:
+        condition: service_healthy
+      situation-service:
+        condition: service_healthy
+      voice-service:
         condition: service_healthy
     healthcheck:
       test:
@@ -558,3 +747,4 @@ volumes:
   elasticsearch-data:
   ollama-data:
   dms-onnx-cache:
+  document-embeddings-cache:
