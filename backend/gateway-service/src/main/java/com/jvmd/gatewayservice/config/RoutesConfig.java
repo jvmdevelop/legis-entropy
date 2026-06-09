@@ -117,19 +117,9 @@ public class RoutesConfig {
     @Bean
     public RouterFunction<ServerResponse> documentRoutes() {
         return GatewayRouterFunctions.route("document-service")
-                .route(GatewayRequestPredicates.path("/api/user-documents/**"),
+                .route(GatewayRequestPredicates.path("/api/user-documents/**", "/api/v1/documents/**", "/api/evidence-pack/**"),
                         HandlerFunctions.http())
                 .filter(LoadBalancerFilterFunctions.lb("document-service"))
-                .before(injectUserHeaders())
-                .build();
-    }
-
-    @Bean
-    public RouterFunction<ServerResponse> documentsManagerRoutes() {
-        return GatewayRouterFunctions.route("documents-manager-service")
-                .route(GatewayRequestPredicates.path("/api/v1/documents/**", "/api/evidence-pack/**"),
-                        HandlerFunctions.http())
-                .filter(LoadBalancerFilterFunctions.lb("documents-manager-service"))
                 .before(injectUserHeaders())
                 .build();
     }

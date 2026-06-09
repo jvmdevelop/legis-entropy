@@ -29,6 +29,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
     implementation("org.springframework.ai:spring-ai-starter-vector-store-pgvector")
+    implementation("org.springframework.ai:spring-ai-transformers")
     implementation("org.jsoup:jsoup:1.17.2")
     runtimeOnly("org.postgresql:postgresql")
     compileOnly("org.projectlombok:lombok")

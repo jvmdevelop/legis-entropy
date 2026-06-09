@@ -22,7 +22,7 @@ public class DmsArticleClient {
     private final RestClient restClient;
 
     public DmsArticleClient(
-            @Value("${dms.base-url:http://documents-manager-service:8083}") String dmsBaseUrl) {
+            @Value("${dms.base-url:http://law-service:8087}") String dmsBaseUrl) {
         this.restClient = RestClient.builder()
                 .baseUrl(dmsBaseUrl)
                 .build();

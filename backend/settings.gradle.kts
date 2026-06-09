@@ -1,7 +1,6 @@
 rootProject.name = "backend"
 include("auth-service")
 include("chat-service")
-include("documents-manager-service")
 include("gateway-service")
 include("eureka-server")
 include("user-service")
