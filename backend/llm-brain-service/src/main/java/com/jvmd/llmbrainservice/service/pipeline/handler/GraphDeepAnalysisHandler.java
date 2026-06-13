@@ -18,11 +18,15 @@ import com.jvmd.llmbrainservice.util.JsonEscape;
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class GraphDeepAnalysisHandler implements BrainTaskHandler {
+
+    private static final ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
     private final DeepAnalysisService deepAnalysisService;
     private final SubjectLinkerRegistry linkerRegistry;
@@ -93,7 +97,7 @@ public class GraphDeepAnalysisHandler implements BrainTaskHandler {
                 } catch (IOException ignored) {}
                 emitter.completeWithError(e);
             }
-        });
+        }, VIRTUAL_EXECUTOR);
         return emitter;
     }
 

@@ -21,11 +21,7 @@ public class MetadataBackfillService {
 
     private final LawRepository lawRepository;
     private final GraphKzLawParser parser;
-    private final ExecutorService executor = Executors.newSingleThreadExecutor(r -> {
-        Thread t = new Thread(r, "metadata-backfill");
-        t.setDaemon(true);
-        return t;
-    });
+    private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     private final AtomicReference<BackfillResult> lastResult = new AtomicReference<>();
     private final AtomicReference<String> status = new AtomicReference<>("idle");
 

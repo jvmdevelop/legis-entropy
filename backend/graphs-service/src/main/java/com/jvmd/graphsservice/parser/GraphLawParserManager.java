@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ public abstract class GraphLawParserManager<T extends Parser> {
     protected final LawRepository lawRepository;
     protected final BlockingDeque<String> pathQueue;
     protected final ExecutorService executorService;
+    protected final Semaphore parserPermits = new Semaphore(5);
 
     @Autowired(required = false)
     protected ArticleExtractor articleExtractor;
@@ -68,9 +70,7 @@ public abstract class GraphLawParserManager<T extends Parser> {
         this.pathQueue = pathQueue;
         this.baseUrl = baseUrl;
         this.searchPath = searchPath;
-        this.executorService = Executors.newFixedThreadPool(
-            Integer.getInteger("parser.thread-pool-size", 3)
-        );
+        this.executorService = Executors.newVirtualThreadPerTaskExecutor();
         initSearchUrl();
     }
 
@@ -152,22 +152,30 @@ public abstract class GraphLawParserManager<T extends Parser> {
 
         executorService.submit(() -> {
             try {
-                log.info("Discovering documents...");
+                parserPermits.acquire();
+                try {
+                    log.info("Discovering documents...");
 
-                var documentUrls = pathParser.parseMultiplePages(searchUrl, 5);
+                    var documentUrls = pathParser.parseMultiplePages(searchUrl, 5);
 
-                for (String documentUrl : documentUrls) {
-                    if (!pathQueue.contains(documentUrl)) {
-                        pathQueue.addLast(documentUrl);
-                        log.debug("Added new document URL: {}", documentUrl);
+                    for (String documentUrl : documentUrls) {
+                        if (!pathQueue.contains(documentUrl)) {
+                            pathQueue.addLast(documentUrl);
+                            log.debug("Added new document URL: {}", documentUrl);
+                        }
                     }
-                }
 
-                log.info(
-                    "Discovered {} documents, queue size: {}",
-                    documentUrls.size(),
-                    pathQueue.size()
-                );
+                    log.info(
+                        "Discovered {} documents, queue size: {}",
+                        documentUrls.size(),
+                        pathQueue.size()
+                    );
+                } finally {
+                    parserPermits.release();
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("Document discovery interrupted");
             } catch (Exception e) {
                 log.error("Error discovering documents: {}", e.getMessage(), e);
             }
@@ -182,62 +190,70 @@ public abstract class GraphLawParserManager<T extends Parser> {
 
         executorService.submit(() -> {
             try {
-                String documentUrl = pathQueue.pollFirst();
-                if (documentUrl != null) {
-                    log.info("Parsing document: {}", documentUrl);
+                parserPermits.acquire();
+                try {
+                    String documentUrl = pathQueue.pollFirst();
+                    if (documentUrl != null) {
+                        log.info("Parsing document: {}", documentUrl);
 
-                    Law law;
-                    LawStructure.ExtractionResult structure = null;
-                    Object parsed = lawParser.parse(documentUrl);
-                    if (parsed instanceof Law l) {
-                        law = l;
-                    } else {
-                        law = (Law) parsed;
-                    }
-                    if (lawParser instanceof GraphKzLawParser kzParser) {
-                        var full = kzParser.parseFull(documentUrl);
-                        law = full.law();
-                        structure = full.structure();
-                    }
-                    if (law.getSource() == null) {
-                        law.applyProvenance(
-                            com.jvmd.graphsservice.model.Provenance.govParser(
+                        Law law;
+                        LawStructure.ExtractionResult structure = null;
+                        Object parsed = lawParser.parse(documentUrl);
+                        if (parsed instanceof Law l) {
+                            law = l;
+                        } else {
+                            law = (Law) parsed;
+                        }
+                        if (lawParser instanceof GraphKzLawParser kzParser) {
+                            var full = kzParser.parseFull(documentUrl);
+                            law = full.law();
+                            structure = full.structure();
+                        }
+                        if (law.getSource() == null) {
+                            law.applyProvenance(
+                                com.jvmd.graphsservice.model.Provenance.govParser(
+                                    documentUrl
+                                )
+                            );
+                        }
+                        if (shouldSkipLaw(law)) {
+                            log.info(
+                                "Skipping non-current law {} (status={}, url={})",
+                                law.getTitle(),
+                                law.getStatus(),
                                 documentUrl
-                            )
-                        );
-                    }
-                    if (shouldSkipLaw(law)) {
+                            );
+                            return;
+                        }
+                        if (!LawIndexService.isIndexable(law)) {
+                            log.debug(
+                                "Skipping low-force act (parser): {} ({})",
+                                law.getCode(),
+                                law.getLegalForce()
+                            );
+                            return;
+                        }
+                        lawRepository.save(law);
+                        if (lawIndexService != null) lawIndexService.index(law);
+                        if (structure != null) {
+                            persistStructured(law, structure, documentUrl);
+                        } else {
+                            extractAndPersistArticles(law, documentUrl);
+                        }
+
                         log.info(
-                            "Skipping non-current law {} (status={}, url={})",
+                            "Successfully parsed and saved law: {} (status: {}, country: {})",
                             law.getTitle(),
                             law.getStatus(),
-                            documentUrl
+                            law.getCountry()
                         );
-                        return;
                     }
-                    if (!LawIndexService.isIndexable(law)) {
-                        log.debug(
-                            "Skipping low-force act (parser): {} ({})",
-                            law.getCode(),
-                            law.getLegalForce()
-                        );
-                        return;
-                    }
-                    lawRepository.save(law);
-                    if (lawIndexService != null) lawIndexService.index(law);
-                    if (structure != null) {
-                        persistStructured(law, structure, documentUrl);
-                    } else {
-                        extractAndPersistArticles(law, documentUrl);
-                    }
-
-                    log.info(
-                        "Successfully parsed and saved law: {} (status: {}, country: {})",
-                        law.getTitle(),
-                        law.getStatus(),
-                        law.getCountry()
-                    );
+                } finally {
+                    parserPermits.release();
                 }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("Document parsing interrupted");
             } catch (Exception e) {
                 log.error("Error parsing document: {}", e.getMessage(), e);
             }

@@ -21,6 +21,8 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.neo4j.core.Neo4jClient;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,7 @@ public class ArticleService {
     @Autowired(required = false)
     private DmsArticleClient dmsArticleClient;
 
+    @Cacheable(value = "articlesByLaw", key = "#country + ':' + #lawCode")
     public List<ArticleDTO> listByLaw(String lawCode, String country) {
         return articleRepository
             .findAllByLawCode(lawCode, country)
@@ -45,6 +48,7 @@ public class ArticleService {
             .toList();
     }
 
+    @Cacheable(value = "article", key = "#country + ':' + #lawCode + ':' + #number")
     public Optional<ArticleDTO> get(
         String lawCode,
         String country,
@@ -55,6 +59,7 @@ public class ArticleService {
             .map(ArticleDTO::from);
     }
 
+    @Cacheable(value = "articleSearch", key = "#country + ':' + #query")
     public List<ArticleDTO> search(String query, String country) {
         return articleRepository
             .search(query, country)
@@ -164,6 +169,7 @@ public class ArticleService {
             : a.getEffectiveFrom();
     }
 
+    @CacheEvict(value = {"articlesByLaw", "article", "articleSearch"}, allEntries = true)
     public ArticleDTO create(CreateArticleRequest req) {
         ProvenanceSource src =
             req.getSource() != null
@@ -254,6 +260,7 @@ public class ArticleService {
         return total;
     }
 
+    @CacheEvict(value = {"articlesByLaw", "article", "articleSearch"}, allEntries = true)
     public int persistEnriched(List<Article> articles) {
         if (articles == null || articles.isEmpty()) return 0;
         int saved = 0;
@@ -399,6 +406,7 @@ public class ArticleService {
         return saved;
     }
 
+    @CacheEvict(value = {"articlesByLaw", "article", "articleSearch"}, allEntries = true)
     public int persistAll(List<Article> articles) {
         if (articles == null || articles.isEmpty()) return 0;
         int saved = 0;

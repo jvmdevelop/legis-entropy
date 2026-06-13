@@ -16,6 +16,8 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @Service
@@ -25,6 +27,7 @@ public class SseStreamingService {
 
     private final RestTemplate loadBalancedRestTemplate;
     private final ObjectMapper objectMapper;
+    private static final ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
     public SseEmitter stream(String url, BrainRequestDto request, Long conversationId, Consumer<String> onComplete) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
@@ -53,7 +56,7 @@ public class SseStreamingService {
                 log.error("Stream error for conversation {}: {}", conversationId, e.getMessage());
                 emitter.completeWithError(e);
             }
-        });
+        }, VIRTUAL_EXECUTOR);
         return emitter;
     }
 

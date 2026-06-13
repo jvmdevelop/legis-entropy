@@ -1,6 +1,13 @@
 spring:
+  threads:
+    virtual:
+      enabled: true
   application:
     name: graphs-service
+  data:
+    redis:
+      host: ${SPRING_DATA_REDIS_HOST:localhost}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
   elasticsearch:
     uris: ${ELASTICSEARCH_URI:http://localhost:9200}
   neo4j:

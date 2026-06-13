@@ -75,6 +75,21 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - legis-entropy-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   minio:
     image: minio/minio:latest
     container_name: minio
@@ -347,12 +362,16 @@ services:
       ELASTICSEARCH_URI: http://elasticsearch:9200
       DMS_BASE_URL: http://law-service:8087
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     networks:
       - legis-entropy-network
     depends_on:
       neo4j:
         condition: service_healthy
       elasticsearch:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       eureka-server:
         condition: service_started
@@ -450,12 +469,16 @@ services:
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
     volumes:
       - law-embeddings-cache:/app/embeddings-cache
     networks:
       - legis-entropy-network
     depends_on:
       postgres-documents:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       eureka-server:
         condition: service_started
@@ -696,6 +719,7 @@ volumes:
   postgres-user-data:
   postgres-chat-data:
   postgres-documents-data:
+  redis-data:
   postgres-workspace-data:
   minio-data:
   neo4j-data:

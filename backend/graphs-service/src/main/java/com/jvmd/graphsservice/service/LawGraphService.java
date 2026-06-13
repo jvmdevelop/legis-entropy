@@ -8,6 +8,8 @@ import com.jvmd.graphsservice.repository.LawRepository;
 import com.jvmd.graphsservice.search.LawIndexService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -31,6 +33,7 @@ public class LawGraphService {
                     RelationType.IMPLEMENTS,  Law::getImplementation
             ));
 
+    @Cacheable(value = "lawGraph", key = "#country + ':' + #code")
     public Optional<LawGraphResponse> getLawWithRelationships(String code, String country) {
         return lawRepository.findLawWithRelationships(code, country)
                 .map(law -> {
@@ -48,6 +51,7 @@ public class LawGraphService {
                 });
     }
 
+    @Cacheable(value = "relatedLaws", key = "#country + ':' + #code")
     public List<LawDTO> findRelatedLaws(String code, String country) {
         return lawRepository.findRelatedLaws(code, country)
                 .stream()
@@ -55,6 +59,7 @@ public class LawGraphService {
                 .toList();
     }
 
+    @Cacheable(value = "lawSearch", key = "#country + ':' + #query")
     public List<LawDTO> searchLaws(String query, String country) {
         try {
             List<LawDTO> results = lawIndexService.search(query, country);
@@ -68,11 +73,13 @@ public class LawGraphService {
                 .toList();
     }
 
+    @Cacheable(value = "lawByCode", key = "#country + ':' + #code")
     public Optional<LawDTO> findLaw(String code, String country) {
         return lawRepository.findByCodeAndCountry(code, country)
                 .map(this::lawToDTO);
     }
 
+    @CacheEvict(value = {"lawGraph", "lawSearch", "relatedLaws", "lawByCode"}, allEntries = true)
     public LawDTO createLaw(Law law) {
         if (!LawIndexService.isIndexable(law)) {
             log.debug("Skipping low-force act: {} ({})", law.getCode(), law.getLegalForce());
@@ -84,6 +91,7 @@ public class LawGraphService {
         return lawToDTO(saved);
     }
 
+    @CacheEvict(value = {"lawGraph", "relatedLaws"}, allEntries = true)
     public void addRelationship(String fromCode, String fromCountry,
                                String toCode, String toCountry, RelationType type) {
         lawRepository.findByCodeAndCountry(fromCode, fromCountry).ifPresent(fromLaw ->

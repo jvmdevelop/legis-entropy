@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -24,6 +25,7 @@ public abstract class LawParserManager<T extends LawParser> {
     protected final CategorizedLawStorage categorizedLawStorage;
     protected final BlockingDeque<String> pathQueue;
     protected final ExecutorService executorService;
+    protected final Semaphore parserPermits = new Semaphore(5);
 
     public LawParserManager(T lawParser,
                            LawPathParser pathParser,
@@ -37,7 +39,7 @@ public abstract class LawParserManager<T extends LawParser> {
         this.pathQueue = pathQueue;
         this.baseUrl = baseUrl;
         this.searchPath = searchPath;
-        this.executorService = Executors.newFixedThreadPool(3);
+        this.executorService = Executors.newVirtualThreadPerTaskExecutor();
         initSearchUrl();
     }
 
@@ -59,19 +61,26 @@ public abstract class LawParserManager<T extends LawParser> {
 
         executorService.submit(() -> {
             try {
-                log.info("Discovering documents...");
+                parserPermits.acquire();
+                try {
+                    log.info("Discovering documents...");
 
-                var documentUrls = pathParser.parseMultiplePages(searchUrl, 5);
+                    var documentUrls = pathParser.parseMultiplePages(searchUrl, 5);
 
-                for (String documentUrl : documentUrls) {
-                    if (!pathQueue.contains(documentUrl)) {
-                        pathQueue.addLast(documentUrl);
-                        log.debug("Added new document URL: {}", documentUrl);
+                    for (String documentUrl : documentUrls) {
+                        if (!pathQueue.contains(documentUrl)) {
+                            pathQueue.addLast(documentUrl);
+                            log.debug("Added new document URL: {}", documentUrl);
+                        }
                     }
+
+                    log.info("Discovered {} documents, queue size: {}", documentUrls.size(), pathQueue.size());
+                } finally {
+                    parserPermits.release();
                 }
-
-                log.info("Discovered {} documents, queue size: {}", documentUrls.size(), pathQueue.size());
-
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("Document discovery interrupted");
             } catch (Exception e) {
                 log.error("Error discovering documents: {}", e.getMessage(), e);
             }
@@ -86,17 +95,24 @@ public abstract class LawParserManager<T extends LawParser> {
 
         executorService.submit(() -> {
             try {
-                String documentUrl = pathQueue.pollFirst();
-                if (documentUrl != null) {
-                    log.info("Parsing document: {}", documentUrl);
+                parserPermits.acquire();
+                try {
+                    String documentUrl = pathQueue.pollFirst();
+                    if (documentUrl != null) {
+                        log.info("Parsing document: {}", documentUrl);
 
-                    var law = lawParser.parse(documentUrl);
-                    categorizedLawStorage.save(law);
+                        var law = lawParser.parse(documentUrl);
+                        categorizedLawStorage.save(law);
 
-                    log.info("Successfully parsed and saved law: {} (category: {}, country: {})",
-                        law.getTitle(), law.getCategory(), law.getCountry());
+                        log.info("Successfully parsed and saved law: {} (category: {}, country: {})",
+                            law.getTitle(), law.getCategory(), law.getCountry());
+                    }
+                } finally {
+                    parserPermits.release();
                 }
-
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.warn("Document parsing interrupted");
             } catch (Exception e) {
                 log.error("Error parsing document: {}", e.getMessage(), e);
             }

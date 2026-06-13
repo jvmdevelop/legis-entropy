@@ -25,6 +25,8 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +37,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @RequiredArgsConstructor
 @Slf4j
 public class DocumentDraftService {
+
+    private static final ExecutorService VIRTUAL_EXECUTOR = Executors.newVirtualThreadPerTaskExecutor();
 
     private final BrainModelClient modelClient;
     private final GraphServiceClient graphServiceClient;
@@ -76,7 +80,7 @@ public class DocumentDraftService {
                 }
                 emitter.completeWithError(e);
             }
-        });
+        }, VIRTUAL_EXECUTOR);
         return emitter;
     }
 
