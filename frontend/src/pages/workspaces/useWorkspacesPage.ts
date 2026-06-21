@@ -38,11 +38,6 @@ export function useWorkspacesPage() {
   const [creating, setCreating] = useState(false)
   const nameInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    clearCrumbs()
-    void load()
-  }, [clearCrumbs])
-
   async function load() {
     setLoading(true)
     try {
@@ -55,6 +50,11 @@ export function useWorkspacesPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    clearCrumbs()
+    void load()
+  }, [clearCrumbs])
 
   async function create(e?: React.FormEvent) {
     e?.preventDefault()

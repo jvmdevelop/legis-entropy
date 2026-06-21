@@ -91,27 +91,6 @@ export function useWorkspaceShell() {
   const [compareLoading, setCompareLoading] = useState(false);
   const [compareResult, setCompareResult] = useState("");
 
-  useEffect(() => {
-    if (!workspaceId) return;
-    void loadShell();
-  }, [workspaceId]);
-
-  useEffect(() => {
-    if (!graphId) {
-      setContent(null);
-      setSelectedNode(null);
-      setCrumbGv(null);
-      return;
-    }
-    void loadGraph();
-  }, [graphId]);
-
-  useEffect(() => {
-    return () => {
-      useBreadcrumbStore.getState().clear();
-    };
-  }, []);
-
   async function loadShell() {
     if (!workspaceId) return;
     setLoading(true);
@@ -143,6 +122,27 @@ export function useWorkspaceShell() {
       if (workspaceId) navigate(`/workspace/${workspaceId}`);
     }
   }
+
+  useEffect(() => {
+    if (!workspaceId) return;
+    void loadShell();
+  }, [workspaceId]);
+
+  useEffect(() => {
+    if (!graphId) {
+      setContent(null);
+      setSelectedNode(null);
+      setCrumbGv(null);
+      return;
+    }
+    void loadGraph();
+  }, [graphId]);
+
+  useEffect(() => {
+    return () => {
+      useBreadcrumbStore.getState().clear();
+    };
+  }, []);
 
   const refreshContent = useCallback(async () => {
     if (!graphId) return;
