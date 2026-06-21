@@ -2,20 +2,43 @@ package com.jvmd.llmbrainservice.service.prompt;
 
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import com.jvmd.llmbrainservice.service.context.DocumentContext;
+import com.jvmd.llmbrainservice.service.graph.link.SubjectLinkerRegistry;
+import com.jvmd.llmbrainservice.service.pipeline.BrainTaskType;
+import com.jvmd.llmbrainservice.service.pipeline.ContextPlan;
+import com.jvmd.llmbrainservice.service.pipeline.ProfessionProfile;
+import com.jvmd.llmbrainservice.service.pipeline.RetrievalMode;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class BrainPromptBuilderTest {
 
-    private final BrainPromptBuilder builder = new BrainPromptBuilder(new LegalAssistantInstructions(), new ProfessionInstructions());
+    @Mock
+    AssistantInstructions instructions;
+
+    @Mock
+    SubjectLinkerRegistry linkerRegistry;
+
+    @InjectMocks
+    BrainPromptBuilder builder;
 
     @Test
     void includesRequestContextDocumentContextAndUserMessage() {
-        BrainRequest request = new BrainRequest("Проверь договор", "user-1", "doc-7", null, null);
-        com.jvmd.llmbrainservice.service.pipeline.ContextPlan plan = new com.jvmd.llmbrainservice.service.pipeline.ContextPlan(com.jvmd.llmbrainservice.service.pipeline.BrainTaskType.DOCUMENT_AUDIT, com.jvmd.llmbrainservice.service.pipeline.RetrievalMode.USER_DOCUMENT);
+        when(instructions.documentAnalysisInstruction()).thenReturn("Analyse document");
+        when(instructions.generalAdviceInstruction()).thenReturn("Give advice");
 
-        String prompt = builder.buildUserPrompt(request, DocumentContext.of("Фрагмент договора", java.util.List.of()), plan, com.jvmd.llmbrainservice.service.pipeline.ProfessionProfile.GENERAL_LAWYER);
+        BrainRequest request = new BrainRequest("Проверь договор", "user-1", "doc-7", null, null);
+        ContextPlan plan = new ContextPlan(BrainTaskType.DOCUMENT_AUDIT, RetrievalMode.USER_DOCUMENT);
+
+        String prompt = builder.buildUserPrompt(request, DocumentContext.of("Фрагмент договора", List.of()), plan, ProfessionProfile.GENERAL_LAWYER);
 
         assertThat(prompt)
                 .contains("Проверь договор")
@@ -24,10 +47,12 @@ class BrainPromptBuilderTest {
 
     @Test
     void usesReadablePlaceholderWhenDocumentIdIsAbsent() {
-        BrainRequest request = new BrainRequest("Вопрос", "user-1", " ", null, null);
-        com.jvmd.llmbrainservice.service.pipeline.ContextPlan plan = new com.jvmd.llmbrainservice.service.pipeline.ContextPlan(com.jvmd.llmbrainservice.service.pipeline.BrainTaskType.GENERAL_LEGAL_ADVICE, com.jvmd.llmbrainservice.service.pipeline.RetrievalMode.NONE);
+        when(instructions.generalAdviceInstruction()).thenReturn("Give advice");
 
-        String prompt = builder.buildUserPrompt(request, DocumentContext.unavailable("Документ не прикреплен."), plan, com.jvmd.llmbrainservice.service.pipeline.ProfessionProfile.GENERAL_LAWYER);
+        BrainRequest request = new BrainRequest("Вопрос", "user-1", " ", null, null);
+        ContextPlan plan = new ContextPlan(BrainTaskType.GENERAL_LEGAL_ADVICE, RetrievalMode.NONE);
+
+        String prompt = builder.buildUserPrompt(request, DocumentContext.unavailable("Документ не прикреплен."), plan, ProfessionProfile.GENERAL_LAWYER);
 
         assertThat(prompt).contains("Вопрос");
     }
