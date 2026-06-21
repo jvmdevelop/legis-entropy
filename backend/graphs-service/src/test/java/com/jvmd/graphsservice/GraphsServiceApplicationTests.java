@@ -2,7 +2,7 @@ package com.jvmd.graphsservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.testcontainers.containers.GenericContainer;
@@ -15,7 +15,7 @@ import org.testcontainers.utility.DockerImageName;
 @Testcontainers
 class GraphsServiceApplicationTests {
 
-    @MockBean
+    @MockitoBean
     ElasticsearchOperations elasticsearchOperations;
 
     @Container
