@@ -2,21 +2,21 @@ package com.jvmd.graphsservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-@SpringBootTest(properties = {
-    "spring.autoconfigure.exclude=" +
-        "org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration," +
-        "org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchDataAutoConfiguration," +
-        "org.springframework.boot.autoconfigure.data.elasticsearch.ElasticsearchRepositoriesAutoConfiguration"
-})
+@SpringBootTest
 @Testcontainers
 class GraphsServiceApplicationTests {
+
+    @MockBean
+    ElasticsearchOperations elasticsearchOperations;
 
     @Container
     @ServiceConnection
