@@ -8,6 +8,7 @@ import com.jvmd.authservice.dto.RegisterRequest;
 import com.jvmd.authservice.model.User;
 import com.jvmd.authservice.model.UserDetailsImpl;
 import com.jvmd.authservice.security.JwtUtils;
+import com.jvmd.authservice.service.AuthService;
 import feign.FeignException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,87 +30,21 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserClient userClient;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtils jwtUtils;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<JwtResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
-        );
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-        String refreshToken = jwtUtils.generateRefreshToken(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        return ResponseEntity.ok(new JwtResponse(
-                jwt,
-                "Bearer",
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                userDetails.getFirstName(),
-                userDetails.getLastName(),
-                refreshToken,
-                userDetails.getRole(),
-                userDetails.getPlanType()
-        ));
+        return ResponseEntity.ok(authService.authUser(loginRequest));
     }
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
-        if (userClient.existsByUsername(registerRequest.getUsername())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "Username is already taken"));
-        }
-
-        if (userClient.existsByEmail(registerRequest.getEmail())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "Email is already in use"));
-        }
-
-        User user = new User();
-        user.setUsername(registerRequest.getUsername());
-        user.setEmail(registerRequest.getEmail());
-        user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-        user.setFirstName(registerRequest.getFirstName());
-        user.setLastName(registerRequest.getLastName());
-        user.setActive(true);
-
-        try {
-            userClient.create(user);
-        } catch (FeignException.Conflict e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(Map.of("error", "Username or email already exists"));
-        }
-
-        return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+        return authService.registerUser(registerRequest);
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponse> refreshToken(@Valid @RequestBody RefreshRequest request) {
-        if (!jwtUtils.isValidRefreshToken(request.getRefreshToken())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
-        UserDetailsImpl userDetails = jwtUtils.getUserDetailsFromJwtToken(request.getRefreshToken());
-        String newAccessToken = jwtUtils.generateJwtToken(userDetails);
-        String newRefreshToken = jwtUtils.generateRefreshToken(userDetails);
-        return ResponseEntity.ok(new JwtResponse(
-                newAccessToken,
-                "Bearer",
-                userDetails.getId(),
-                userDetails.getUsername(),
-                userDetails.getEmail(),
-                userDetails.getFirstName(),
-                userDetails.getLastName(),
-                newRefreshToken,
-                userDetails.getRole(),
-                userDetails.getPlanType()
-        ));
+        return authService.refreshToken(request);
     }
 
     @GetMapping("/me")

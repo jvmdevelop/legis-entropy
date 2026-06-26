@@ -1,5 +1,5 @@
 {
-  "title": "Legis Entropy — Services Overview",
+  "title": "LE",
   "uid": "legis-entropy-overview",
   "schemaVersion": 38,
   "version": 1,
@@ -8,7 +8,7 @@
     {
       "id": 1,
       "type": "stat",
-      "title": "HTTP Requests — Gateway",
+      "title": "HTTP Requests - gateway-service",
       "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
       "targets": [
         {
@@ -21,7 +21,7 @@
     {
       "id": 2,
       "type": "stat",
-      "title": "HTTP Requests — Auth",
+      "title": "HTTP Requests - auth-service",
       "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 },
       "targets": [
         {
@@ -34,7 +34,7 @@
     {
       "id": 3,
       "type": "stat",
-      "title": "HTTP Requests — Chat",
+      "title": "HTTP Requests - chat-service",
       "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 },
       "targets": [
         {
@@ -47,7 +47,7 @@
     {
       "id": 4,
       "type": "stat",
-      "title": "HTTP Requests — LLM Brain",
+      "title": "HTTP Requests - llm-brain-service",
       "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 },
       "targets": [
         {
@@ -60,7 +60,7 @@
     {
       "id": 5,
       "type": "timeseries",
-      "title": "JVM Heap Memory — All Services",
+      "title": "JVM Heap Memory General",
       "gridPos": { "x": 0, "y": 4, "w": 24, "h": 8 },
       "targets": [
         {
