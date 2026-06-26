@@ -5,25 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="04af6dd3-68a3-46ff-8738-65da20ac8a47" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/auth-service/backend.auth-service.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/auth-service/backend.auth-service.main.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/llm-brain-service.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/llm-brain-service.main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/sha1-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/executionHistory/executionHistory.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/executionHistory/executionHistory.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/fileHashes.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/resourceHashesCache.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/file-system.probe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/build/reports/problems/problems-report.html" beforeDir="false" afterPath="$PROJECT_DIR$/backend/build/reports/problems/problems-report.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/HallucinationDetector.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/HallucinationDetector.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/IntentClassifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/IntentClassifier.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/prompt/BrainPromptBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/prompt/BrainPromptBuilder.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="EmbeddingIndexingInfo">
+    <option name="cachedIndexableFilesCount" value="690" />
   </component>
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$/backend">
@@ -76,11 +74,11 @@
         <option value="Enum" />
         <option value="Interface" />
         <option value="Kotlin Script Gradle.gradle" />
-        <option value="Class" />
         <option value="com.haulmont.ampsbb.Component" />
         <option value="Exception" />
         <option value="com.haulmont.ampjpb.JpaRepository" />
         <option value="GitHub Workflow" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -109,6 +107,65 @@
   <component name="McpProjectServerCommands">
     <commands />
     <urls />
+  </component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="2.0632004844358347" />
+      <entry key="MS500" value="5.379016217420872" />
+      <entry key="S2" value="11.869158599941098" />
+      <entry key="S5" value="19.83078977358518" />
+      <entry key="S10" value="25.86034786634681" />
+      <entry key="S30" value="32.37063461930923" />
+      <entry key="S60" value="35.718849729077704" />
+      <entry key="M2" value="40.9503839735296" />
+      <entry key="M5" value="57.635556778449185" />
+      <entry key="M10" value="78.19822098867756" />
+      <entry key="M15" value="90.37281921420008" />
+      <entry key="M30" value="107.2508825141478" />
+      <entry key="H1" value="118.09351245323583" />
+      <entry key="H2" value="124.2630129501468" />
+      <entry key="H4" value="127.55704825784916" />
+      <entry key="D1" value="130.41551903555754" />
+      <entry key="W1" value="130.91623755888497" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="9.71883105620376E-156" />
+      <entry key="MS500" value="9.943122879374762E-32" />
+      <entry key="S2" value="1.7757506340634724E-8" />
+      <entry key="S5" value="8.015128558321533E-4" />
+      <entry key="S10" value="0.03347426732867731" />
+      <entry key="S30" value="0.9273119277098808" />
+      <entry key="S60" value="3.356566671101022" />
+      <entry key="M2" value="8.923727320592286" />
+      <entry key="M5" value="23.416251575451785" />
+      <entry key="M10" value="36.91795866884505" />
+      <entry key="M15" value="43.85372414868569" />
+      <entry key="M30" value="52.674288721429264" />
+      <entry key="H1" value="57.97725841917547" />
+      <entry key="H2" value="60.891985251101985" />
+      <entry key="H4" value="62.4209391389807" />
+      <entry key="D1" value="63.73326489252146" />
+      <entry key="W1" value="63.96180679702061" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.9981069327349599" />
+      <entry key="MS500" value="5.343242731320269" />
+      <entry key="S2" value="11.847871256742048" />
+      <entry key="S5" value="19.81418116471787" />
+      <entry key="S10" value="25.877733906874596" />
+      <entry key="S30" value="33.25196269117825" />
+      <entry key="S60" value="38.9912629337092" />
+      <entry key="M2" value="49.7514682952195" />
+      <entry key="M5" value="80.91698217269388" />
+      <entry key="M10" value="115.01048509038613" />
+      <entry key="M15" value="134.14325635403492" />
+      <entry key="M30" value="159.8754656765034" />
+      <entry key="H1" value="176.04351335774794" />
+      <entry key="H2" value="185.14071096453586" />
+      <entry key="H4" value="189.9706713708716" />
+      <entry key="D1" value="194.1475399524565" />
+      <entry key="W1" value="194.87786603247392" />
+    </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 6,
@@ -143,7 +200,7 @@
     "git-widget-placeholder": "master",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/dieno/projects/legis-entropy-/backend/llm-brain-service",
+    "last_opened_file_path": "/home/dieno/projects/legis-entropy",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -376,8 +433,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.32098.37" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.32098.37" />
+        <option value="bundled-jdk-30f59d01ecdd-37e91769500f-intellij.indexing.shared.core-IU-261.25134.95" />
+        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-IU-261.25134.95" />
       </set>
     </attachedChunks>
   </component>

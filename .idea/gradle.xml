@@ -10,13 +10,16 @@
             <option value="$PROJECT_DIR$/backend" />
             <option value="$PROJECT_DIR$/backend/auth-service" />
             <option value="$PROJECT_DIR$/backend/chat-service" />
-            <option value="$PROJECT_DIR$/backend/documents-manager-service" />
+            <option value="$PROJECT_DIR$/backend/document-service" />
             <option value="$PROJECT_DIR$/backend/eureka-server" />
             <option value="$PROJECT_DIR$/backend/gateway-service" />
             <option value="$PROJECT_DIR$/backend/graphs-service" />
             <option value="$PROJECT_DIR$/backend/law-service" />
             <option value="$PROJECT_DIR$/backend/llm-brain-service" />
+            <option value="$PROJECT_DIR$/backend/situation-service" />
+            <option value="$PROJECT_DIR$/backend/template-service" />
             <option value="$PROJECT_DIR$/backend/user-service" />
+            <option value="$PROJECT_DIR$/backend/voice-service" />
             <option value="$PROJECT_DIR$/backend/workspace-service" />
           </set>
         </option>

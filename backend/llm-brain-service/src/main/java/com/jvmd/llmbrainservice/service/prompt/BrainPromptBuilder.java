@@ -24,34 +24,6 @@ public class BrainPromptBuilder {
 
     public String buildUserPrompt(
         BrainRequest request,
-        DocumentContext documentContext
-    ) {
-        return buildUserPrompt(
-            request,
-            documentContext,
-            new ContextPlan(
-                BrainTaskType.DOCUMENT_AUDIT,
-                RetrievalMode.USER_DOCUMENT
-            ),
-            ProfessionProfile.GENERAL_LAWYER
-        );
-    }
-
-    public String buildUserPrompt(
-        BrainRequest request,
-        DocumentContext documentContext,
-        ContextPlan plan
-    ) {
-        return buildUserPrompt(
-            request,
-            documentContext,
-            plan,
-            ProfessionProfile.GENERAL_LAWYER
-        );
-    }
-
-    public String buildUserPrompt(
-        BrainRequest request,
         DocumentContext documentContext,
         ContextPlan plan,
         ProfessionProfile profession

@@ -34,39 +34,10 @@ public class HallucinationDetector {
         return !retrievedArticleNumbers(context).isEmpty();
     }
 
-    public boolean isPossibleHallucination(String answer, ContextPlan plan, DocumentContext context) {
-        if (answer == null || answer.isBlank()) return false;
-        if (!hasLawReferences(answer)) return false;
-
-        boolean noContext = context == null || context.citations() == null || context.citations().isEmpty();
-        boolean notLawSearch = plan.retrievalMode() != RetrievalMode.LAW
-                && plan.retrievalMode() != RetrievalMode.HYBRID_LEGAL;
-        if (noContext && notLawSearch) {
-            log.warn("Possible hallucination: law refs without context, mode={}", plan.retrievalMode());
-            return true;
-        }
-        return false;
-    }
-
     public boolean hasLawReferences(String answer) {
         return LAW_REFERENCE_PATTERN.matcher(answer.toLowerCase()).find();
     }
 
-    public boolean hasUngroundedArticleNumbers(String answer, ContextPlan plan, DocumentContext context) {
-        if (answer == null || answer.isBlank()) return false;
-        Set<Integer> cited = extractArticleNumbers(answer);
-        if (cited.isEmpty()) return false;
-
-        Set<Integer> retrieved = retrievedArticleNumbers(context);
-        for (Integer num : cited) {
-            if (!retrieved.contains(num)) {
-                log.warn("Ungrounded article reference: ст. {} (retrieved={}, mode={})",
-                        num, retrieved, plan.retrievalMode());
-                return true;
-            }
-        }
-        return false;
-    }
 
     public Set<Integer> getUngroundedArticles(String answer, DocumentContext context) {
         Set<Integer> ungrounded = new LinkedHashSet<>();
@@ -101,16 +72,6 @@ public class HallucinationDetector {
         }
         m.appendTail(out);
         return out.toString();
-    }
-
-    public String extractStatuteNumbers(String answer) {
-        StringBuilder sb = new StringBuilder();
-        Matcher matcher = STATUTE_NUMBER_PATTERN.matcher(answer);
-        while (matcher.find()) {
-            if (sb.length() > 0) sb.append(", ");
-            sb.append("ст. ").append(matcher.group(1));
-        }
-        return sb.toString();
     }
 
     private Set<Integer> extractArticleNumbers(String answer) {

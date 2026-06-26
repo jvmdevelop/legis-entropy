@@ -10,10 +10,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class IntentClassifier {
 
-    private static final Logger log = LoggerFactory.getLogger(
-        IntentClassifier.class
-    );
-
     public ContextPlan classify(BrainRequest request) {
         String message = normalize(request.message());
         boolean hasDocument = request.hasDocumentId();

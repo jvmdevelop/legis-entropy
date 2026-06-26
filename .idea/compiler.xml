@@ -9,14 +9,19 @@
         </processorPath>
         <module name="backend.chat-service.main" />
         <module name="backend.gateway-service.main" />
-        <module name="backend.documents-manager-service.main" />
+        <module name="backend.voice-service.main" />
+        <module name="backend.voice-service.test" />
         <module name="backend.user-service.test" />
+        <module name="backend.template-service.test" />
         <module name="backend.user-service.main" />
         <module name="backend.graphs-service.test" />
+        <module name="backend.document-service.main" />
+        <module name="backend.template-service.main" />
+        <module name="backend.situation-service.main" />
         <module name="com.jvmd.backend.workspace-service.main" />
-        <module name="backend.documents-manager-service.test" />
         <module name="backend.chat-service.test" />
         <module name="backend.auth-service.main" />
+        <module name="backend.situation-service.test" />
         <module name="com.jvmd.backend.graphs-service.main" />
         <module name="backend.llm-brain-service.main" />
         <module name="com.jvmd.backend.law-service.main" />
@@ -41,6 +46,9 @@
       <module name="backend.chat-service.aotTest" options="-parameters" />
       <module name="backend.chat-service.main" options="-parameters" />
       <module name="backend.chat-service.test" options="-parameters" />
+      <module name="backend.document-service" options="-parameters" />
+      <module name="backend.document-service.main" options="-parameters" />
+      <module name="backend.document-service.test" options="-parameters" />
       <module name="backend.documents-manager-service" options="-parameters" />
       <module name="backend.documents-manager-service.main" options="-parameters" />
       <module name="backend.documents-manager-service.test" options="-parameters" />
@@ -64,11 +72,20 @@
       <module name="backend.load-balancer.aotTest" options="-parameters" />
       <module name="backend.load-balancer.main" options="-parameters" />
       <module name="backend.load-balancer.test" options="-parameters" />
+      <module name="backend.situation-service" options="-parameters" />
+      <module name="backend.situation-service.main" options="-parameters" />
+      <module name="backend.situation-service.test" options="-parameters" />
+      <module name="backend.template-service" options="-parameters" />
+      <module name="backend.template-service.main" options="-parameters" />
+      <module name="backend.template-service.test" options="-parameters" />
       <module name="backend.user-service" options="-parameters" />
       <module name="backend.user-service.aot" options="-parameters" />
       <module name="backend.user-service.aotTest" options="-parameters" />
       <module name="backend.user-service.main" options="-parameters" />
       <module name="backend.user-service.test" options="-parameters" />
+      <module name="backend.voice-service" options="-parameters" />
+      <module name="backend.voice-service.main" options="-parameters" />
+      <module name="backend.voice-service.test" options="-parameters" />
       <module name="backend.workspace-service" options="-parameters" />
       <module name="backend.workspace-service.main" options="-parameters" />
       <module name="backend.workspace-service.test" options="-parameters" />
