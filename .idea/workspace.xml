@@ -5,15 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="04af6dd3-68a3-46ff-8738-65da20ac8a47" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/auth-service/backend.auth-service.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/auth-service/backend.auth-service.main.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/llm-brain-service.main.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules/llm-brain-service.main.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/HallucinationDetector.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/HallucinationDetector.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/IntentClassifier.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/pipeline/IntentClassifier.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/prompt/BrainPromptBuilder.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/src/main/java/com/jvmd/llmbrainservice/service/prompt/BrainPromptBuilder.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -110,61 +103,61 @@
   </component>
   <component name="NextEditCompletionFeaturesState">
     <decayedCancelled>
-      <entry key="MS100" value="2.0632004844358347" />
-      <entry key="MS500" value="5.379016217420872" />
-      <entry key="S2" value="11.869158599941098" />
-      <entry key="S5" value="19.83078977358518" />
-      <entry key="S10" value="25.86034786634681" />
-      <entry key="S30" value="32.37063461930923" />
-      <entry key="S60" value="35.718849729077704" />
-      <entry key="M2" value="40.9503839735296" />
-      <entry key="M5" value="57.635556778449185" />
-      <entry key="M10" value="78.19822098867756" />
-      <entry key="M15" value="90.37281921420008" />
-      <entry key="M30" value="107.2508825141478" />
-      <entry key="H1" value="118.09351245323583" />
-      <entry key="H2" value="124.2630129501468" />
-      <entry key="H4" value="127.55704825784916" />
-      <entry key="D1" value="130.41551903555754" />
-      <entry key="W1" value="130.91623755888497" />
+      <entry key="MS100" value="1.0017727100807503" />
+      <entry key="MS500" value="1.451347237100492" />
+      <entry key="S2" value="6.095809505747839" />
+      <entry key="S5" value="16.323127879799355" />
+      <entry key="S10" value="30.65049649763336" />
+      <entry key="S30" value="55.58218366625358" />
+      <entry key="S60" value="67.23646808792921" />
+      <entry key="M2" value="77.39139887044789" />
+      <entry key="M5" value="97.21903347049778" />
+      <entry key="M10" value="119.02668815624081" />
+      <entry key="M15" value="131.74344727220947" />
+      <entry key="M30" value="149.31042555130037" />
+      <entry key="H1" value="160.58289730942926" />
+      <entry key="H2" value="166.9962145825398" />
+      <entry key="H4" value="170.42058123509818" />
+      <entry key="D1" value="173.3923308061502" />
+      <entry key="W1" value="173.9129138503423" />
     </decayedCancelled>
     <decayedSelected>
-      <entry key="MS100" value="9.71883105620376E-156" />
-      <entry key="MS500" value="9.943122879374762E-32" />
-      <entry key="S2" value="1.7757506340634724E-8" />
-      <entry key="S5" value="8.015128558321533E-4" />
-      <entry key="S10" value="0.03347426732867731" />
-      <entry key="S30" value="0.9273119277098808" />
-      <entry key="S60" value="3.356566671101022" />
-      <entry key="M2" value="8.923727320592286" />
-      <entry key="M5" value="23.416251575451785" />
-      <entry key="M10" value="36.91795866884505" />
-      <entry key="M15" value="43.85372414868569" />
-      <entry key="M30" value="52.674288721429264" />
-      <entry key="H1" value="57.97725841917547" />
-      <entry key="H2" value="60.891985251101985" />
-      <entry key="H4" value="62.4209391389807" />
-      <entry key="D1" value="63.73326489252146" />
-      <entry key="W1" value="63.96180679702061" />
+      <entry key="MS100" value="6.591853642396127E-213" />
+      <entry key="MS500" value="3.6627013729549014E-43" />
+      <entry key="S2" value="2.460093732692422E-11" />
+      <entry key="S5" value="5.7615371039947285E-5" />
+      <entry key="S10" value="0.008974804878822955" />
+      <entry key="S30" value="0.5979485601060793" />
+      <entry key="S60" value="2.695344410715738" />
+      <entry key="M2" value="7.996607608555741" />
+      <entry key="M5" value="22.4109967795375" />
+      <entry key="M10" value="36.11682610845405" />
+      <entry key="M15" value="43.216979794006726" />
+      <entry key="M30" value="52.290482137442176" />
+      <entry key="H1" value="57.76564914258112" />
+      <entry key="H2" value="60.780759848053684" />
+      <entry key="H4" value="62.363903985549015" />
+      <entry key="D1" value="63.723555487094224" />
+      <entry key="W1" value="63.96041467433933" />
     </decayedSelected>
     <decayedShown>
-      <entry key="MS100" value="1.9981069327349599" />
-      <entry key="MS500" value="5.343242731320269" />
-      <entry key="S2" value="11.847871256742048" />
-      <entry key="S5" value="19.81418116471787" />
-      <entry key="S10" value="25.877733906874596" />
-      <entry key="S30" value="33.25196269117825" />
-      <entry key="S60" value="38.9912629337092" />
-      <entry key="M2" value="49.7514682952195" />
-      <entry key="M5" value="80.91698217269388" />
-      <entry key="M10" value="115.01048509038613" />
-      <entry key="M15" value="134.14325635403492" />
-      <entry key="M30" value="159.8754656765034" />
-      <entry key="H1" value="176.04351335774794" />
-      <entry key="H2" value="185.14071096453586" />
-      <entry key="H4" value="189.9706713708716" />
-      <entry key="D1" value="194.1475399524565" />
-      <entry key="W1" value="194.87786603247392" />
+      <entry key="MS100" value="0.0145796549725659" />
+      <entry key="MS500" value="0.6578508472307308" />
+      <entry key="S2" value="5.663987893086179" />
+      <entry key="S5" value="16.105595394335378" />
+      <entry key="S10" value="30.53598972663334" />
+      <entry key="S30" value="56.10735530815547" />
+      <entry key="S60" value="69.84214523202078" />
+      <entry key="M2" value="85.26691698397788" />
+      <entry key="M5" value="119.4964810906748" />
+      <entry key="M10" value="155.03785170717913" />
+      <entry key="M15" value="174.87684026855706" />
+      <entry key="M30" value="201.55080907488502" />
+      <entry key="H1" value="218.32101063743292" />
+      <entry key="H2" value="227.7625243549985" />
+      <entry key="H4" value="232.77708140076555" />
+      <entry key="D1" value="237.11462675919304" />
+      <entry key="W1" value="237.87314795538887" />
     </decayedShown>
   </component>
   <component name="ProjectColorInfo">{
@@ -175,47 +168,47 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
-    "Gradle.Build backend.executor": "Run",
-    "Gradle.Build eureka-server.executor": "Run",
-    "Gradle.Build user-service.executor": "Run",
-    "Gradle.backend:documents-manager-service [build].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.EurekaServerApplication.executor": "Run",
-    "Spring Boot.LoadBalancerApplication.executor": "Run",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/dieno/projects/legis-entropy",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "/home/dieno/.local/share/JetBrains/Toolbox/apps/intellij-idea/plugins/javascript-plugin/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build backend.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build eureka-server.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build user-service.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.backend:documents-manager-service [build].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.EurekaServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.LoadBalancerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/dieno/projects/legis-entropy&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/dieno/.local/share/JetBrains/Toolbox/apps/intellij-idea/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.jvmd.dms.law.parser" />

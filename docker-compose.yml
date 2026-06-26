@@ -686,30 +686,30 @@ services:
     depends_on:
       - prometheus
 
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    profiles:
-      - local
-    ports:
-      - "${OLLAMA_PORT:-11434}:11434"
-    volumes:
-      - ollama-data:/root/.ollama
-    networks:
-      - legis-entropy-network
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/tags || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
+#  ollama:
+#    image: ollama/ollama:latest
+#    container_name: ollama
+#    profiles:
+#      - local
+#    ports:
+#      - "${OLLAMA_PORT:-11434}:11434"
+#    volumes:
+#      - ollama-data:/root/.ollama
+#    networks:
+#      - legis-entropy-network
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [gpu]
+#    healthcheck:
+#      test: ["CMD-SHELL", "curl -sf http://localhost:11434/api/tags || exit 1"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 5
+#      start_period: 30s
 
 networks:
   legis-entropy-network:
