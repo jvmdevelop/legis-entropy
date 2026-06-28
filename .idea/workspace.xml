@@ -5,45 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="04af6dd3-68a3-46ff-8738-65da20ac8a47" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/chat-service/backend.chat-service.main.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/gateway-service/backend.gateway-service.main.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/graphs-service/com.jvmd.backend.graphs-service.main.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/llm-brain-service/backend.llm-brain-service.main.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/user-service/backend.user-service.main.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules/workspace-service/com.jvmd.backend.workspace-service.main.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.6.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.6.1/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/auth-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/auth-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/auth-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/chat-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/chat-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/chat-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/chat-service/compose.yaml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/document-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/document-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/document-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/eureka-server/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/eureka-server/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/eureka-server/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/gateway-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/gateway-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gateway-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/graphs-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/graphs-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graphs-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/law-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/law-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/law-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/situation-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/situation-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/situation-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/template-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/template-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/template-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/user-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/user-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/user-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/voice-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/voice-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/voice-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/workspace-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/workspace-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/workspace-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.prod.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -549,7 +511,7 @@
       <workItem from="1782651436039" duration="67000" />
       <workItem from="1782653981843" duration="2437000" />
       <workItem from="1782666213254" duration="2319000" />
-      <workItem from="1782668977183" duration="198000" />
+      <workItem from="1782668977183" duration="1590000" />
     </task>
     <servers />
   </component>
