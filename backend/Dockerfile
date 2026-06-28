@@ -17,6 +17,8 @@ RUN gradle :${SERVICE_NAME}:bootJar --no-daemon -x test
 FROM eclipse-temurin:26-jre-alpine
 WORKDIR /app
 
+RUN apk add --no-cache libstdc++ gcompat
+
 ARG SERVICE_NAME
 
 COPY --from=builder /app/${SERVICE_NAME}/build/libs/${SERVICE_NAME}-*.jar app.jar
