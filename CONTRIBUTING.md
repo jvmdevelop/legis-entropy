@@ -6,5 +6,7 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout ip.key -out ip.
 ```
 
 ### 2. almost u need setup .env file to local development. U have to choose docker-compose.prod.yml and docker-compose.dev.yml
-
+```shell
+docker compose -f docker-compose.dev.yml up -d
+```
 ### 3. almost u need setup application properties to local developpment. 

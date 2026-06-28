@@ -5,154 +5,45 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="04af6dd3-68a3-46ff-8738-65da20ac8a47" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/CONTRIBUTING.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.prod.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/gradle.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/gradle.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/Dockerfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/chat-service/backend.chat-service.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/gateway-service/backend.gateway-service.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/graphs-service/com.jvmd.backend.graphs-service.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/llm-brain-service/backend.llm-brain-service.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/user-service/backend.user-service.main.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules/workspace-service/com.jvmd.backend.workspace-service.main.iml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/checksums.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/md5-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/md5-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/sha1-checksums.bin" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/checksums/sha1-checksums.bin" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.3.0/fileHashes/fileHashes.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gradle/buildOutputCleanup/cache.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/buildOutputCleanup/cache.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.settings/org.eclipse.buildship.core.prefs" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.settings/org.eclipse.buildship.core.prefs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.gradle/9.6.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/backend/.gradle/9.6.1/fileHashes/fileHashes.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/auth-service/Dockerfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/auth-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/auth-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chat-service/Dockerfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/chat-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/chat-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/chat-service/compose.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/document-service/Dockerfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/document-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/document-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/.dockerignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/.gitattributes" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/build.gradle.kts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/gradlew" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/gradlew.bat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/scripts/download-model.sh" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/settings.gradle.kts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/DocumentsManagerServiceApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/config/AsyncConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/config/EmbeddingConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/config/MinioConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/config/MinioProperties.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/controller/CategorizedLawController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/controller/DocumentUploadController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/controller/UserDocumentController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/document/reader/DocumentFormatReader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/document/reader/DocumentFormatReaderFactory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/document/reader/DocxDocumentFormatReader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/document/reader/PdfDocumentFormatReader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/document/reader/TextDocumentFormatReader.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/dto/DocumentRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/dto/DocumentResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/dto/DocumentStatusResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/dto/RetrievalChunkResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/evidence/EvidencePackController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/exception/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/exception/GlobalExceptionHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/exception/ResourceNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/config/KzParserConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/controller/ArticleIndexController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/controller/KzLawController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/graph/DocumentGraphRelationship.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/graph/KzArticleGraphNode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/graph/KzLawGraphNode.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/graph/repository/KzArticleGraphRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/graph/repository/KzLawGraphRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/graph/service/KzLawGraphService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/importer/DataInitializer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/importer/KzLawImporter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/Law.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/LawCategory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/LawStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/Article.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/Clause.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/Code.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/Constitution.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/KzLegislativeDocument.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/KzLegislativeDocumentType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/Regulation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/SimpleLaw.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/model/kz/Subclause.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/KzLawNerParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/KzLawParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/LawParserManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/Parser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/impl/LawParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/impl/LawPathParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/impl/impl/AdiletJsoup.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/impl/impl/KzLawParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/impl/impl/KzLawPathParser.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/parser/impl/impl/KzParserManager.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/repository/ArticleRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/repository/ClauseRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/repository/KzLegislativeDocumentRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/repository/SubclauseRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/service/ArticleIndexService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/service/KzLawService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/storage/ArticleAwareLawSplitter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/storage/CategorizedLawStorage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/law/storage/LawStorage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/model/UserDocument.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/repository/UserDocumentRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentChunkingService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentIngestionJob.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentIngestionPipeline.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentIngestionRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentProcessingStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentReaderService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentStorageService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/DocumentUploadService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/EmbeddingTestService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/MinioDocumentStorageService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/RelationshipMapperService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/StoredMultipartFile.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/StoredObject.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/service/UserDocumentService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/controller/GeneratedDocumentController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/controller/TemplateController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/dto/GeneratedDocumentDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/dto/RenderTemplateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/dto/TemplateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/model/DocumentTemplate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/model/GeneratedDocument.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/model/Slot.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/repository/DocumentTemplateRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/repository/GeneratedDocumentRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/service/DocumentExportService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/service/SlotDetector.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/service/TemplateConversionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/service/TemplateRenderer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/template/service/TemplateService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/controller/VoiceMessageController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/dto/VoiceMessageDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/model/VoiceMessage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/model/VoiceMessageStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/repository/VoiceMessageRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/service/StubVoiceTranscriptionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/service/VoiceAnalysisService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/service/VoiceMessageService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/service/VoiceTranscriptionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/java/com/jvmd/dms/voice/service/WhisperServerVoiceTranscriptionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/application.properties" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/db/migration/V1__create_user_documents.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/db/migration/V2__strip_null_vector_metadata.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/db/migration/V3__add_plain_text_to_user_documents.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/db/migration/V4__create_kz_legislative_documents.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/db/migration/V5__create_document_templates.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/db/migration/V6__create_voice_messages.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/main/resources/db/migration/V7__user_templates_with_slots.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/test/java/com/jvmd/dms/DocumentsManagerServiceApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/test/java/com/jvmd/dms/service/DocumentReaderServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/test/java/com/jvmd/dms/service/UserDocumentServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/documents-manager-service/src/test/resources/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/eureka-server/Dockerfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/eureka-server/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/eureka-server/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/gateway-service/Dockerfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/gateway-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/gateway-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphs-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/graphs-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/graphs-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/law-service/Dockerfile" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/law-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/law-service/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.dev.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/llm-brain-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/llm-brain-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/situation-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/situation-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/situation-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/template-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/template-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/template-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/user-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/user-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/voice-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/voice-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/voice-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/workspace-service/Dockerfile" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/workspace-service/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/backend/workspace-service/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.prod.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.prod.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -314,47 +205,47 @@
   <component name="ProjectViewState">
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Docker.docker-compose.yml: Compose Deployment.executor": "Run",
-    "Gradle.Build backend.executor": "Run",
-    "Gradle.Build eureka-server.executor": "Run",
-    "Gradle.Build user-service.executor": "Run",
-    "Gradle.backend:documents-manager-service [build].executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.EurekaServerApplication.executor": "Run",
-    "Spring Boot.LoadBalancerApplication.executor": "Run",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "master",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/dieno/projects/legis-entropy",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Modules",
-    "project.structure.proportion": "0.15",
-    "project.structure.side.proportion": "0.2",
-    "run.configurations.included.in.services": "true",
-    "settings.editor.selected.configurable": "reference.settingsdialog.project.gradle",
-    "to.speed.mode.migration.done": "true",
-    "ts.external.directory.path": "/home/dieno/.local/share/JetBrains/Toolbox/apps/intellij-idea/plugins/javascript-plugin/jsLanguageServicesImpl/external",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Docker.docker-compose.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build backend.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build eureka-server.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.Build user-service.executor&quot;: &quot;Run&quot;,
+    &quot;Gradle.backend:documents-manager-service [build].executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.EurekaServerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.LoadBalancerApplication.executor&quot;: &quot;Run&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/dieno/projects/legis-entropy&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settingsdialog.project.gradle&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/home/dieno/.local/share/JetBrains/Toolbox/apps/intellij-idea/plugins/javascript-plugin/jsLanguageServicesImpl/external&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
       <recent name="com.jvmd.dms.law.parser" />
@@ -490,7 +381,7 @@
       </method>
     </configuration>
     <configuration name="GraphsServiceApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
-      <module name="backend.graphs-service.main" />
+      <module name="backend.graphs-service.main~1" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.jvmd.graphsservice.GraphsServiceApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -657,7 +548,8 @@
       <workItem from="1782649988609" duration="1439000" />
       <workItem from="1782651436039" duration="67000" />
       <workItem from="1782653981843" duration="2437000" />
-      <workItem from="1782666213254" duration="1876000" />
+      <workItem from="1782666213254" duration="2319000" />
+      <workItem from="1782668977183" duration="198000" />
     </task>
     <servers />
   </component>

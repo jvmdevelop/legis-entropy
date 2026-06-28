@@ -7,26 +7,8 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.46/a5cfe99fdf320e84955ef653f2ce1bf789d11385/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="backend.chat-service.main" />
-        <module name="backend.gateway-service.main" />
-        <module name="backend.voice-service.main" />
-        <module name="backend.voice-service.test" />
-        <module name="backend.user-service.test" />
-        <module name="backend.template-service.test" />
         <module name="backend.user-service.main" />
-        <module name="backend.graphs-service.test" />
-        <module name="backend.document-service.main" />
-        <module name="backend.template-service.main" />
-        <module name="backend.situation-service.main" />
-        <module name="com.jvmd.backend.workspace-service.main" />
-        <module name="backend.chat-service.test" />
-        <module name="backend.auth-service.main" />
-        <module name="backend.situation-service.test" />
-        <module name="com.jvmd.backend.graphs-service.main" />
-        <module name="backend.llm-brain-service.main" />
-        <module name="com.jvmd.backend.law-service.main" />
-        <module name="backend.llm-brain-service.test" />
-        <module name="backend.auth-service.test" />
+        <module name="backend.user-service.test" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="21" />
@@ -60,6 +42,7 @@
       <module name="backend.gateway-service.test" options="-parameters" />
       <module name="backend.graphs-service" options="-parameters" />
       <module name="backend.graphs-service.main" options="-parameters" />
+      <module name="backend.graphs-service.main~1" options="-parameters" />
       <module name="backend.graphs-service.test" options="-parameters" />
       <module name="backend.law-service" options="-parameters" />
       <module name="backend.law-service.main" options="-parameters" />

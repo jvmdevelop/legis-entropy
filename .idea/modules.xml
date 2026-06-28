@@ -5,9 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/graphs-service/backend.graphs-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/graphs-service/backend.graphs-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/law-service/backend.law-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/law-service/backend.law-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/workspace-service/backend.workspace-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/workspace-service/backend.workspace-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/graphs-service/com.jvmd.backend.graphs-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/graphs-service/com.jvmd.backend.graphs-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/law-service/com.jvmd.backend.law-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/law-service/com.jvmd.backend.law-service.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/workspace-service/com.jvmd.backend.workspace-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/workspace-service/com.jvmd.backend.workspace-service.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/graphs-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/graphs-service.main.iml" />
     </modules>
   </component>
