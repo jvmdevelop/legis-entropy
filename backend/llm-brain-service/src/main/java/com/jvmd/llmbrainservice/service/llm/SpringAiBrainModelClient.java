@@ -13,6 +13,7 @@ import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
@@ -20,27 +21,14 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class SpringAiBrainModelClient implements BrainModelClient {
 
-    private static final String[] TOOL_NAMES = {
-        "searchLaws",
-        "searchUserDocuments",
-        "getLawGraph",
-        "findRelatedLaws",
-        "addLawToUserGraph",
-        "findAndAddRelatedLawsToGraph",
-        "linkDocumentToLawsInGraph",
-        "findArticle",
-        "searchArticles",
-        "linkDocumentClauseToArticle",
-        "flagArticleConflict",
-        "flagDocumentArticleConflict",
-    };
-
     private final ChatClient chatClient;
     private final List<Message> fewShotMessages;
+    private final ToolCallbackProvider toolCallbacks;
 
     public SpringAiBrainModelClient(
         ChatClient.Builder builder,
-        AssistantInstructions instructions
+        AssistantInstructions instructions,
+        ToolCallbackProvider toolCallbacks
     ) {
         this.chatClient = builder
             .defaultSystem(instructions.systemPrompt())
@@ -48,6 +36,7 @@ public class SpringAiBrainModelClient implements BrainModelClient {
         this.fewShotMessages = buildFewShotMessages(
             instructions.fewShotExamples()
         );
+        this.toolCallbacks = toolCallbacks;
     }
 
     private static List<Message> buildFewShotMessages(
@@ -71,43 +60,29 @@ public class SpringAiBrainModelClient implements BrainModelClient {
                 .prompt()
                 .messages(historyMessages)
                 .user(userPrompt)
-                .toolNames(TOOL_NAMES)
+                .tools(toolCallbacks)
                 .call()
                 .chatResponse();
         } catch (RuntimeException ex) {
             log.warn(
-                "LLM tool call failed: {}. Retrying with tools again before falling back.",
+                "LLM tool call failed ({}): {}. Falling back without tools.",
+                ex.getClass().getSimpleName(),
                 ex.getMessage()
             );
             try {
-                Thread.sleep(500);
                 response = chatClient
                     .prompt()
                     .messages(historyMessages)
                     .user(userPrompt)
-                    .toolNames(TOOL_NAMES)
                     .call()
                     .chatResponse();
-            } catch (RuntimeException ex2) {
-                log.warn(
-                    "Second tool call failed, disabling tools for this request: {}",
-                    ex2.getMessage()
+            } catch (RuntimeException fallbackException) {
+                log.error(
+                    "LLM fallback failed ({}): {}",
+                    fallbackException.getClass().getSimpleName(),
+                    fallbackException.getMessage()
                 );
-                response = chatClient
-                    .prompt()
-                    .messages(historyMessages)
-                    .user(userPrompt)
-                    .call()
-                    .chatResponse();
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-                log.warn("Tool retry interrupted: {}", ie.getMessage());
-                response = chatClient
-                    .prompt()
-                    .messages(historyMessages)
-                    .user(userPrompt)
-                    .call()
-                    .chatResponse();
+                return new BrainResponse("Не удалось получить ответ от LLM.", 0);
             }
         }
         return toBrainResponse(response);
@@ -123,7 +98,7 @@ public class SpringAiBrainModelClient implements BrainModelClient {
             .prompt()
             .messages(historyMessages)
             .user(userPrompt)
-            .toolNames(TOOL_NAMES)
+            .tools(toolCallbacks)
             .stream()
             .content()
             .filter(chunk -> chunk != null && !chunk.isEmpty())

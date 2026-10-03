@@ -18,7 +18,7 @@ repositories {
     mavenCentral()
 }
 
-extra["springAiVersion"] = "2.0.0-M5"
+extra["springAiVersion"] = "2.0.1"
 extra["springCloudVersion"] = "2025.1.1"
 
 dependencies {

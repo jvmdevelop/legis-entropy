@@ -11,7 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Description;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -19,6 +24,55 @@ import java.util.stream.Collectors;
 @Configuration
 @Slf4j
 public class AITools {
+
+    @Bean
+    public ToolCallbackProvider brainToolCallbacks(
+            Function<LawSearchRequest, List<RetrievalChunkResponse>> searchLaws,
+            Function<UserDocSearchRequest, List<RetrievalChunkResponse>> searchUserDocuments,
+            Function<LawGraphSearchRequest, String> getLawGraph,
+            Function<LawRelatedSearchRequest, String> findRelatedLaws,
+            Function<AddLawToGraphRequest, String> addLawToUserGraph,
+            Function<FindAndAddRelatedLawsRequest, String> findAndAddRelatedLawsToGraph,
+            Function<ArticleLookupRequest, String> findArticle,
+            Function<ArticleSearchRequest, String> searchArticles,
+            Function<LinkClauseToArticleRequest, String> linkDocumentClauseToArticle,
+            Function<FlagArticleConflictRequest, String> flagArticleConflict,
+            Function<FlagDocumentArticleConflictRequest, String> flagDocumentArticleConflict,
+            Function<LinkDocumentToLawsRequest, String> linkDocumentToLawsInGraph
+    ) {
+        return ToolCallbackProvider.from(
+                functionTool("searchLaws", searchLaws, LawSearchRequest.class),
+                functionTool("searchUserDocuments", searchUserDocuments, UserDocSearchRequest.class),
+                functionTool("getLawGraph", getLawGraph, LawGraphSearchRequest.class),
+                functionTool("findRelatedLaws", findRelatedLaws, LawRelatedSearchRequest.class),
+                functionTool("addLawToUserGraph", addLawToUserGraph, AddLawToGraphRequest.class),
+                functionTool("findAndAddRelatedLawsToGraph", findAndAddRelatedLawsToGraph, FindAndAddRelatedLawsRequest.class),
+                functionTool("findArticle", findArticle, ArticleLookupRequest.class),
+                functionTool("searchArticles", searchArticles, ArticleSearchRequest.class),
+                functionTool("linkDocumentClauseToArticle", linkDocumentClauseToArticle, LinkClauseToArticleRequest.class),
+                functionTool("flagArticleConflict", flagArticleConflict, FlagArticleConflictRequest.class),
+                functionTool("flagDocumentArticleConflict", flagDocumentArticleConflict, FlagDocumentArticleConflictRequest.class),
+                functionTool("linkDocumentToLawsInGraph", linkDocumentToLawsInGraph, LinkDocumentToLawsRequest.class)
+        );
+    }
+
+    private static <I, O> ToolCallback functionTool(String name, Function<I, O> function, Class<I> inputType) {
+        Description description = findDescription(name);
+        return FunctionToolCallback.builder(name, function)
+                .description(description.value())
+                .inputType(inputType)
+                .build();
+    }
+
+    private static Description findDescription(String name) {
+        for (Method method : AITools.class.getDeclaredMethods()) {
+            if (method.getName().equals(name)) {
+                Description description = method.getAnnotation(Description.class);
+                if (description != null) return description;
+            }
+        }
+        throw new IllegalStateException("Missing tool description for " + name);
+    }
 
     @Bean
     @Description("Поиск в базе нормативно-правовых актов (законов) Казахстана и РФ")
@@ -327,7 +381,7 @@ public class AITools {
     @Description("Найти законы, семантически связанные с загруженным пользователем документом, и соединить их с ним в графе. " +
             "Используется когда юрист загружает свой документ (договор, иск) и хочет понять, какие законы РК с ним связаны. " +
             "graphId — активный граф, documentId — ID документа уже в графе, userId — ID пользователя, limit — сколько связей создать (по умолчанию 5).")
-    public Function<LinkDocumentToLawsRequest, String> linkDocumentToLawsInGraph(GraphActionService graphActionService) {
+    public Function<LinkDocumentToLawsRequest, String> linkDocumentToLawsInGraph(@Lazy GraphActionService graphActionService) {
         return request -> {
             log.info("Tool linkDocumentToLawsInGraph: graphId={}, doc={}", request.graphId(), request.documentId());
             int limit = request.limit() == null ? 5 : request.limit();

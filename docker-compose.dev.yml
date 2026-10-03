@@ -348,9 +348,9 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
-      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434/v1}
-      LLM_API_KEY: ${LLM_API_KEY:-ollama}
-      LLM_MODEL: ${LLM_MODEL:-qwen2.5:7b}
+      LLM_BASE_URL: ${LLM_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai/}
+      LLM_API_KEY: ${LLM_API_KEY:?Set LLM_API_KEY in .env}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.8-flash}
       LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.2}
       GRAPH_SERVICE_URL: http://graphs-service:8086
       DEEP_ANALYSIS_MAX_LAWS_TOTAL: ${DEEP_ANALYSIS_MAX_LAWS_TOTAL:-25}
@@ -462,6 +462,7 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      JAVA_TOOL_OPTIONS: "-Xms512m -Xmx1024m"
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-documents:5432/${DOCUMENTS_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
@@ -469,6 +470,10 @@ services:
       SPRING_DATA_REDIS_PORT: 6379
     volumes:
       - law-embeddings-cache:/app/embeddings-cache
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
     depends_on:
       postgres-documents: { condition: service_healthy }
       redis: { condition: service_healthy }
