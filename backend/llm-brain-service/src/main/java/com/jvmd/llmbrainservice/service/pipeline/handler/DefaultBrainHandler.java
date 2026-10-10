@@ -96,11 +96,14 @@ public class DefaultBrainHandler implements BrainTaskHandler {
                             String finalAnswer = accumulatedAnswer.toString();
                             boolean grounded = hallucinationDetector.hasGroundingContext(context);
                             if (grounded) {
-                                var ungrounded = hallucinationDetector.getUngroundedArticles(finalAnswer, context);
+                                var ungrounded = hallucinationDetector.getUngroundedArticleReferences(finalAnswer, context);
                                 if (!ungrounded.isEmpty()) {
                                     log.warn("Stream redaction: {} ungrounded article(s) {}", ungrounded.size(), ungrounded);
-                                    String redacted = hallucinationDetector.redactUngroundedArticles(finalAnswer, ungrounded);
-                                    String list = ungrounded.stream().map(String::valueOf)
+                                    String redacted = hallucinationDetector.redactUngroundedArticleReferences(finalAnswer, ungrounded);
+                                    String list = ungrounded.stream()
+                                            .map(HallucinationDetector.UngroundedArticleReference::number)
+                                            .distinct()
+                                            .map(String::valueOf)
                                             .collect(Collectors.joining(", "));
                                     String footer = "\n\n> Не удалось подтвердить номера статей по retrieval-контексту: **"
                                             + list + "**. Перепроверьте по официальному источнику — модель могла перепутать раздел кодекса.";

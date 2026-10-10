@@ -8,10 +8,12 @@ import com.jvmd.voiceservice.repository.VoiceMessageRepository;
 import io.minio.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -29,7 +31,10 @@ public class VoiceMessageService {
     private final MinioClient minioClient;
     private final MinioProperties minioProperties;
 
-    @Transactional
+    @Autowired
+    @Qualifier("voiceProcessingExecutor")
+    private TaskExecutor voiceProcessingExecutor;
+
     public VoiceMessageDTO upload(String userId, String graphId, String situationId,
                                    String conversationId, String languageHint, MultipartFile file) {
         if (file == null || file.isEmpty()) throw new IllegalArgumentException("Audio file is empty");
@@ -50,12 +55,11 @@ public class VoiceMessageService {
 
         VoiceMessage saved = repository.save(v);
         log.info("Uploaded voice message {} ({} bytes) for user {}", id, file.getSize(), userId);
-        processAsync(id);
+        voiceProcessingExecutor.execute(() -> processAsync(id));
         return VoiceMessageDTO.from(saved);
     }
 
-    @Async
-    public void processAsync(String voiceMessageId) {
+    private void processAsync(String voiceMessageId) {
         try {
             transcribeAndAnalyze(voiceMessageId);
         } catch (Exception e) {
@@ -68,7 +72,6 @@ public class VoiceMessageService {
         }
     }
 
-    @Transactional
     public Optional<VoiceMessageDTO> transcribeAndAnalyze(String id) {
         Optional<VoiceMessage> opt = repository.findById(id);
         if (opt.isEmpty()) return Optional.empty();

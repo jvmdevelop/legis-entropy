@@ -115,14 +115,17 @@ public class SpringAiBrainModelClient implements BrainModelClient {
         if (history == null || history.isEmpty()) {
             return fewShotMessages;
         }
-        return history
-            .stream()
-            .map(h ->
-                "USER".equalsIgnoreCase(h.role())
-                    ? (Message) new UserMessage(h.content())
-                    : (Message) new AssistantMessage(h.content())
-            )
-            .toList();
+        List<Message> messages = new ArrayList<>(fewShotMessages.size() + history.size());
+        messages.addAll(fewShotMessages);
+        for (HistoryEntry entry : history) {
+            if (entry == null || entry.role() == null || entry.content() == null) continue;
+            if ("USER".equalsIgnoreCase(entry.role())) {
+                messages.add(new UserMessage(entry.content()));
+            } else if ("ASSISTANT".equalsIgnoreCase(entry.role())) {
+                messages.add(new AssistantMessage(entry.content()));
+            }
+        }
+        return List.copyOf(messages);
     }
 
     private BrainResponse toBrainResponse(ChatResponse response) {

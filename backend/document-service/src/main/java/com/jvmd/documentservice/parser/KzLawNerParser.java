@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.math.BigDecimal;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,7 +14,7 @@ import java.util.regex.Pattern;
 @Component
 public class KzLawNerParser {
 
-    private static final Pattern ARTICLE_REFERENCE = Pattern.compile("Статья\\s+(\\d+(?:\\.\\d+)?)(?:\\s+|-)(\\d+)?\\s*(?:Закона|Кодекса)?");
+    private static final Pattern ARTICLE_REFERENCE = Pattern.compile("Статья\\s+(\\d+(?:\\.\\d+)?)(?:\\s+|-)(\\d+)?\\s*(?:Закона|Кодекса)?", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
     private static final Pattern LAW_NAME_PATTERN = Pattern.compile("\"([^\"]+)\"\\s+(?:Закон|Кодекс|Закон\\s+Республики\\s+Казахстан)");
     private static final Pattern CODE_NAME_PATTERN = Pattern.compile("(Уголовный|Гражданский|Процессуальный|Налоговый|Трудовой)\\s+Кодекс");
     private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{1,2})\\.(\\d{1,2})\\.(\\d{4})");
@@ -41,7 +42,7 @@ public class KzLawNerParser {
         while (matcher.find()) {
             String articleRef = matcher.group(0).trim();
             if (seen.add(articleRef)) {
-                int articleNumber = Integer.parseInt(matcher.group(1).split("\\.")[0]);
+                BigDecimal articleNumber = new BigDecimal(matcher.group(1));
                 result.articleReferences.add(new Entity("ARTICLE_REFERENCE", articleRef, articleNumber));
             }
         }

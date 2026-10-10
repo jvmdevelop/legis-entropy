@@ -43,10 +43,9 @@ public class WhisperServerVoiceTranscriptionService implements VoiceTranscriptio
         try {
             bytes = audio.readAllBytes();
         } catch (Exception e) {
-            log.error("Could not read audio bytes for transcription: {}", e.getMessage());
-            return emptyResult(languageHint);
+            throw new IllegalStateException("Could not read audio bytes for transcription.", e);
         }
-        if (bytes.length == 0) return emptyResult(languageHint);
+        if (bytes.length == 0) throw new IllegalArgumentException("Audio file is empty.");
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         ByteArrayResource fileResource = new ByteArrayResource(bytes) {
@@ -73,13 +72,14 @@ public class WhisperServerVoiceTranscriptionService implements VoiceTranscriptio
             String response = spec.body(body).retrieve().body(String.class);
             return parseResponse(response, languageHint);
         } catch (Exception e) {
-            log.error("Whisper STT call failed: {}", e.getMessage(), e);
-            return emptyResult(languageHint);
+            throw new IllegalStateException("Whisper STT request failed.", e);
         }
     }
 
     private TranscriptionResult parseResponse(String response, String fallbackLanguage) {
-        if (response == null || response.isBlank()) return emptyResult(fallbackLanguage);
+        if (response == null || response.isBlank()) {
+            throw new IllegalStateException("Whisper STT returned an empty response.");
+        }
         try {
             JsonNode root = json.readTree(response);
             String text = root.path("text").asText("");
@@ -101,13 +101,8 @@ public class WhisperServerVoiceTranscriptionService implements VoiceTranscriptio
             }
             return new TranscriptionResult(lang, (int) Math.round(duration * 1000), text, segments);
         } catch (Exception e) {
-            log.warn("Could not parse Whisper STT response: {}", e.getMessage());
-            return emptyResult(fallbackLanguage);
+            throw new IllegalStateException("Could not parse Whisper STT response.", e);
         }
-    }
-
-    private TranscriptionResult emptyResult(String languageHint) {
-        return new TranscriptionResult(languageHint != null ? languageHint : "ru", 0, "", List.of());
     }
 
     private static String extensionFor(String contentType) {

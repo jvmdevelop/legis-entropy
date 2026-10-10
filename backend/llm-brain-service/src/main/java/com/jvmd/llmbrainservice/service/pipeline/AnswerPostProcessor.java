@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,11 +25,16 @@ public class AnswerPostProcessor {
             return stripped + "\n\nПримечание: retrieval-контекст был найден, но ответ неполный. Проверьте вывод вручную.";
         }
 
-        Set<Integer> ungrounded = hallucinationDetector.getUngroundedArticles(stripped, context);
+        List<HallucinationDetector.UngroundedArticleReference> ungrounded =
+                hallucinationDetector.getUngroundedArticleReferences(stripped, context);
         if (!ungrounded.isEmpty()) {
-            log.warn("Redacting {} ungrounded article number(s): {}", ungrounded.size(), ungrounded);
-            String redacted = hallucinationDetector.redactUngroundedArticles(stripped, ungrounded);
-            String list = ungrounded.stream().map(String::valueOf).collect(Collectors.joining(", "));
+            List<Integer> numbers = ungrounded.stream()
+                    .map(HallucinationDetector.UngroundedArticleReference::number)
+                    .distinct()
+                    .toList();
+            log.warn("Redacting {} ungrounded article reference(s): {}", ungrounded.size(), numbers);
+            String redacted = hallucinationDetector.redactUngroundedArticleReferences(stripped, ungrounded);
+            String list = numbers.stream().map(String::valueOf).collect(Collectors.joining(", "));
             return redacted + "\n\n> Не удалось подтвердить номера статей по retrieval-контексту: **"
                     + list + "**. Перепроверьте по официальному источнику — модель могла перепутать раздел кодекса.";
         }

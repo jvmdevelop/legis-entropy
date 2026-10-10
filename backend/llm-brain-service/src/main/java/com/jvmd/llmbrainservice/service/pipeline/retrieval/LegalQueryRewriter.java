@@ -114,7 +114,7 @@ public class LegalQueryRewriter {
         String normalized = TextMatcher.normalize(rawMessage);
         String cleaned = removeConversationalFiller(normalized);
         String extracted = extractLegalContext(cleaned, normalized);
-        String truncated = truncate(extracted, 100);
+        String truncated = truncate(extracted, 500);
 
         log.debug("Query rewrite: '{}' → '{}'", rawMessage, truncated);
         return truncated;
