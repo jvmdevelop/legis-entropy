@@ -22,15 +22,20 @@ public class RoutesConfig {
             String username = (String) request.servletRequest().getAttribute(JwtGatewayFilter.ATTR_USERNAME);
             String userRole = (String) request.servletRequest().getAttribute(JwtGatewayFilter.ATTR_USER_ROLE);
             String planType = (String) request.servletRequest().getAttribute(JwtGatewayFilter.ATTR_PLAN_TYPE);
-            if (userId != null || username != null || userRole != null) {
-                ServerRequest.Builder builder = ServerRequest.from(request);
-                if (userId   != null) builder.header(JwtGatewayFilter.ATTR_USER_ID,   userId);
-                if (username != null) builder.header(JwtGatewayFilter.ATTR_USERNAME,  username);
-                if (userRole != null) builder.header(JwtGatewayFilter.ATTR_USER_ROLE, userRole);
-                builder.header(JwtGatewayFilter.ATTR_PLAN_TYPE, planType != null ? planType : "FREE");
-                return builder.build();
-            }
-            return request;
+            ServerRequest.Builder builder = ServerRequest.from(request);
+            builder.headers(headers -> {
+                headers.remove(JwtGatewayFilter.ATTR_USER_ID);
+                headers.remove(JwtGatewayFilter.ATTR_USERNAME);
+                headers.remove(JwtGatewayFilter.ATTR_USER_ROLE);
+                headers.remove(JwtGatewayFilter.ATTR_PLAN_TYPE);
+                if (userId != null) headers.set(JwtGatewayFilter.ATTR_USER_ID, userId);
+                if (username != null) headers.set(JwtGatewayFilter.ATTR_USERNAME, username);
+                if (userRole != null) headers.set(JwtGatewayFilter.ATTR_USER_ROLE, userRole);
+                if (planType != null || userId != null || username != null || userRole != null) {
+                    headers.set(JwtGatewayFilter.ATTR_PLAN_TYPE, planType != null ? planType : "FREE");
+                }
+            });
+            return builder.build();
         };
     }
 

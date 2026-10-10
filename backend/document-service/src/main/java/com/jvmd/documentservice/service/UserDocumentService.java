@@ -36,8 +36,8 @@ public class UserDocumentService {
         String documentId = UUID.randomUUID().toString();
         log.info("Uploading document for user {}: {}", userId, file.getOriginalFilename());
 
-        String objectName = documentStorageService.store(documentId, userId, file);
         String plainText = extractPlainText(file);
+        String objectName = documentStorageService.store(documentId, userId, file);
 
         UserDocument document = new UserDocument();
         document.setId(documentId);
@@ -46,9 +46,19 @@ public class UserDocumentService {
         document.setContentType(file.getContentType());
         document.setObjectName(objectName);
         document.setPlainText(plainText);
-        document.setStatus(DocumentProcessingStatus.READY);
+        document.setStatus(DocumentProcessingStatus.UPLOADED);
         document.setChunkCount(0);
-        userDocumentRepository.save(document);
+        try {
+            userDocumentRepository.save(document);
+        } catch (RuntimeException e) {
+            try {
+                documentStorageService.delete(objectName);
+            } catch (RuntimeException cleanupError) {
+                e.addSuppressed(cleanupError);
+                log.error("Could not remove uploaded object {} after database failure", objectName, cleanupError);
+            }
+            throw e;
+        }
         ingestionJob.indexAsync(documentId);
         return documentId;
     }
@@ -112,16 +122,19 @@ public class UserDocumentService {
 
     private String extractPlainText(MultipartFile file) {
         try {
-            return documentReader.read(file).stream()
-                    .map(Document::getText)
-                    .filter(t -> t != null && !t.isBlank())
-                    .reduce((a, b) -> a + "\n\n" + b)
-                    .orElse("");
+            StringBuilder text = new StringBuilder();
+            for (Document page : documentReader.read(file)) {
+                String pageText = page.getText();
+                if (pageText != null && !pageText.isBlank()) {
+                    if (!text.isEmpty()) text.append("\n\n");
+                    text.append(pageText);
+                }
+            }
+            return text.toString();
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
-            log.warn("Could not extract plain text from {}: {}", file.getOriginalFilename(), e.getMessage());
-            return "";
+            throw new IllegalArgumentException("Could not extract text from uploaded document.", e);
         }
     }
 

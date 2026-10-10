@@ -8,6 +8,8 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,23 +21,53 @@ public class ArticleIndexService {
     private final VectorStore vectorStore;
 
     public void index(ArticleIndexRequest req) {
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("lawCode", req.lawCode());
-        metadata.put("country", req.country() != null ? req.country() : "RK");
-        metadata.put("articleNumber", req.articleNumber());
-        metadata.put("articleTitle", req.articleTitle() != null ? req.articleTitle() : "");
-        metadata.put("collection", collectionName(req.country()));
-        metadata.put("sourceType", "article");
+        indexBatch(List.of(req));
+    }
 
-        String text = buildText(req);
-        Document doc = new Document(text, metadata);
-        vectorStore.add(List.of(doc));
+    public void indexBatch(List<ArticleIndexRequest> requests) {
+        List<ArticleIndexRequest> validRequests = requests.stream()
+                .filter(req -> req.body() != null && !req.body().isBlank())
+                .toList();
+        if (validRequests.isEmpty()) return;
 
-        log.debug("Indexed article {} ст.{} into pgvector", req.lawCode(), req.articleNumber());
+        // Replace existing versions of these articles before writing the new batch.
+        new LinkedHashSet<>(validRequests.stream().map(this::articleFilter).toList())
+                .forEach(vectorStore::delete);
+
+        List<Document> documents = new ArrayList<>(validRequests.size());
+        for (ArticleIndexRequest req : validRequests) {
+            Map<String, Object> metadata = new HashMap<>();
+            String country = normalizedCountry(req.country());
+            metadata.put("lawCode", req.lawCode());
+            metadata.put("country", country);
+            metadata.put("articleNumber", req.articleNumber());
+            metadata.put("articleTitle", req.articleTitle() != null ? req.articleTitle() : "");
+            metadata.put("collection", collectionName(country));
+            metadata.put("sourceType", "article");
+            documents.add(new Document(buildText(req), metadata));
+        }
+        for (int start = 0; start < documents.size(); start += 100) {
+            vectorStore.add(documents.subList(start, Math.min(start + 100, documents.size())));
+        }
+        log.debug("Indexed {} articles into pgvector", documents.size());
     }
 
     public void deleteByLaw(String lawCode, String country) {
-        log.info("deleteByLaw requested for {} {} — re-index will replace stale chunks", lawCode, country);
+        vectorStore.delete("lawCode == '" + escape(lawCode) + "' && country == '" + escape(normalizedCountry(country)) + "'");
+        log.info("Deleted indexed articles for law {} ({})", lawCode, country);
+    }
+
+    private String articleFilter(ArticleIndexRequest req) {
+        return "lawCode == '" + escape(req.lawCode()) + "' && country == '" + escape(normalizedCountry(req.country()))
+                + "' && articleNumber == '" + escape(req.articleNumber()) + "'";
+    }
+
+    private String normalizedCountry(String country) {
+        return country == null || country.isBlank() ? "RK" : country.toUpperCase();
+    }
+
+    private String escape(String value) {
+        return value.replace("\\", "\\\\").replace("'", "\\'");
     }
 
     private String buildText(ArticleIndexRequest req) {
@@ -52,6 +84,6 @@ public class ArticleIndexService {
     }
 
     private String collectionName(String country) {
-        return (country != null ? country.toLowerCase() : "rk") + "_article";
+        return country.toLowerCase() + "_article";
     }
 }
