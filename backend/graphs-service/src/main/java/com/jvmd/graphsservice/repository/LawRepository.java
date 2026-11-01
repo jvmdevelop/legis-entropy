@@ -52,8 +52,10 @@ public interface LawRepository extends Neo4jRepository<Law, Long> {
 
     @Query("""
             MATCH path = (start:Law {code: $startCode, country: $country})-[*1..3]->(end:Law)
-            RETURN distinct end
-            ORDER BY length(path)
+            WHERE end <> start
+            WITH end, min(length(path)) AS distance
+            RETURN end
+            ORDER BY distance
             LIMIT 20
             """)
     List<Law> findRelatedLaws(@Param("startCode") String startCode, @Param("country") String country);

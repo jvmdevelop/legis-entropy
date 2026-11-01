@@ -4,6 +4,7 @@ import com.jvmd.lawservice.controller.ArticleIndexController.ArticleIndexRequest
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +20,14 @@ import java.util.Map;
 public class ArticleIndexService {
 
     private final VectorStore vectorStore;
+
+    // Long articles exceed the embedding batching token limit; split them into chunks.
+    // Metadata (lawCode/country/articleNumber) is copied to every chunk, so delete filters still match.
+    private final TokenTextSplitter splitter = TokenTextSplitter.builder()
+            .withChunkSize(800)
+            .withMinChunkSizeChars(200)
+            .withKeepSeparator(true)
+            .build();
 
     public void index(ArticleIndexRequest req) {
         indexBatch(List.of(req));
@@ -46,6 +55,7 @@ public class ArticleIndexService {
             metadata.put("sourceType", "article");
             documents.add(new Document(buildText(req), metadata));
         }
+        documents = splitter.apply(documents);
         for (int start = 0; start < documents.size(); start += 100) {
             vectorStore.add(documents.subList(start, Math.min(start + 100, documents.size())));
         }

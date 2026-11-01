@@ -157,7 +157,13 @@ public class DeepAnalysisService {
         for (LawInfo law : laws) {
             if (articlesLinked >= maxArticlesTotal) break;
 
-            List<ArticleInfo> all = graphServiceClient.listArticlesByLaw(law.code(), ctry);
+            List<ArticleInfo> all;
+            try {
+                all = graphServiceClient.listArticlesByLaw(law.code(), ctry);
+            } catch (Exception e) {
+                log.warn("Failed to load articles for {}: {}", law.code(), e.getMessage());
+                continue;
+            }
             if (all.isEmpty()) continue;
 
             List<RankedArticle> ranked = rankArticles(all, docText, articlesPerLaw);
@@ -187,7 +193,13 @@ public class DeepAnalysisService {
         for (LawInfo parent : sourceLaws) {
             if (visitedLaws.size() >= maxLawsTotal) break;
 
-            List<LawInfo> related = graphServiceClient.findRelatedLaws(parent.code(), ctry);
+            List<LawInfo> related;
+            try {
+                related = graphServiceClient.findRelatedLaws(parent.code(), ctry);
+            } catch (Exception e) {
+                log.warn("Failed to load related laws for {}: {}", parent.code(), e.getMessage());
+                continue;
+            }
             int addedForThisParent = 0;
 
             for (LawInfo rel : related) {
