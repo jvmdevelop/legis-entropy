@@ -26,7 +26,7 @@ export function useExtractGraphsFromContent() {
         }
       } catch (err) {
         const message =
-          err instanceof Error ? err.message : "Failed to extract graphs";
+          err instanceof Error ? err.message : "Не удалось извлечь графы";
         setError(message);
       } finally {
         setLoading(false);

@@ -15,7 +15,7 @@ export function Spinner({ size = 'md', className }: SpinnerProps) {
   return (
     <span
       role="status"
-      aria-label="Loading"
+      aria-label="Загрузка"
       className={cn(
         'inline-block rounded-full border-[var(--color-accent)] border-t-transparent animate-spin',
         sizes[size],
@@ -35,7 +35,7 @@ export function FullscreenSpinner() {
         </div>
         <p className="text-[var(--color-text-muted)] text-sm font-medium tracking-wider uppercase"
           style={{ fontFamily: "'IBM Plex Mono', monospace", fontSize: '11px', letterSpacing: '0.14em' }}>
-          Loading
+          Загрузка
         </p>
       </div>
     </div>

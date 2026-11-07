@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   FileScan, Upload, AlertCircle, CheckCircle2, AlertTriangle,
-  HelpCircle, XCircle, ExternalLink, ChevronLeft, FileText, Download,
+  HelpCircle, XCircle, ExternalLink, FileText, Download,
   ShieldAlert, Lock,
 } from 'lucide-react'
 import { documentApi } from '@/features/document/api/documentApi'
@@ -21,7 +21,6 @@ type Phase = 'idle' | 'uploading' | 'extracting' | 'scanning' | 'ready' | 'error
 type Mode = 'citations' | 'risks'
 
 export default function ContractScannerPage() {
-  const navigate = useNavigate()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { user } = useAuthStore()
 
@@ -115,13 +114,7 @@ export default function ContractScannerPage() {
           {mode === 'risks' ? <ShieldAlert /> : <FileScan />}
         </div>
         <div className="le-cpage__hero-text">
-          <button
-            className="le-backlink le-backlink--mb"
-            onClick={() => navigate(-1)}
-          >
-            <ChevronLeft /> назад
-          </button>
-          <div className="le-cpage__eyebrow">contract_scanner</div>
+          <div className="le-cpage__eyebrow">проверка договора</div>
           <div className="le-chips" style={{ marginBottom: 8 }}>
             <button
               className={'le-chip' + (mode === 'citations' ? ' le-chip--on' : '')}

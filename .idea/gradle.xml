@@ -4,9 +4,8 @@
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
-        <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/backend" />
-        <option name="gradleJvm" value="25" />
+        <option name="gradleJvm" value="corretto-26" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/backend" />
@@ -25,7 +24,6 @@
             <option value="$PROJECT_DIR$/backend/workspace-service" />
           </set>
         </option>
-        <option name="myGradleHome" value="/usr/share/java/gradle" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/backend/eureka-server" />
@@ -34,7 +32,6 @@
             <option value="$PROJECT_DIR$/backend/eureka-server" />
           </set>
         </option>
-        <option name="myGradleHome" value="/usr/share/java/gradle" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/backend/graphs-service" />
@@ -43,7 +40,6 @@
             <option value="$PROJECT_DIR$/backend/graphs-service" />
           </set>
         </option>
-        <option name="myGradleHome" value="/usr/share/java/gradle" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/backend/llm-brain-service" />
@@ -52,7 +48,6 @@
             <option value="$PROJECT_DIR$/backend/llm-brain-service" />
           </set>
         </option>
-        <option name="myGradleHome" value="/usr/share/java/gradle" />
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/backend/user-service" />
@@ -61,7 +56,6 @@
             <option value="$PROJECT_DIR$/backend/user-service" />
           </set>
         </option>
-        <option name="myGradleHome" value="/usr/share/java/gradle" />
       </GradleProjectSettings>
     </option>
   </component>

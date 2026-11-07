@@ -109,6 +109,21 @@ public class GraphActionService {
         return new LinkResult(added, report.toString(), codes);
     }
 
+    /** Adds laws found during retrieval to the user's graph; returns the codes actually added. */
+    public List<String> addLawCodesToGraph(String graphId, java.util.Collection<String> codes, String country) {
+        String ctry = defaultCountry(country);
+        List<String> added = new ArrayList<>();
+        for (String code : codes) {
+            if (code == null || code.isBlank()) continue;
+            if (tryAddLaw(graphId, code, ctry)) {
+                added.add(code);
+            } else {
+                log.debug("Could not add law {} to graph {}", code, graphId);
+            }
+        }
+        return added;
+    }
+
     private SubjectLinker requireLinker(SubjectKind kind) {
         return linkerRegistry.byKind(kind)
             .orElseThrow(() -> new IllegalStateException(kind + " linker is not registered"));

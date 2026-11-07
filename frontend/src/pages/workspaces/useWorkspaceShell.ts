@@ -104,7 +104,7 @@ export function useWorkspaceShell() {
       setCrumbWs(wsRes.data.name);
     } catch (e) {
       console.error(e);
-      toast.error("Не удалось загрузить workspace");
+      toast.error("Не удалось загрузить пространство");
     } finally {
       setLoading(false);
     }
@@ -118,7 +118,7 @@ export function useWorkspaceShell() {
       setCrumbGv(c.graph.name);
     } catch (e) {
       console.error(e);
-      toast.error("Не удалось загрузить graph_view");
+      toast.error("Не удалось загрузить граф");
       if (workspaceId) navigate(`/workspace/${workspaceId}`);
     }
   }
@@ -335,7 +335,7 @@ export function useWorkspaceShell() {
       navigate(`/workspace/${workspaceId}/graph/${created.id}`);
     } catch (e) {
       console.error(e);
-      toast.error("Не удалось создать graph_view");
+      toast.error("Не удалось создать граф");
     } finally {
       setCreating(false);
     }
@@ -343,7 +343,7 @@ export function useWorkspaceShell() {
 
   async function deleteGraph(g: UserGraphDTO, ev?: React.MouseEvent) {
     ev?.stopPropagation();
-    if (!window.confirm(`Удалить graph_view «${g.name}»?`)) return;
+    if (!window.confirm(`Удалить граф «${g.name}»?`)) return;
     try {
       await userGraphApi.remove(g.id);
       setGraphs((p) => p.filter((x) => x.id !== g.id));
@@ -352,7 +352,7 @@ export function useWorkspaceShell() {
       toast.success("Граф удалён");
     } catch (e) {
       console.error(e);
-      toast.error("Не удалось удалить graph_view");
+      toast.error("Не удалось удалить граф");
     }
   }
 

@@ -28,15 +28,11 @@ export default function WorkspacesPageMobile({ state }: Props) {
   return (
     <div className="le-m-home">
       <div className="le-m-home__head">
-        <div className="le-home__eyebrow">all_workspaces</div>
-        <h1 className="le-m-home__title">
-          workspaces
-          <span className="le-home__count">{String(workspaces.length).padStart(2, '0')}</span>
-        </h1>
+        <h1 className="le-m-home__title">пространства</h1>
         <div className="le-search le-m-search">
           <I.search />
           <input
-            placeholder="filter_workspaces"
+            placeholder="фильтр пространств"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
@@ -53,7 +49,7 @@ export default function WorkspacesPageMobile({ state }: Props) {
         <div className="le-emptyws" style={{ padding: '40px 24px' }}>
           <div className="le-emptyws__glyph">◇</div>
           <div className="le-emptyws__title">
-            {workspaces.length === 0 ? 'нет workspace-ов' : 'ничего не найдено'}
+            {workspaces.length === 0 ? 'нет пространств' : 'ничего не найдено'}
           </div>
           {workspaces.length === 0 && (
             <button
@@ -61,7 +57,7 @@ export default function WorkspacesPageMobile({ state }: Props) {
               onClick={() => setShowCreate(true)}
               style={{ marginTop: 16 }}
             >
-              <I.plus /> create_workspace
+              <I.plus /> создать пространство
             </button>
           )}
         </div>
@@ -87,7 +83,7 @@ export default function WorkspacesPageMobile({ state }: Props) {
                   e.stopPropagation()
                   remove(w)
                 }}
-                title="удалить workspace"
+                title="удалить пространство"
               >
                 <I.trash />
               </button>
@@ -99,7 +95,7 @@ export default function WorkspacesPageMobile({ state }: Props) {
       <button
         className="le-m-fab"
         onClick={() => setShowCreate(true)}
-        title="create_workspace"
+        title="создать пространство"
       >
         <I.plus />
       </button>
@@ -108,7 +104,7 @@ export default function WorkspacesPageMobile({ state }: Props) {
         <div className="le-modal-backdrop" onClick={() => !creating && setShowCreate(false)}>
           <div className="le-modal" onClick={(e) => e.stopPropagation()}>
             <div className="le-modal__head">
-              <span>create_workspace</span>
+              <span>создать пространство</span>
               <button className="le-modal__close" onClick={() => setShowCreate(false)}>
                 <I.close />
               </button>
@@ -116,10 +112,10 @@ export default function WorkspacesPageMobile({ state }: Props) {
             <form onSubmit={create}>
               <div className="le-modal__body">
                 <label className="le-field">
-                  <span className="le-field__label">название workspace</span>
+                  <span className="le-field__label">название пространства</span>
                   <input
                     ref={nameInputRef}
-                    placeholder="snake_case_name"
+                    placeholder="название"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value.replace(/\s+/g, '_').toLowerCase())}
                     disabled={creating}
@@ -146,7 +142,7 @@ export default function WorkspacesPageMobile({ state }: Props) {
                   отмена
                 </button>
                 <button type="submit" className="le-btn le-btn--primary" disabled={!newName.trim() || creating}>
-                  {creating ? 'creating...' : 'create'}
+                  {creating ? 'создание…' : 'создать'}
                 </button>
               </div>
             </form>

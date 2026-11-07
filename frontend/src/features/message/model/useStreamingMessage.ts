@@ -93,11 +93,11 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
       });
 
       if (!response.ok) {
-        throw new Error(`Stream failed: ${response.status}`);
+        throw new Error(`Ошибка потока ответа: ${response.status}`);
       }
 
       const reader = response.body?.getReader();
-      if (!reader) throw new Error("No readable stream body");
+      if (!reader) throw new Error("Пустой ответ сервера");
 
       const decoder = new TextDecoder();
       let eventBuf = "";
@@ -157,7 +157,7 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
       if ((err as Error).name === "AbortError") {
 
       } else {
-        const msg = (err as Error).message ?? "Streaming error";
+        const msg = (err as Error).message ?? "Ошибка получения ответа";
         setError(msg);
         throw err;
       }

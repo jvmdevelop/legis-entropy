@@ -202,15 +202,15 @@ export default function AdminPage() {
     <div style={S.page}>
       <div style={S.heading}>
         <Shield size={20} color="var(--purple)" />
-        <h1 style={S.h1}>Admin Panel</h1>
+        <h1 style={S.h1}>Панель администратора</h1>
       </div>
 
       <div style={S.tabBar}>
         <TabButton active={tab === 'users'} onClick={() => setTab('users')} icon={<Users size={14} />}>
-          Users
+          Пользователи
         </TabButton>
         <TabButton active={tab === 'monitoring'} onClick={() => setTab('monitoring')} icon={<BarChart3 size={14} />}>
-          Monitoring
+          Мониторинг
         </TabButton>
       </div>
 
@@ -296,18 +296,18 @@ function UsersTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {stats && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 12 }}>
-          <StatCard label="Total Users" value={stats.totalUsers} color="var(--purple)" />
-          <StatCard label="Active Users" value={stats.activeUsers} color="#10b981" />
-          <StatCard label="Admins" value={stats.adminUsers} color="var(--amber, #f59e0b)" />
+          <StatCard label="Всего пользователей" value={stats.totalUsers} color="var(--purple)" />
+          <StatCard label="Активные" value={stats.activeUsers} color="#10b981" />
+          <StatCard label="Администраторы" value={stats.adminUsers} color="var(--amber, #f59e0b)" />
         </div>
       )}
 
       <div style={S.panel}>
         <div style={S.panelHead}>
-          <span>All Users</span>
+          <span>Все пользователи</span>
           <button style={S.primaryBtn} onClick={() => setShowCreateModal(true)}>
             <UserPlus size={13} />
-            Create User
+            Создать пользователя
           </button>
         </div>
 
@@ -319,13 +319,13 @@ function UsersTab() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                 <thead>
                   <tr>
-                    <th style={S.th}>User</th>
+                    <th style={S.th}>Пользователь</th>
                     <th style={S.th}>Email</th>
-                    <th style={S.th}>Role</th>
-                    <th style={S.th}>Plan</th>
-                    <th style={S.th}>Status</th>
-                    <th style={S.th}>Joined</th>
-                    <th style={{ ...S.th, textAlign: 'right' }}>Actions</th>
+                    <th style={S.th}>Роль</th>
+                    <th style={S.th}>Тариф</th>
+                    <th style={S.th}>Статус</th>
+                    <th style={S.th}>Регистрация</th>
+                    <th style={{ ...S.th, textAlign: 'right' }}>Действия</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -349,10 +349,10 @@ function UsersTab() {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '12px 20px', borderTop: '1px solid var(--line)', fontSize: 12, color: 'var(--dim)',
               }}>
-                <span>Page {page + 1} of {data.page.totalPages}</span>
+                <span>Страница {page + 1} из {data.page.totalPages}</span>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button disabled={page === 0} onClick={() => setPage(p => p - 1)} style={S.ghostBtn}>Prev</button>
-                  <button disabled={page >= data.page.totalPages - 1} onClick={() => setPage(p => p + 1)} style={S.ghostBtn}>Next</button>
+                  <button disabled={page === 0} onClick={() => setPage(p => p - 1)} style={S.ghostBtn}>Назад</button>
+                  <button disabled={page >= data.page.totalPages - 1} onClick={() => setPage(p => p + 1)} style={S.ghostBtn}>Вперёд</button>
                 </div>
               </div>
             )}
@@ -362,7 +362,7 @@ function UsersTab() {
 
       {confirmDelete !== null && (
         <ConfirmDialog
-          message="Delete this user permanently?"
+          message="Удалить этого пользователя навсегда?"
           onConfirm={() => deleteUser.mutate(confirmDelete)}
           onCancel={() => setConfirmDelete(null)}
           loading={deleteUser.isPending}
@@ -408,14 +408,14 @@ function UserRow({ user, onToggleActive, onRoleChange, onPlanChange, onDelete, i
       <td style={{ ...S.td, color: 'var(--dim)' }}>{user.email}</td>
       <td style={S.td}>
         <select value={user.role} onChange={e => onRoleChange(e.target.value)} disabled={isProcessing} style={S.select}>
-          <option value="ROLE_USER">User</option>
-          <option value="ROLE_ADMIN">Admin</option>
+          <option value="ROLE_USER">Пользователь</option>
+          <option value="ROLE_ADMIN">Администратор</option>
         </select>
       </td>
       <td style={S.td}>
         <select value={user.planType ?? 'FREE'} onChange={e => onPlanChange(e.target.value)} disabled={isProcessing} style={S.select}>
-          <option value="FREE">Free</option>
-          <option value="BASIC">Basic</option>
+          <option value="FREE">Бесплатный</option>
+          <option value="BASIC">Базовый</option>
           <option value="PRO">Pro</option>
         </select>
       </td>
@@ -426,7 +426,7 @@ function UserRow({ user, onToggleActive, onRoleChange, onPlanChange, onDelete, i
           background: user.active ? 'rgba(16,185,129,0.12)' : 'rgba(220,38,38,0.10)',
           color: user.active ? '#059669' : '#dc2626',
         }}>
-          {user.active ? 'Active' : 'Inactive'}
+          {user.active ? 'Активен' : 'Неактивен'}
         </span>
       </td>
       <td style={{ ...S.td, color: 'var(--dim)', fontSize: 12 }}>{joinedDate}</td>
@@ -435,7 +435,7 @@ function UserRow({ user, onToggleActive, onRoleChange, onPlanChange, onDelete, i
           <button
             onClick={onToggleActive}
             disabled={isProcessing}
-            title={user.active ? 'Deactivate' : 'Activate'}
+            title={user.active ? 'Деактивировать' : 'Активировать'}
             style={S.iconBtn}
             onMouseEnter={e => (e.currentTarget.style.background = 'var(--bg)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
@@ -445,7 +445,7 @@ function UserRow({ user, onToggleActive, onRoleChange, onPlanChange, onDelete, i
           {!isAdmin && (
             <button
               onClick={onDelete}
-              title="Delete user"
+              title="Удалить пользователя"
               style={{ ...S.iconBtn, color: 'var(--dim)' }}
               onMouseEnter={e => { e.currentTarget.style.background = 'rgba(220,38,38,0.08)'; e.currentTarget.style.color = '#dc2626' }}
               onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--dim)' }}
@@ -479,13 +479,13 @@ function ConfirmDialog({ message, onConfirm, onCancel, loading }: {
       <div style={S.modal}>
         <p style={{ color: 'var(--ink)', marginBottom: 24, fontSize: 14 }}>{message}</p>
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
-          <button onClick={onCancel} style={S.ghostBtn}>Cancel</button>
+          <button onClick={onCancel} style={S.ghostBtn}>Отмена</button>
           <button
             onClick={onConfirm}
             disabled={loading}
             style={{ ...S.primaryBtn, background: 'var(--danger, #dc2626)', opacity: loading ? 0.6 : 1 }}
           >
-            {loading ? 'Deleting…' : 'Delete'}
+            {loading ? 'Удаление…' : 'Удалить'}
           </button>
         </div>
       </div>
@@ -505,7 +505,7 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
     mutationFn: () => adminApi.createUser(form),
     onSuccess: onCreated,
     onError: (e: any) => {
-      setError(e?.response?.data?.message ?? e?.message ?? 'Failed to create user')
+      setError(e?.response?.data?.message ?? e?.message ?? 'Не удалось создать пользователя')
     },
   })
 
@@ -517,37 +517,37 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
   return (
     <div style={S.overlay}>
       <div style={S.modal}>
-        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 20 }}>Create User</h2>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', marginBottom: 20 }}>Создать пользователя</h2>
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <Field label="Username *">
-            <input value={form.username} onChange={set('username')} placeholder="username" style={S.input} />
+          <Field label="Логин *">
+            <input value={form.username} onChange={set('username')} placeholder="логин" style={S.input} />
           </Field>
           <Field label="Email *">
             <input type="email" value={form.email} onChange={set('email')} placeholder="email@example.com" style={S.input} />
           </Field>
-          <Field label="Password *">
-            <input type="password" value={form.password} onChange={set('password')} placeholder="password" style={S.input} />
+          <Field label="Пароль *">
+            <input type="password" value={form.password} onChange={set('password')} placeholder="пароль" style={S.input} />
           </Field>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Field label="First name">
-              <input value={form.firstName} onChange={set('firstName')} placeholder="First" style={S.input} />
+            <Field label="Имя">
+              <input value={form.firstName} onChange={set('firstName')} placeholder="Имя" style={S.input} />
             </Field>
-            <Field label="Last name">
-              <input value={form.lastName} onChange={set('lastName')} placeholder="Last" style={S.input} />
+            <Field label="Фамилия">
+              <input value={form.lastName} onChange={set('lastName')} placeholder="Фамилия" style={S.input} />
             </Field>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-            <Field label="Role">
+            <Field label="Роль">
               <select value={form.role} onChange={set('role')} style={{ ...S.input, cursor: 'pointer' }}>
-                <option value="ROLE_USER">User</option>
-                <option value="ROLE_ADMIN">Admin</option>
+                <option value="ROLE_USER">Пользователь</option>
+                <option value="ROLE_ADMIN">Администратор</option>
               </select>
             </Field>
-            <Field label="Plan">
+            <Field label="Тариф">
               <select value={form.planType} onChange={set('planType')} style={{ ...S.input, cursor: 'pointer' }}>
-                <option value="FREE">Free</option>
-                <option value="BASIC">Basic</option>
+                <option value="FREE">Бесплатный</option>
+                <option value="BASIC">Базовый</option>
                 <option value="PRO">Pro</option>
               </select>
             </Field>
@@ -557,13 +557,13 @@ function CreateUserModal({ onClose, onCreated }: { onClose: () => void; onCreate
         {error && <p style={{ marginTop: 12, fontSize: 12, color: 'var(--danger, #dc2626)' }}>{error}</p>}
 
         <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end', marginTop: 24 }}>
-          <button onClick={onClose} style={S.ghostBtn}>Cancel</button>
+          <button onClick={onClose} style={S.ghostBtn}>Отмена</button>
           <button
             onClick={() => createUser.mutate()}
             disabled={!canSubmit}
             style={{ ...S.primaryBtn, opacity: canSubmit ? 1 : 0.5 }}
           >
-            {createUser.isPending ? 'Creating…' : 'Create'}
+            {createUser.isPending ? 'Создание…' : 'Создать'}
           </button>
         </div>
       </div>
@@ -588,17 +588,17 @@ function MonitoringTab() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <MonitoringCard
         title="Grafana"
-        description="Dashboards, metrics, service health, alerts"
+        description="Дашборды, метрики, состояние сервисов, алерты"
         href={grafanaUrl}
         accentColor="#f97316"
-        hint="Opens in a new tab — accept the self-signed cert if prompted"
+        hint="Откроется в новой вкладке — при запросе примите самоподписанный сертификат"
       />
       <MonitoringCard
         title="Prometheus"
-        description="Raw metrics, PromQL query explorer, targets"
+        description="Сырые метрики, обозреватель запросов PromQL, таргеты"
         href={prometheusUrl}
         accentColor="#ef4444"
-        hint="Opens in a new tab"
+        hint="Откроется в новой вкладке"
       />
     </div>
   )
@@ -642,7 +642,7 @@ function MonitoringCard({ title, description, href, accentColor, hint }: {
           flexShrink: 0,
         }}
       >
-        Open <ExternalLink size={12} />
+        Открыть <ExternalLink size={12} />
       </a>
     </div>
   )

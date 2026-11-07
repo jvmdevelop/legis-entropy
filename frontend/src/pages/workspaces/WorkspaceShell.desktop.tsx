@@ -77,7 +77,7 @@ function HelpOverlay({ onClose }: { onClose: () => void }) {
     {
       label: "глубокий анализ выделенного",
       keys: [{ k: "A", purple: true }],
-      note: "doc · ситуация · ГС",
+      note: "документ · ситуация · ГС",
     },
     {
       label: "помощь / шорткаты",
@@ -92,10 +92,10 @@ function HelpOverlay({ onClose }: { onClose: () => void }) {
     meta: string;
   }> = [
     { kind: "LAW", label: "закон", meta: "НПА" },
-    { kind: "ARTICLE", label: "статья", meta: "clause" },
-    { kind: "DOCUMENT", label: "документ", meta: "user-doc" },
-    { kind: "SITUATION", label: "ситуация", meta: "situation" },
-    { kind: "VOICE", label: "голосовое", meta: "voice" },
+    { kind: "ARTICLE", label: "статья", meta: "норма" },
+    { kind: "DOCUMENT", label: "документ", meta: "ваш файл" },
+    { kind: "SITUATION", label: "ситуация", meta: "кейс" },
+    { kind: "VOICE", label: "голосовое", meta: "аудио" },
   ];
 
   useEffect(() => {
@@ -139,9 +139,9 @@ function HelpOverlay({ onClose }: { onClose: () => void }) {
             <section className="le-help__section">
               <header className="le-help__heading">
                 <span>
-                  <span className="le-help__heading-glyph">⌘</span>shortcuts
+                  <span className="le-help__heading-glyph">⌘</span>горячие клавиши
                 </span>
-                <span className="le-help__heading-meta">desktop</span>
+                <span className="le-help__heading-meta">десктоп</span>
               </header>
               <div className="le-help__rows">
                 {shortcuts.map(({ label, keys, note }) => (
@@ -192,7 +192,7 @@ function HelpOverlay({ onClose }: { onClose: () => void }) {
                 <span>
                   <span className="le-help__heading-glyph">●</span>цвета
                 </span>
-                <span className="le-help__heading-meta">node legend</span>
+                <span className="le-help__heading-meta">легенда узлов</span>
               </header>
               <div className="le-help__legend">
                 {legend.map(({ kind, label, meta }) => (
@@ -208,7 +208,7 @@ function HelpOverlay({ onClose }: { onClose: () => void }) {
               </div>
               <div className="le-help__hint">
                 Сплошные линии — смысловые связи (CITES, RELATED, REFERENCES).
-                Пунктир — структурные (HAS_ARTICLE, doc → закон). Красный
+                Пунктир — структурные (HAS_ARTICLE, документ → закон). Красный
                 пунктир — <b>CONFLICTS_WITH</b>.
               </div>
             </section>
@@ -346,7 +346,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
     <div className="le-wsview">
       <aside className="le-sidebar">
         <div className="le-sidebar__head">
-          <div className="le-sidebar__label">workspace_name</div>
+          <div className="le-sidebar__label">пространство</div>
           <div className="le-sidebar__wsname">{workspace?.name ?? "..."}</div>
           <div className="le-sidebar__wsmeta">
             {workspace ? formatRelative(workspace.createdAt) : ""}
@@ -358,12 +358,12 @@ export default function WorkspaceShellDesktop({ state }: Props) {
             className="le-btn le-btn--primary le-btn--full"
             onClick={() => setShowCreate(true)}
           >
-            <I.plus /> create_new
+            <I.plus /> создать
           </button>
         </div>
 
         <div className="le-sidebar__divider">
-          <span>graph_views</span>
+          <span>графы</span>
           <span className="le-sidebar__count">
             {String(graphs.length).padStart(2, "0")}
           </span>
@@ -372,7 +372,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
         <div className="le-search le-search--inset">
           <I.search />
           <input
-            placeholder="filter_views"
+            placeholder="фильтр графов"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
@@ -418,8 +418,8 @@ export default function WorkspaceShellDesktop({ state }: Props) {
         </ul>
 
         <div className="le-sidebar__foot">
-          <span className="le-blink">●</span> connected ·{" "}
-          {user?.username ?? "anon"}
+          <span className="le-blink">●</span> в сети ·{" "}
+          {user?.username ?? "гость"}
         </div>
       </aside>
 
@@ -428,12 +428,12 @@ export default function WorkspaceShellDesktop({ state }: Props) {
           <div className="le-emptyws">
             <div className="le-emptyws__glyph">◇</div>
             <div className="le-emptyws__title">
-              {graphs.length > 0 ? "выберите graph_view" : "workspace пуст"}
+              {graphs.length > 0 ? "выберите граф" : "пространство пусто"}
             </div>
             <div className="le-emptyws__sub">
               {graphs.length > 0
                 ? "откройте граф из списка слева, чтобы начать работу"
-                : "создайте первый graph_view, чтобы добавить законы и документы"}
+                : "создайте первый граф, чтобы добавить законы и документы"}
             </div>
             {graphs.length === 0 && (
               <button
@@ -441,14 +441,14 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                 onClick={() => setShowCreate(true)}
                 style={{ marginTop: 16 }}
               >
-                <I.plus /> create_new
+                <I.plus /> создать
               </button>
             )}
           </div>
         ) : !content ? (
           <div className="le-emptyws">
             <div className="le-emptyws__glyph">·</div>
-            <div className="le-emptyws__sub">загрузка graph_view...</div>
+            <div className="le-emptyws__sub">загрузка графа…</div>
           </div>
         ) : (
           <div className="le-graphshell">
@@ -495,7 +495,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                       gap: 5,
                     }}
                   >
-                    <I.compare /> compare
+                    <I.compare /> сравнить
                   </span>
                   {[0, 1].map((i) => (
                     <span
@@ -521,7 +521,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                     >
                       {compareNodes[i]
                         ? compareNodes[i].label
-                        : `slot_${i + 1}`}
+                        : `слот ${i + 1}`}
                     </span>
                   ))}
                   <button
@@ -785,12 +785,6 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                         }
                       />
                     </div>
-                    <p className="le-rpanel__hint">
-                      После загрузки запускается транскрипция (Whisper) и
-                      анализ. Готовое ГС появляется узлом в графе — нажмите{" "}
-                      <b>A</b>, чтобы привязать к нему применимые нормы.
-                    </p>
-
                     {voiceLoading && voices.length === 0 && (
                       <div className="le-rpanel__hint">загрузка ГС…</div>
                     )}
@@ -933,7 +927,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
         >
           <div className="le-modal" onClick={(e) => e.stopPropagation()}>
             <div className="le-modal__head">
-              <span>create_graph_view</span>
+              <span>новый граф</span>
               <button
                 className="le-modal__close"
                 onClick={() => setShowCreate(false)}
@@ -944,10 +938,10 @@ export default function WorkspaceShellDesktop({ state }: Props) {
             <form onSubmit={createGraph}>
               <div className="le-modal__body">
                 <label className="le-field">
-                  <span className="le-field__label">название graph_view</span>
+                  <span className="le-field__label">название графа</span>
                   <input
                     autoFocus
-                    placeholder="snake_case_name"
+                    placeholder="название"
                     value={newName}
                     onChange={(e) =>
                       setNewName(
@@ -976,7 +970,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                   className="le-btn le-btn--primary"
                   disabled={!newName.trim() || creating}
                 >
-                  {creating ? "creating..." : "create"}
+                  {creating ? "создание…" : "создать"}
                 </button>
               </div>
             </form>
@@ -1108,7 +1102,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                 <span className="le-rpanel__code">
                   A: {compareNodes[0]?.label}
                 </span>
-                <span style={{ color: "var(--dim)" }}>vs</span>
+                <span style={{ color: "var(--dim)" }}>и</span>
                 <span className="le-rpanel__code">
                   B: {compareNodes[1]?.label}
                 </span>

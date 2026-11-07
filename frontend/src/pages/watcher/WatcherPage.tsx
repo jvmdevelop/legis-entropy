@@ -64,7 +64,7 @@ export default function WatcherPage() {
           >
             <ChevronLeft /> назад
           </button>
-          <div className="le-cpage__eyebrow">change_tracker</div>
+          <div className="le-cpage__eyebrow">отслеживание изменений</div>
           <h1 className="le-cpage__title">уведомления о поправках</h1>
           <p className="le-cpage__sub">подписки на статьи и события из adilet.zan.kz</p>
         </div>

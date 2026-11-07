@@ -37,7 +37,7 @@ export function Navbar() {
           className="le-logo"
           onClick={() => navigate('/workspaces')}
           style={{ background: 'none', padding: 0 }}
-          title="к workspaces"
+          title="к пространствам"
         >
           <span className="le-logo__l">L</span>
           <span className="le-logo__e">E</span>
@@ -52,13 +52,8 @@ export function Navbar() {
               title={user ? `выйти (${user.username})` : 'выйти'}
             >
               <span className="le-avatar" />
-              <span>{user?.username ?? 'settings'}</span>
+              <span>{user?.username ?? 'настройки'}</span>
             </button>
-            {user?.planType && user.planType !== 'PRO' && (
-              <span className={'le-plan-badge le-plan-badge--' + user.planType.toLowerCase()}>
-                {user.planType === 'FREE' ? 'free' : 'basic'}
-              </span>
-            )}
           </div>
         )}
 
@@ -69,13 +64,13 @@ export function Navbar() {
               <button
                 className="le-backlink le-backlink--icon"
                 onClick={() => navigate(isGraph ? `/workspace/${wsId}` : '/workspaces')}
-                title={isGraph ? 'к workspace' : 'к workspaces'}
+                title={isGraph ? 'к пространству' : 'к пространствам'}
               >
                 <IconBack />
               </button>
             ) : (
               <button className="le-backlink" onClick={() => navigate('/workspaces')}>
-                <IconBack /> workspaces
+                <IconBack /> пространства
               </button>
             )}
             {!isMobile && <span className="le-crumb-sep">/</span>}
@@ -102,32 +97,32 @@ export function Navbar() {
             className={'le-tab' + (!isLaws && !isSearch && !isScan && !isWatcher && !isTemplates && !isAdmin ? ' le-tab--active' : '')}
             onClick={() => navigate('/workspaces')}
           >
-            workspaces
+            пространства
           </button>
           <button
             className={'le-tab' + (isLaws ? ' le-tab--active' : '')}
             onClick={() => navigate('/laws')}
           >
-            laws
+            законы
           </button>
           <button
             className={'le-tab' + (isTemplates ? ' le-tab--active' : '')}
             onClick={() => navigate('/templates')}
           >
-            templates
+            шаблоны
           </button>
           <button
             className={'le-tab' + (isScan ? ' le-tab--active' : '')}
             onClick={() => navigate('/scan')}
           >
-            scan
+            проверка
           </button>
           {user?.role === 'ROLE_ADMIN' && (
             <button
               className={'le-tab' + (isAdmin ? ' le-tab--active' : '')}
               onClick={() => navigate('/admin')}
             >
-              admin
+              админ
             </button>
           )}
         </nav>

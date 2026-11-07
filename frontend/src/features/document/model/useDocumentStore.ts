@@ -33,7 +33,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       const page = await documentApi.list(0, 50);
       set({ documents: page.content, isLoading: false });
     } catch {
-      set({ error: "Failed to load documents", isLoading: false });
+      set({ error: "Не удалось загрузить документы", isLoading: false });
     }
   },
 
@@ -48,7 +48,7 @@ export const useDocumentStore = create<DocumentState>((set, get) => ({
       get().pollStatus(docId);
       return docId;
     } catch (err) {
-      set({ isUploading: false, uploadProgress: 0, error: "Upload failed" });
+      set({ isUploading: false, uploadProgress: 0, error: "Ошибка загрузки" });
       throw err;
     }
   },

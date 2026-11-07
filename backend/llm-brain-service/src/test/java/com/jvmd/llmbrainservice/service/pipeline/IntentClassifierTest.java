@@ -75,6 +75,32 @@ class IntentClassifierTest {
         assertThat(plan.retrievalMode()).isEqualTo(RetrievalMode.HYBRID_LEGAL);
     }
 
+    @Test
+    void questionListAboutContractsIsNotDraft() {
+        ContextPlan plan = classify(
+            "Какую правовую природу имеет договор на разработку ПО? Каковы юридические риски AGPL-3.0? " +
+            "Как правильно оформить передачу исходного кода от подрядчика к заказчику?",
+            null
+        );
+
+        assertThat(plan.taskType()).isNotEqualTo(BrainTaskType.DOCUMENT_DRAFT);
+    }
+
+    @Test
+    void substringOfRiskDoesNotMatchLawsuit() {
+        ContextPlan plan = classify("Составь список рисков по исключительным правам", null);
+
+        assertThat(plan.taskType()).isNotEqualTo(BrainTaskType.DOCUMENT_DRAFT);
+    }
+
+    @Test
+    void imperativeDraftRequestIsDraft() {
+        assertThat(classify("Составь исковое заявление о взыскании долга", null).taskType())
+            .isEqualTo(BrainTaskType.DOCUMENT_DRAFT);
+        assertThat(classify("Помоги составить договор аренды", null).taskType())
+            .isEqualTo(BrainTaskType.DOCUMENT_DRAFT);
+    }
+
     private ContextPlan classify(String message, String documentId) {
         return classifier.classify(new BrainRequest(message, "user-1", documentId, null, List.of()));
     }

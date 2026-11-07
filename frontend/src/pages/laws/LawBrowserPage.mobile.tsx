@@ -14,7 +14,6 @@ export default function LawBrowserPageMobile({ state }: Props) {
     setType,
     allLaws,
     loading,
-    submittedQuery,
     setSelectedCode,
     selected,
     filtered,
@@ -32,18 +31,6 @@ export default function LawBrowserPageMobile({ state }: Props) {
 
   return (
     <div className="le-m-laws">
-      <div className="le-m-laws__head">
-        <div className="le-laws-page__hero-icon">
-          <IconBook />
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <h1 className="le-m-laws__title">Законы и кодексы</h1>
-          <p className="le-m-laws__sub">
-            {allLaws.length} актов{submittedQuery && ` · «${submittedQuery}»`}
-          </p>
-        </div>
-      </div>
-
       <div className="le-m-laws__searchrow">
         <div className="le-search le-m-search" style={{ flex: 1 }}>
           <IconSearch />

@@ -106,6 +106,34 @@ public class LegalQueryRewriter {
         "\\b(?:ГК|ТК|СК|УК|НК|ЖК|ЗК|РК|РФ|КОАП)\\b"
     );
 
+    private static final int MIN_SUB_QUESTION_LENGTH = 15;
+    private static final int MAX_SUB_QUESTIONS = 12;
+
+    /**
+     * Splits a message holding several questions ("...? ...? ...?") into separate retrieval
+     * queries. A single 500-char query over a 10-question message only ever searched the
+     * first one or two questions.
+     */
+    public List<String> rewriteAll(String rawMessage) {
+        if (rawMessage == null || rawMessage.isBlank()) {
+            return List.of(rawMessage == null ? "" : rawMessage);
+        }
+        List<String> queries = new java.util.ArrayList<>();
+        for (String part : rawMessage.split("\\?")) {
+            String trimmed = part.trim();
+            if (trimmed.length() < MIN_SUB_QUESTION_LENGTH) continue;
+            String rewritten = rewrite(trimmed);
+            if (rewritten != null && !rewritten.isBlank() && !queries.contains(rewritten)) {
+                queries.add(rewritten);
+            }
+            if (queries.size() >= MAX_SUB_QUESTIONS) break;
+        }
+        if (queries.size() <= 1) {
+            return List.of(rewrite(rawMessage));
+        }
+        return queries;
+    }
+
     public String rewrite(String rawMessage) {
         if (rawMessage == null || rawMessage.isBlank()) {
             return rawMessage;

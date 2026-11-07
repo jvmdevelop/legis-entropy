@@ -13,6 +13,19 @@ import type {
   GeneratedDocumentDTO,
 } from "@/entities/template";
 
+const SLOT_TYPE_LABELS: Record<string, string> = {
+  TEXT: "текст",
+  NAME: "имя",
+  DATE: "дата",
+  ADDRESS: "адрес",
+  PHONE: "телефон",
+  AMOUNT: "сумма",
+  EMAIL: "email",
+  MULTILINE: "многострочный",
+  ENUM: "список",
+  ARTICLE_REF: "ссылка на статью",
+};
+
 export default function TemplatesPage() {
   const [tab, setTab] = useState<"templates" | "docs">("templates");
   const [items, setItems] = useState<TemplateDTO[]>([]);
@@ -128,43 +141,10 @@ export default function TemplatesPage() {
 
   return (
     <div className="le-tmpl-page">
-      <div className="le-tmpl-page__hero">
-        <div className="le-tmpl-page__hero-icon">
-          <IconDoc />
-        </div>
-        <div>
-          <h1 className="le-tmpl-page__title">Шаблоны документов</h1>
-          <p className="le-tmpl-page__sub">
-            ваша библиотека · {userCount} пользовательских + {systemCount}{" "}
-            системных · доступны во всех workspace'ах
-          </p>
-        </div>
-        <div className="le-tmpl-page__hero-actions">
-          <button
-            className="le-btn le-btn--primary"
-            disabled={uploading}
-            onClick={() => inputRef.current?.click()}
-          >
-            {uploading ? <IconSpinner /> : <IconUpload />}
-            <span>{uploading ? "импорт…" : "загрузить"}</span>
-          </button>
-          <input
-            ref={inputRef}
-            type="file"
-            accept=".docx,.pdf,.md,.txt,.html,.odt,.rtf"
-            style={{ display: "none" }}
-            onChange={(e) => {
-              const f = e.target.files?.[0];
-              if (f) void handleUpload(f);
-              if (inputRef.current) inputRef.current.value = "";
-            }}
-          />
-        </div>
-      </div>
-
       <div
         style={{
           display: "flex",
+          alignItems: "center",
           gap: 4,
           padding: "0 0 4px",
           borderBottom: "1px solid var(--line)",
@@ -191,6 +171,27 @@ export default function TemplatesPage() {
               : `мои документы${docs.length ? ` (${docs.length})` : ""}`}
           </button>
         ))}
+        <div style={{ marginLeft: "auto" }}>
+          <button
+            className="le-btn le-btn--primary"
+            disabled={uploading}
+            onClick={() => inputRef.current?.click()}
+          >
+            {uploading ? <IconSpinner /> : <IconUpload />}
+            <span>{uploading ? "импорт…" : "загрузить"}</span>
+          </button>
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".docx,.pdf,.md,.txt,.html,.odt,.rtf"
+            style={{ display: "none" }}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void handleUpload(f);
+              if (inputRef.current) inputRef.current.value = "";
+            }}
+          />
+        </div>
       </div>
 
       {tab === "docs" && (
@@ -364,7 +365,7 @@ export default function TemplatesPage() {
                         (t.systemTemplate ? "sys" : "user")
                       }
                     >
-                      {t.systemTemplate ? "system" : "user"}
+                      {t.systemTemplate ? "системный" : "мой"}
                     </span>
                     <span className="le-lp-item__code">{t.code}</span>
                     <span className="le-lp-item__year">
@@ -430,11 +431,11 @@ function TemplateDetail({
         <code className="le-lp-item__code">{template.code}</code>
         {template.systemTemplate ? (
           <span className={"le-lp-item__type le-lp-item__type--sys"}>
-            system
+            системный
           </span>
         ) : (
           <span className={"le-lp-item__type le-lp-item__type--user"}>
-            user
+            мой
           </span>
         )}
       </div>
@@ -496,18 +497,18 @@ function TemplateDetail({
                     (s.type ?? "TEXT").toLowerCase()
                   }
                 >
-                  {s.type ?? "TEXT"}
+                  {SLOT_TYPE_LABELS[s.type ?? "TEXT"] ?? s.type}
                 </span>
-                {s.required && <span className="le-slot__flag">required</span>}
+                {s.required && <span className="le-slot__flag">обязательное</span>}
                 {s.multiline && (
-                  <span className="le-slot__flag">multiline</span>
+                  <span className="le-slot__flag">многострочное</span>
                 )}
               </div>
               <div className="le-slot__label">{s.label}</div>
               <code className="le-slot__token">{`{{${s.id}}}`}</code>
               {s.aiHint && (
                 <p className="le-slot__hint">
-                  <span style={{ color: "var(--purple)" }}>ai · </span>
+                  <span style={{ color: "var(--purple)" }}>ИИ · </span>
                   {s.aiHint}
                 </p>
               )}

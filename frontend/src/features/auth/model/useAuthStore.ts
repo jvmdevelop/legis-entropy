@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         isLoading: false,
       })
     } catch (err: unknown) {
-      const msg = extractMessage(err) ?? 'Login failed. Check your credentials.'
+      const msg = extractMessage(err) ?? 'Не удалось войти. Проверьте логин и пароль.'
       set({ error: msg, isLoading: false })
       throw err
     }
@@ -59,7 +59,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await authApi.register(data)
       set({ isLoading: false })
     } catch (err: unknown) {
-      const msg = extractMessage(err) ?? 'Registration failed.'
+      const msg = extractMessage(err) ?? 'Не удалось зарегистрироваться.'
       set({ error: msg, isLoading: false })
       throw err
     }

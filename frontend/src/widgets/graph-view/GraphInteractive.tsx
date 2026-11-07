@@ -231,7 +231,7 @@ export function GraphInteractive({ data, mainLaw, title, onClose }: GraphInterac
                 </div>
                 <button
                   onClick={() => {
-                    toast.info(`Загружение информации о ${selectedNodeData.code}...`)
+                    toast.info(`Загрузка информации о ${selectedNodeData.code}...`)
                   }}
                   className="w-full px-3 py-1.5 text-xs font-medium rounded-lg bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-hover)] transition-colors"
                 >

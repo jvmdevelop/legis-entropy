@@ -28,7 +28,7 @@ export const useConversationStore = create<ConversationState>((set) => ({
       const page = await conversationApi.listActive(0, 50);
       set({ conversations: page.content, isLoading: false });
     } catch {
-      set({ error: "Failed to load conversations", isLoading: false });
+      set({ error: "Не удалось загрузить диалоги", isLoading: false });
     }
   },
 

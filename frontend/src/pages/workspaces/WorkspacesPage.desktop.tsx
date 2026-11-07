@@ -8,7 +8,6 @@ interface Props {
 export default function WorkspacesPageDesktop({ state }: Props) {
   const {
     navigate,
-    workspaces,
     filtered,
     loading,
     filter,
@@ -29,22 +28,19 @@ export default function WorkspacesPageDesktop({ state }: Props) {
     <div className="le-home">
       <div className="le-home__head">
         <div>
-          <div className="le-home__eyebrow">all_workspaces</div>
-          <h1 className="le-home__title">
-            workspaces <span className="le-home__count">{String(workspaces.length).padStart(2, '0')}</span>
-          </h1>
+          <h1 className="le-home__title">пространства</h1>
         </div>
         <div className="le-home__tools">
           <div className="le-search le-search--lg">
             <I.search />
             <input
-              placeholder="filter_workspaces"
+              placeholder="фильтр пространств"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             />
           </div>
           <button className="le-btn le-btn--primary" onClick={() => setShowCreate(true)}>
-            <I.plus /> create_workspace
+            <I.plus /> создать пространство
           </button>
         </div>
       </div>
@@ -70,7 +66,7 @@ export default function WorkspacesPageDesktop({ state }: Props) {
             >
               <div className="le-card__preview">
                 <div className="le-mini le-mini--empty">
-                  <span>graph_view preview</span>
+                  <span>предпросмотр графа</span>
                 </div>
               </div>
               <div className="le-card__body">
@@ -88,7 +84,7 @@ export default function WorkspacesPageDesktop({ state }: Props) {
                   e.stopPropagation()
                   remove(w)
                 }}
-                title="удалить workspace"
+                title="удалить пространство"
               >
                 <I.trash />
               </button>
@@ -98,7 +94,7 @@ export default function WorkspacesPageDesktop({ state }: Props) {
           <button className="le-card le-card--new" onClick={() => setShowCreate(true)}>
             <div className="le-card--new__inner">
               <I.plus />
-              <span>create_workspace</span>
+              <span>создать пространство</span>
               <span className="le-card--new__hint">пустое пространство</span>
             </div>
           </button>
@@ -109,7 +105,7 @@ export default function WorkspacesPageDesktop({ state }: Props) {
         <div className="le-modal-backdrop" onClick={() => !creating && setShowCreate(false)}>
           <div className="le-modal" onClick={(e) => e.stopPropagation()}>
             <div className="le-modal__head">
-              <span>create_workspace</span>
+              <span>создать пространство</span>
               <button className="le-modal__close" onClick={() => setShowCreate(false)}>
                 <I.close />
               </button>
@@ -117,10 +113,10 @@ export default function WorkspacesPageDesktop({ state }: Props) {
             <form onSubmit={create}>
               <div className="le-modal__body">
                 <label className="le-field">
-                  <span className="le-field__label">название workspace</span>
+                  <span className="le-field__label">название пространства</span>
                   <input
                     ref={nameInputRef}
-                    placeholder="snake_case_name"
+                    placeholder="название"
                     value={newName}
                     onChange={(e) => setNewName(e.target.value.replace(/\s+/g, '_').toLowerCase())}
                     disabled={creating}
@@ -137,7 +133,7 @@ export default function WorkspacesPageDesktop({ state }: Props) {
                   />
                 </label>
                 <p className="le-rpanel__hint" style={{ textAlign: 'left' }}>
-                  Workspace — контейнер для ваших graph_views. Один проект — один workspace.
+                  Пространство — контейнер для ваших графов. Один проект — одно пространство.
                 </p>
               </div>
               <div className="le-modal__foot">
@@ -150,7 +146,7 @@ export default function WorkspacesPageDesktop({ state }: Props) {
                   отмена
                 </button>
                 <button type="submit" className="le-btn le-btn--primary" disabled={!newName.trim() || creating}>
-                  {creating ? 'creating...' : 'create'}
+                  {creating ? 'создание…' : 'создать'}
                 </button>
               </div>
             </form>

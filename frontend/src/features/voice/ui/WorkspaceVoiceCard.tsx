@@ -143,7 +143,7 @@ export function WorkspaceVoiceCard({
 
       <div className="le-voice-card__head">
         <span className="le-voice-card__name">
-          {message.fileName || "voice_message"}
+          {message.fileName || "голосовое сообщение"}
         </span>
         <StatusChip status={message.status} />
       </div>

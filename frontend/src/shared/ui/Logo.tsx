@@ -18,7 +18,7 @@ export function Logo({ size = 'md', showText = true, className, textClassName }:
 
       <img
         src="/logo.png"
-        alt="Legis Entropy logo"
+        alt="Логотип Legis Entropy"
         width={px}
         height={px}
         style={{ objectFit: 'contain' }}

@@ -3,12 +3,17 @@ package com.jvmd.llmbrainservice.service.pipeline;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class IntentClassifier {
+
+    private static final Map<String, Pattern> WORD_PATTERNS = new ConcurrentHashMap<>();
 
     public ContextPlan classify(BrainRequest request) {
         String message = normalize(request.message());
@@ -26,10 +31,7 @@ public class IntentClassifier {
         boolean lawSearch = containsAny(message, IntentKeywords.LAW_SEARCH);
         boolean comparison = containsAny(message, IntentKeywords.COMPARISON);
 
-        if (
-            containsAny(message, IntentKeywords.DRAFT_ACTION) &&
-            containsAny(message, IntentKeywords.DRAFT_TYPE)
-        ) {
+        if (looksLikeDraftRequest(message)) {
             return new ContextPlan(
                 BrainTaskType.DOCUMENT_DRAFT,
                 RetrievalMode.LAW
@@ -164,6 +166,39 @@ public class IntentClassifier {
             BrainTaskType.GENERAL_LEGAL_ADVICE,
             RetrievalMode.NONE
         );
+    }
+
+    /**
+     * Whole-word matching only: substring matching made "риски"/"исключительное" hit "иск",
+     * and question lists like "как оформить передачу ... договор?" were routed to drafting.
+     */
+    private boolean looksLikeDraftRequest(String message) {
+        if (!containsAnyWord(message, IntentKeywords.DRAFT_TYPE)) {
+            return false;
+        }
+        if (containsAnyWord(message, IntentKeywords.DRAFT_ACTION)) {
+            return true;
+        }
+        return (
+            containsAnyWord(message, IntentKeywords.DRAFT_ACTION_INFINITIVE) &&
+            containsAnyWord(message, IntentKeywords.DRAFT_REQUEST_MARKERS) &&
+            !message.contains("?")
+        );
+    }
+
+    private boolean containsAnyWord(String value, List<String> needles) {
+        for (String needle : needles) {
+            Pattern pattern = WORD_PATTERNS.computeIfAbsent(needle, n ->
+                Pattern.compile(
+                    "(?<![\\p{L}\\p{N}])" + Pattern.quote(n) + "(?![\\p{L}\\p{N}])",
+                    Pattern.UNICODE_CHARACTER_CLASS
+                )
+            );
+            if (pattern.matcher(value).find()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private RetrievalMode retrievalForLawOnly(boolean lawRelated) {

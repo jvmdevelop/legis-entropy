@@ -3840,16 +3840,26 @@ input, select, textarea { font-family: var(--mono); color: inherit; }
 .le-cmt {
   display: grid;
   grid-template-columns: 1fr 220px;
+  grid-template-rows: minmax(0, 1fr);
   gap: 0;
+  flex: 1;
   height: 100%;
   min-height: 0;
+  overflow: hidden;
 }
-@media (max-width: 720px) { .le-cmt { grid-template-columns: 1fr; } }
+@media (max-width: 720px) {
+  .le-cmt {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    overflow-y: auto;
+  }
+}
 
 .le-cmt__main {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 .le-cmt__head {
   display: flex;
@@ -3907,6 +3917,9 @@ input, select, textarea { font-family: var(--mono); color: inherit; }
 }
 @media (max-width: 720px) {
   .le-cmt__rail { border-left: none; border-top: 1px dashed var(--line); }
+  .le-cmt__main,
+  .le-cmt__body,
+  .le-cmt__rail { overflow: visible; }
 }
 .le-cmt__rail-h {
   font-family: var(--mono);

@@ -90,7 +90,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
         <button
           className="le-m-iconbtn"
           onClick={() => setDrawerOpen(true)}
-          title="graph_views"
+          title="графы"
         >
           <I.menu />
         </button>
@@ -116,12 +116,12 @@ export default function WorkspaceShellMobile({ state }: Props) {
           <div className="le-emptyws">
             <div className="le-emptyws__glyph">◇</div>
             <div className="le-emptyws__title">
-              {graphs.length > 0 ? "выберите graph_view" : "workspace пуст"}
+              {graphs.length > 0 ? "выберите граф" : "пространство пусто"}
             </div>
             <div className="le-emptyws__sub" style={{ padding: "0 24px" }}>
               {graphs.length > 0
                 ? "откройте граф из меню слева"
-                : "создайте первый graph_view"}
+                : "создайте первый граф"}
             </div>
             <button
               className="le-btn le-btn--primary"
@@ -136,7 +136,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
                 </>
               ) : (
                 <>
-                  <I.plus /> create_new
+                  <I.plus /> создать
                 </>
               )}
             </button>
@@ -163,7 +163,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
             {compareNodes.length > 0 && (
               <div className="le-m-comparebar">
                 <span className="le-m-comparebar__title">
-                  <I.compare /> compare
+                  <I.compare /> сравнить
                 </span>
                 <div className="le-m-comparebar__slots">
                   {[0, 1].map((i) => (
@@ -177,7 +177,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
                     >
                       {compareNodes[i]
                         ? compareNodes[i].label
-                        : `slot_${i + 1}`}
+                        : `слот ${i + 1}`}
                     </span>
                   ))}
                 </div>
@@ -537,7 +537,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
           />
           <aside className="le-m-drawer">
             <div className="le-sidebar__head">
-              <div className="le-sidebar__label">workspace_name</div>
+              <div className="le-sidebar__label">пространство</div>
               <div className="le-sidebar__wsname">
                 {workspace?.name ?? "..."}
               </div>
@@ -554,12 +554,12 @@ export default function WorkspaceShellMobile({ state }: Props) {
                   setShowCreate(true);
                 }}
               >
-                <I.plus /> create_new
+                <I.plus /> создать
               </button>
             </div>
 
             <div className="le-sidebar__divider">
-              <span>graph_views</span>
+              <span>графы</span>
               <span className="le-sidebar__count">
                 {String(graphs.length).padStart(2, "0")}
               </span>
@@ -568,7 +568,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
             <div className="le-search le-search--inset">
               <I.search />
               <input
-                placeholder="filter_views"
+                placeholder="фильтр графов"
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
               />
@@ -615,8 +615,8 @@ export default function WorkspaceShellMobile({ state }: Props) {
             </ul>
 
             <div className="le-sidebar__foot">
-              <span className="le-blink">●</span> connected ·{" "}
-              {user?.username ?? "anon"}
+              <span className="le-blink">●</span> в сети ·{" "}
+              {user?.username ?? "гость"}
             </div>
           </aside>
         </>
@@ -629,7 +629,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
         >
           <div className="le-modal" onClick={(e) => e.stopPropagation()}>
             <div className="le-modal__head">
-              <span>create_graph_view</span>
+              <span>новый граф</span>
               <button
                 className="le-modal__close"
                 onClick={() => setShowCreate(false)}
@@ -640,10 +640,10 @@ export default function WorkspaceShellMobile({ state }: Props) {
             <form onSubmit={createGraph}>
               <div className="le-modal__body">
                 <label className="le-field">
-                  <span className="le-field__label">название graph_view</span>
+                  <span className="le-field__label">название графа</span>
                   <input
                     autoFocus
-                    placeholder="snake_case_name"
+                    placeholder="название"
                     value={newName}
                     onChange={(e) =>
                       setNewName(
@@ -671,7 +671,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
                   className="le-btn le-btn--primary"
                   disabled={!newName.trim() || creating}
                 >
-                  {creating ? "creating..." : "create"}
+                  {creating ? "создание…" : "создать"}
                 </button>
               </div>
             </form>
@@ -724,7 +724,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
                 <span className="le-rpanel__code">
                   A: {compareNodes[0]?.label}
                 </span>
-                <span style={{ color: "var(--dim)" }}>vs</span>
+                <span style={{ color: "var(--dim)" }}>и</span>
                 <span className="le-rpanel__code">
                   B: {compareNodes[1]?.label}
                 </span>

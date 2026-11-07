@@ -3,6 +3,7 @@ package com.jvmd.graphsservice.controller;
 import com.jvmd.graphsservice.dto.ArticleDTO;
 import com.jvmd.graphsservice.dto.ArticleHistoryDTO;
 import com.jvmd.graphsservice.dto.CreateArticleRequest;
+import com.jvmd.graphsservice.dto.GraphSearchRequest;
 import com.jvmd.graphsservice.dto.LinkDocumentToArticleRequest;
 import com.jvmd.graphsservice.service.ArticleService;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,11 @@ public class ArticleController {
             @RequestParam String query,
             @RequestParam(defaultValue = "RK") String country) {
         return ResponseEntity.ok(articleService.search(query, country));
+    }
+
+    @PostMapping("/articles/search")
+    public ResponseEntity<List<ArticleDTO>> searchPost(@RequestBody GraphSearchRequest request) {
+        return ResponseEntity.ok(articleService.search(request.safeQuery(), request.safeCountry()));
     }
 
     @GetMapping("/laws/{code}/articles/{number}/history")

@@ -92,7 +92,7 @@ export function Sidebar({ onCloseMobile }: SidebarProps) {
     ? user.firstName && user.lastName
       ? `${user.firstName} ${user.lastName}`
       : user.username
-    : "Unknown";
+    : "Неизвестно";
 
   return (
     <aside

@@ -45,7 +45,7 @@ export function useWorkspacesPage() {
       setWorkspaces(data.content || [])
     } catch (e) {
       console.error(e)
-      toast.error('Не удалось загрузить workspace-ы')
+      toast.error('Не удалось загрузить пространства')
     } finally {
       setLoading(false)
     }
@@ -70,25 +70,25 @@ export function useWorkspacesPage() {
       setNewName('')
       setNewDesc('')
       setShowCreate(false)
-      toast.success(`Workspace «${data.name}» создан`)
+      toast.success(`Пространство «${data.name}» создано`)
       navigate(`/workspace/${data.id}`)
     } catch (e) {
       console.error(e)
-      toast.error('Не удалось создать workspace')
+      toast.error('Не удалось создать пространство')
     } finally {
       setCreating(false)
     }
   }
 
   async function remove(w: Workspace) {
-    if (!window.confirm(`Удалить «${w.name}» со всеми graph_views?`)) return
+    if (!window.confirm(`Удалить «${w.name}» со всеми графами?`)) return
     try {
       await apiClient.delete(`/v1/workspaces/${w.id}`)
       setWorkspaces((prev) => prev.filter((x) => x.id !== w.id))
-      toast.success('Workspace удалён')
+      toast.success('Пространство удалено')
     } catch (e) {
       console.error(e)
-      toast.error('Не удалось удалить workspace')
+      toast.error('Не удалось удалить пространство')
     }
   }
 

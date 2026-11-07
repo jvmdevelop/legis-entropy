@@ -140,7 +140,14 @@ export function CommentViewerOverlay({
           </div>
         </div>
 
-        <div style={{ flex: 1, minHeight: 0 }}>
+        <div
+          style={{
+            flex: 1,
+            minHeight: 0,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
           <div className="le-cmt">
             <div className="le-cmt__main">
               <header className="le-cmt__head">

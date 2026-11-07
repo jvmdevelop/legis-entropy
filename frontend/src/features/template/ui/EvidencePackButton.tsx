@@ -25,7 +25,7 @@ export function EvidencePackButton({ graphId, situationId, label }: Props) {
       title="Собрать ZIP с расшифровками, аудио и документами"
     >
       <Archive size={14} />
-      {label ?? 'Evidence Pack (ZIP)'}
+      {label ?? 'Пакет доказательств (ZIP)'}
     </a>
   )
 }

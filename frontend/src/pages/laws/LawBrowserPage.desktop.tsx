@@ -13,7 +13,6 @@ export default function LawBrowserPageDesktop({ state }: Props) {
     setType,
     allLaws,
     loading,
-    submittedQuery,
     selectedCode,
     setSelectedCode,
     selected,
@@ -24,19 +23,6 @@ export default function LawBrowserPageDesktop({ state }: Props) {
 
   return (
     <div className="le-laws-page">
-      <div className="le-laws-page__hero">
-        <div className="le-laws-page__hero-icon">
-          <IconBook />
-        </div>
-        <div>
-          <h1 className="le-laws-page__title">Законы и кодексы</h1>
-          <p className="le-laws-page__sub">
-            база казахстанского законодательства · {allLaws.length} актов в выдаче
-            {submittedQuery && ` · запрос: «${submittedQuery}»`}
-          </p>
-        </div>
-      </div>
-
       <div className="le-laws-page__grid">
         <aside className="le-lp-filter">
           <div className="le-lp-filter__head">

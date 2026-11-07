@@ -64,7 +64,7 @@ export function SituationsPanel({ graphId, initialDraftOpen = false, initialEdit
       <header className="le-sit-panel__head">
         <span className="le-sit-panel__title">
           <span className="le-sit-panel__title-glyph">✦</span>
-          situations
+          ситуации
           <span className="le-sit-panel__count">
             [{String(items.length).padStart(2, '0')}]
             {loading && (

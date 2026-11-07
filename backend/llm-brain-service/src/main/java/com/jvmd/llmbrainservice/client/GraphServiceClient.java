@@ -23,11 +23,12 @@ public interface GraphServiceClient {
             @RequestParam("country") String country
     );
 
-    @GetMapping("/api/graph/laws/search")
-    List<LawInfo> searchLaws(
-            @RequestParam("query") String query,
-            @RequestParam("country") String country
-    );
+    @PostMapping(value = "/api/graph/laws/search", consumes = MediaType.APPLICATION_JSON_VALUE)
+    List<LawInfo> searchLaws(@RequestBody GraphSearchRequest request);
+
+    default List<LawInfo> searchLaws(String query, String country) {
+        return searchLaws(new GraphSearchRequest(query, country));
+    }
 
     @GetMapping("/api/graph/laws/{code}/articles")
     List<ArticleInfo> listArticlesByLaw(
@@ -42,11 +43,12 @@ public interface GraphServiceClient {
             @RequestParam("country") String country
     );
 
-    @GetMapping("/api/graph/articles/search")
-    List<ArticleInfo> searchArticles(
-            @RequestParam("query") String query,
-            @RequestParam("country") String country
-    );
+    @PostMapping(value = "/api/graph/articles/search", consumes = MediaType.APPLICATION_JSON_VALUE)
+    List<ArticleInfo> searchArticles(@RequestBody GraphSearchRequest request);
+
+    default List<ArticleInfo> searchArticles(String query, String country) {
+        return searchArticles(new GraphSearchRequest(query, country));
+    }
 
     @PostMapping(value = "/api/graph/articles/link-document", consumes = MediaType.APPLICATION_JSON_VALUE)
     void linkDocumentClauseToArticle(@RequestBody LinkClauseRequest request);

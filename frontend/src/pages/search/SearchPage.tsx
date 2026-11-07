@@ -87,7 +87,7 @@ export default function SearchPage() {
           <Sparkles />
         </div>
         <div className="le-cpage__hero-text">
-          <div className="le-cpage__eyebrow">smart_search</div>
+          <div className="le-cpage__eyebrow">умный поиск</div>
           <h1 className="le-cpage__title">умный поиск по законам</h1>
           <p className="le-cpage__sub">
             по смыслу и по ключевым словам · реестр adilet.zan.kz
@@ -118,7 +118,7 @@ export default function SearchPage() {
               ? <>найдено: <b style={{ color: 'var(--purple)' }}>{totalFound}</b></>
               : 'введите запрос'}
           </span>
-          <span className="le-section-head__count">vector + keyword</span>
+          <span className="le-section-head__count">векторный + по ключевым словам</span>
         </div>
 
         {state.error && (
@@ -209,7 +209,7 @@ function SemanticCard({ chunk }: { chunk: SemanticChunk }) {
             {chunk.page != null && ` · стр. ${chunk.page}`}
           </span>
         </div>
-        {scorePct != null && <span className="le-score" title="similarity score">{scorePct}%</span>}
+        {scorePct != null && <span className="le-score" title="степень сходства">{scorePct}%</span>}
       </div>
       <p className="le-rcard__body">{preview}</p>
     </article>

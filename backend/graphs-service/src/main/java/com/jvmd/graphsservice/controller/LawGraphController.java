@@ -1,11 +1,13 @@
 package com.jvmd.graphsservice.controller;
 
+import com.jvmd.graphsservice.dto.GraphSearchRequest;
 import com.jvmd.graphsservice.dto.LawDTO;
 import com.jvmd.graphsservice.dto.LawGraphResponse;
 import com.jvmd.graphsservice.model.Law;
 import com.jvmd.graphsservice.model.RelationType;
 import com.jvmd.graphsservice.service.LawGraphService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/graph/laws")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*")
+@Slf4j
 public class LawGraphController {
 
     private final LawGraphService lawGraphService;
@@ -42,7 +45,13 @@ public class LawGraphController {
             @RequestParam String query,
             @RequestParam(defaultValue = "RK") String country) {
         List<LawDTO> results = lawGraphService.searchLaws(query, country);
+        log.info("Laws requested by country: {} and query {} : {}" , country, query,results);
         return ResponseEntity.ok(results);
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<List<LawDTO>> searchLawsPost(@RequestBody GraphSearchRequest request) {
+        return ResponseEntity.ok(lawGraphService.searchLaws(request.safeQuery(), request.safeCountry()));
     }
 
     @GetMapping("/{code}/info")

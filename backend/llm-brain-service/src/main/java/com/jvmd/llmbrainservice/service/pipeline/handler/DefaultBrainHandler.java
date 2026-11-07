@@ -2,13 +2,16 @@ package com.jvmd.llmbrainservice.service.pipeline.handler;
 
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import com.jvmd.llmbrainservice.model.BrainResponse;
+import com.jvmd.llmbrainservice.service.citation.Citation;
 import com.jvmd.llmbrainservice.service.context.DocumentContext;
+import com.jvmd.llmbrainservice.service.graph.GraphActionService;
 import com.jvmd.llmbrainservice.service.llm.BrainModelClient;
 import com.jvmd.llmbrainservice.service.pipeline.AnswerPostProcessor;
 import com.jvmd.llmbrainservice.service.pipeline.BrainTaskType;
 import com.jvmd.llmbrainservice.service.pipeline.ContextPlan;
 import com.jvmd.llmbrainservice.service.pipeline.HallucinationDetector;
 import com.jvmd.llmbrainservice.service.pipeline.ProfessionClassifier;
+import com.jvmd.llmbrainservice.service.pipeline.RetrievalMode;
 import com.jvmd.llmbrainservice.service.pipeline.retrieval.RetrievalStrategyRouter;
 import com.jvmd.llmbrainservice.service.prompt.BrainPromptBuilder;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +20,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
@@ -30,6 +36,10 @@ public class DefaultBrainHandler implements BrainTaskHandler {
     private final AnswerPostProcessor answerPostProcessor;
     private final ProfessionClassifier professionClassifier;
     private final HallucinationDetector hallucinationDetector;
+    private final GraphActionService graphActionService;
+
+    private static final int MAX_AUTO_GRAPH_LAWS = 8;
+    private static final String DEFAULT_COUNTRY = "RK";
 
     @Override
     public BrainTaskType taskType() {
@@ -51,6 +61,10 @@ public class DefaultBrainHandler implements BrainTaskHandler {
         String prompt = promptBuilder.buildUserPrompt(request, context, plan, profession);
         BrainResponse raw = modelClient.answer(prompt, request.history());
         String processed = answerPostProcessor.process(raw.content(), plan, context);
+        List<String> addedLaws = addRetrievedLawsToGraph(request, plan, context);
+        if (!addedLaws.isEmpty()) {
+            processed += "\n\n---\nДобавлено в граф: " + String.join(", ", addedLaws);
+        }
         return new BrainResponse(processed, raw.tokens());
     }
 
@@ -67,6 +81,11 @@ public class DefaultBrainHandler implements BrainTaskHandler {
         if (request.hasDocumentId() && context.unavailable()) {
             sendDocumentUnavailableMessage(emitter, context.unavailableReason());
             return emitter;
+        }
+
+        List<String> addedLaws = addRetrievedLawsToGraph(request, plan, context);
+        if (!addedLaws.isEmpty()) {
+            emitThinking(emitter, "{\"step\":\"graph\",\"added\":" + addedLaws.size() + "}");
         }
 
         String prompt = promptBuilder.buildUserPrompt(request, context, plan, profession);
@@ -124,6 +143,37 @@ public class DefaultBrainHandler implements BrainTaskHandler {
                         }
                 );
         return emitter;
+    }
+
+    /**
+     * Laws used as retrieval context for a plain question are attached to the workspace graph,
+     * so the graph reflects what the answer was grounded on (no situation/document is created).
+     */
+    private List<String> addRetrievedLawsToGraph(BrainRequest request, ContextPlan plan, DocumentContext context) {
+        if (!request.hasGraphId() || context == null || !context.hasCitations()) {
+            return List.of();
+        }
+        if (plan.retrievalMode() != RetrievalMode.LAW && plan.retrievalMode() != RetrievalMode.HYBRID_LEGAL) {
+            return List.of();
+        }
+        Set<String> codes = new LinkedHashSet<>();
+        for (Citation citation : context.citations()) {
+            if (citation.lawCode() != null && !citation.lawCode().isBlank()) {
+                codes.add(citation.lawCode());
+            }
+            if (codes.size() >= MAX_AUTO_GRAPH_LAWS) break;
+        }
+        if (codes.isEmpty()) {
+            return List.of();
+        }
+        try {
+            List<String> added = graphActionService.addLawCodesToGraph(request.graphId(), codes, DEFAULT_COUNTRY);
+            log.info("Auto-added {} retrieved law(s) to graph {}: {}", added.size(), request.graphId(), added);
+            return added;
+        } catch (RuntimeException e) {
+            log.warn("Auto-adding retrieved laws to graph {} failed: {}", request.graphId(), e.getMessage());
+            return List.of();
+        }
     }
 
     private String documentUnavailableMessage(String reason) {

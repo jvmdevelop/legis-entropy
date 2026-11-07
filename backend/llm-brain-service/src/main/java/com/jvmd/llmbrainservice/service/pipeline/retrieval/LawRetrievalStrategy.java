@@ -10,6 +10,11 @@ import com.jvmd.llmbrainservice.service.context.DocumentContextFormatter;
 import com.jvmd.llmbrainservice.service.pipeline.ContextPlan;
 import com.jvmd.llmbrainservice.service.pipeline.RetrievalMode;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +29,8 @@ public class LawRetrievalStrategy implements RetrievalStrategy {
 
     private static final String DEFAULT_COUNTRY = "RK";
     private static final int MAX_GRAPH_HOPS = 2;
+    private static final int PER_QUESTION_HITS = 3;
+    private static final int MAX_MERGED_HITS = 20;
 
     private final LawClient lawClient;
     private final GraphServiceClient graphServiceClient;
@@ -38,16 +45,10 @@ public class LawRetrievalStrategy implements RetrievalStrategy {
     @Override
     public DocumentContext retrieve(BrainRequest request, ContextPlan plan) {
         try {
-            String optimizedQuery = queryRewriter.rewrite(request.message());
-
-            List<RetrievalChunkResponse> chunks = lawClient.searchLawsByCountry(
-                DEFAULT_COUNTRY,
-                optimizedQuery
-            );
-
-            if (chunks.isEmpty()) {
-                chunks = lawClient.searchLaws(optimizedQuery);
-            }
+            List<String> queries = queryRewriter.rewriteAll(request.message());
+            List<RetrievalChunkResponse> chunks = queries.size() == 1
+                ? search(queries.get(0))
+                : searchEach(queries);
 
             DocumentContext primary = formatter.format(chunks);
 
@@ -68,6 +69,52 @@ public class LawRetrievalStrategy implements RetrievalStrategy {
                 "Не удалось загрузить контекст нормативно-правовых актов."
             );
         }
+    }
+
+    private List<RetrievalChunkResponse> search(String query) {
+        List<RetrievalChunkResponse> chunks = lawClient.searchLawsByCountry(
+            DEFAULT_COUNTRY,
+            query
+        );
+        return chunks.isEmpty() ? lawClient.searchLaws(query) : chunks;
+    }
+
+    /** One search per sub-question, top hits of each interleaved so every question gets context. */
+    private List<RetrievalChunkResponse> searchEach(List<String> queries) {
+        List<CompletableFuture<List<RetrievalChunkResponse>>> futures;
+        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            futures = queries.stream()
+                .map(q -> CompletableFuture.supplyAsync(() -> {
+                    try {
+                        return search(q);
+                    } catch (RuntimeException e) {
+                        log.debug("Sub-question search failed for '{}': {}", q, e.getMessage());
+                        return List.<RetrievalChunkResponse>of();
+                    }
+                }, executor))
+                .toList();
+        }
+        List<List<RetrievalChunkResponse>> perQuery = futures.stream()
+            .map(CompletableFuture::join)
+            .toList();
+
+        Map<String, RetrievalChunkResponse> merged = new LinkedHashMap<>();
+        for (int rank = 0; rank < PER_QUESTION_HITS; rank++) {
+            for (List<RetrievalChunkResponse> hits : perQuery) {
+                if (rank >= hits.size() || merged.size() >= MAX_MERGED_HITS) continue;
+                RetrievalChunkResponse chunk = hits.get(rank);
+                merged.putIfAbsent(chunkKey(chunk), chunk);
+            }
+        }
+        log.info("Multi-question law retrieval: {} queries -> {} chunks", queries.size(), merged.size());
+        return new ArrayList<>(merged.values());
+    }
+
+    private static String chunkKey(RetrievalChunkResponse chunk) {
+        if (chunk.documentId() != null && chunk.chunkIndex() != null) {
+            return chunk.documentId() + "#" + chunk.chunkIndex();
+        }
+        return String.valueOf(chunk.text() == null ? 0 : chunk.text().hashCode());
     }
 
     private String buildGraphContext(
