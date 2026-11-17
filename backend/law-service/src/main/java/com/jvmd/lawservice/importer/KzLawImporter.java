@@ -20,6 +20,18 @@ public class KzLawImporter {
 
     @Transactional
     public void importSampleKzLaws() {
+        long existing = lawRepository.count();
+        if (existing > 0) {
+            long distinctTitles = lawRepository.countDistinctTitles();
+            if (distinctTitles == existing) {
+                log.info("Sample KZ laws already imported ({} documents), skipping", existing);
+                return;
+            }
+            log.warn("Found {} legislative documents for {} distinct titles, re-importing once to remove duplicates",
+                    existing, distinctTitles);
+            lawRepository.deleteAll();
+            lawRepository.flush();
+        }
         log.info("Starting import of sample KZ laws...");
 
         Constitution constitution = importConstitution();

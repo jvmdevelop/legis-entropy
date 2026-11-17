@@ -109,7 +109,6 @@ public class GraphActionService {
         return new LinkResult(added, report.toString(), codes);
     }
 
-    /** Adds laws found during retrieval to the user's graph; returns the codes actually added. */
     public List<String> addLawCodesToGraph(String graphId, java.util.Collection<String> codes, String country) {
         String ctry = defaultCountry(country);
         List<String> added = new ArrayList<>();

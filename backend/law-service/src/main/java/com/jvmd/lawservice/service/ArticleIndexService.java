@@ -21,8 +21,6 @@ public class ArticleIndexService {
 
     private final VectorStore vectorStore;
 
-    // Long articles exceed the embedding batching token limit; split them into chunks.
-    // Metadata (lawCode/country/articleNumber) is copied to every chunk, so delete filters still match.
     private final TokenTextSplitter splitter = TokenTextSplitter.builder()
             .withChunkSize(800)
             .withMinChunkSizeChars(200)
@@ -39,7 +37,6 @@ public class ArticleIndexService {
                 .toList();
         if (validRequests.isEmpty()) return;
 
-        // Replace existing versions of these articles before writing the new batch.
         new LinkedHashSet<>(validRequests.stream().map(this::articleFilter).toList())
                 .forEach(vectorStore::delete);
 

@@ -1,5 +1,9 @@
 package com.jvmd.llmbrainservice.service.llm;
 
+import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.beans.factory.annotation.Value;
+import java.util.Map;
+
 import com.jvmd.llmbrainservice.model.BrainResponse;
 import com.jvmd.llmbrainservice.model.HistoryEntry;
 import com.jvmd.llmbrainservice.service.prompt.AssistantInstructions;
@@ -25,11 +29,15 @@ public class SpringAiBrainModelClient implements BrainModelClient {
     private final List<Message> fewShotMessages;
     private final ToolCallbackProvider toolCallbacks;
 
+    private final boolean disableThinkingForStructured;
+
     public SpringAiBrainModelClient(
         ChatClient.Builder builder,
         AssistantInstructions instructions,
-        ToolCallbackProvider toolCallbacks
+        ToolCallbackProvider toolCallbacks,
+        @Value("${brain.llm.structured.disable-thinking:false}") boolean disableThinkingForStructured
     ) {
+        this.disableThinkingForStructured = disableThinkingForStructured;
         this.chatClient = builder
             .defaultSystem(instructions.systemPrompt())
             .build();
@@ -86,6 +94,16 @@ public class SpringAiBrainModelClient implements BrainModelClient {
             }
         }
         return toBrainResponse(response);
+    }
+
+    @Override
+    public String complete(String systemPrompt, String userPrompt) {
+        var request = chatClient.prompt().system(systemPrompt).user(userPrompt);
+        if (disableThinkingForStructured) {
+            request = request.options(OpenAiChatOptions.builder()
+                .extraBody(Map.of("chat_template_kwargs", Map.of("enable_thinking", false))));
+        }
+        return toBrainResponse(request.call().chatResponse()).content();
     }
 
     @Override

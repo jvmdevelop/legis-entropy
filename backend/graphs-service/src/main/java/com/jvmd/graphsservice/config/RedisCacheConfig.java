@@ -23,11 +23,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Each cache gets a serializer bound to its concrete value type.
- * No default typing: values like Stream.toList() (final ImmutableCollections.ListN)
- * were written without type ids and then failed to deserialize on cache hit.
- */
 @Configuration
 @EnableCaching
 public class RedisCacheConfig {

@@ -79,7 +79,6 @@ public class LawRetrievalStrategy implements RetrievalStrategy {
         return chunks.isEmpty() ? lawClient.searchLaws(query) : chunks;
     }
 
-    /** One search per sub-question, top hits of each interleaved so every question gets context. */
     private List<RetrievalChunkResponse> searchEach(List<String> queries) {
         List<CompletableFuture<List<RetrievalChunkResponse>>> futures;
         try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {

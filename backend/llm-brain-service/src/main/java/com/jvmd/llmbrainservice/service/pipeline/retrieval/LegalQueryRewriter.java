@@ -109,11 +109,6 @@ public class LegalQueryRewriter {
     private static final int MIN_SUB_QUESTION_LENGTH = 15;
     private static final int MAX_SUB_QUESTIONS = 12;
 
-    /**
-     * Splits a message holding several questions ("...? ...? ...?") into separate retrieval
-     * queries. A single 500-char query over a 10-question message only ever searched the
-     * first one or two questions.
-     */
     public List<String> rewriteAll(String rawMessage) {
         if (rawMessage == null || rawMessage.isBlank()) {
             return List.of(rawMessage == null ? "" : rawMessage);

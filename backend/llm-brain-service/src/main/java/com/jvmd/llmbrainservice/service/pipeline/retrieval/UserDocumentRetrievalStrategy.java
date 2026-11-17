@@ -3,6 +3,7 @@ package com.jvmd.llmbrainservice.service.pipeline.retrieval;
 import com.jvmd.llmbrainservice.client.DmsClient;
 import com.jvmd.llmbrainservice.model.BrainRequest;
 import com.jvmd.llmbrainservice.model.RetrievalChunkResponse;
+import com.jvmd.llmbrainservice.service.citation.ArticleReferenceVerifier;
 import com.jvmd.llmbrainservice.service.context.DocumentContext;
 import com.jvmd.llmbrainservice.service.context.DocumentContextFormatter;
 import com.jvmd.llmbrainservice.service.pipeline.ContextPlan;
@@ -23,6 +24,7 @@ public class UserDocumentRetrievalStrategy implements RetrievalStrategy {
 
     private final DmsClient dmsClient;
     private final DocumentContextFormatter formatter;
+    private final ArticleReferenceVerifier referenceVerifier;
 
     @Override
     public RetrievalMode mode() {
@@ -35,11 +37,11 @@ public class UserDocumentRetrievalStrategy implements RetrievalStrategy {
             return DocumentContext.unavailable("Документ не прикреплен.");
         }
 
-        if (plan.taskType() == BrainTaskType.SUMMARY) {
-            String fullText = fetchFullText(request);
-            if (fullText != null && !fullText.isBlank() && fullText.length() <= FULL_TEXT_CHAR_LIMIT) {
-                return DocumentContext.of(fullText);
-            }
+        String fullText = fetchFullText(request);
+
+        if (plan.taskType() == BrainTaskType.SUMMARY
+                && fullText != null && !fullText.isBlank() && fullText.length() <= FULL_TEXT_CHAR_LIMIT) {
+            return withReferenceReport(DocumentContext.of(fullText), fullText);
         }
 
         try {
@@ -48,7 +50,7 @@ public class UserDocumentRetrievalStrategy implements RetrievalStrategy {
                 request.userId(),
                 request.documentId()
             );
-            return formatter.format(chunks);
+            return withReferenceReport(formatter.format(chunks), fullText);
         } catch (RuntimeException ex) {
             log.warn(
                 "Could not load document context for user {} document {}: {}",
@@ -60,6 +62,19 @@ public class UserDocumentRetrievalStrategy implements RetrievalStrategy {
                 "Не удалось загрузить контекст документа из сервиса документов."
             );
         }
+    }
+
+    private DocumentContext withReferenceReport(DocumentContext context, String fullText) {
+        if (context.unavailable() || fullText == null || fullText.isBlank()) return context;
+        String report;
+        try {
+            report = referenceVerifier.buildReport(fullText);
+        } catch (RuntimeException ex) {
+            log.warn("Reference check failed for document context: {}", ex.getMessage());
+            return context;
+        }
+        if (report.isBlank()) return context;
+        return new DocumentContext(context.text() + "\n\n" + report, context.citations(), false, null);
     }
 
     private String fetchFullText(BrainRequest request) {

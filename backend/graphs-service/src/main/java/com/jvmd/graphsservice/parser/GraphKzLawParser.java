@@ -19,6 +19,8 @@ public class GraphKzLawParser extends GraphLawParser {
     private final CitationCodeBuilder citationCodeBuilder;
     private final ZanGovApi zanGovApi;
     private final ZanGovJsonExtractor jsonExtractor;
+    private final AdiletDocParser adiletDocParser;
+    private final com.jvmd.graphsservice.repository.LawRepository lawRepository;
 
     public record ParsedKzLaw(
         Law law,
@@ -57,6 +59,18 @@ public class GraphKzLawParser extends GraphLawParser {
     }
 
     public ParsedKzLaw parseFull(String url) {
+        if (adiletDocParser.supports(url)) {
+            Law adiletLaw = adiletDocParser.parse(url);
+            adiletLaw = mergeWithExisting(adiletLaw);
+            return new ParsedKzLaw(
+                adiletLaw,
+                new LawStructure.ExtractionResult(
+                    java.util.List.of(),
+                    java.util.List.of(),
+                    java.util.List.of()
+                )
+            );
+        }
         try {
             CodeAndLang ref = resolveDocumentRef(url);
             if (ref == null) {
@@ -280,6 +294,38 @@ public class GraphKzLawParser extends GraphLawParser {
     }
 
     private record CodeAndLang(String code, String lang) {}
+
+    private Law mergeWithExisting(Law parsed) {
+        if (parsed.getCode() == null) return parsed;
+        try {
+            var existing = lawRepository.findByCodeAndCountry(
+                parsed.getCode(),
+                parsed.getCountry()
+            );
+            if (existing.isEmpty()) return parsed;
+            Law e = existing.get();
+            e.setTitle(parsed.getTitle());
+            e.setStatus(parsed.getStatus());
+            e.setSummary(parsed.getSummary());
+            e.setSourceUri(parsed.getSourceUri());
+            e.setLanguage(parsed.getLanguage());
+            e.setType(parsed.getType() != null ? parsed.getType() : e.getType());
+            e.setFormOfAct(
+                parsed.getFormOfAct() != null ? parsed.getFormOfAct() : e.getFormOfAct()
+            );
+            if (e.getLegalForce() == null) e.setLegalForce(parsed.getLegalForce());
+            e.setExtractedBy("adilet-doc-parser");
+            e.setRecordedAt(java.time.LocalDateTime.now());
+            return e;
+        } catch (Exception ex) {
+            log.debug(
+                "Could not merge parsed adilet law {}: {}",
+                parsed.getCode(),
+                ex.getMessage()
+            );
+            return parsed;
+        }
+    }
 
     private CodeAndLang resolveDocumentRef(String url) {
         if (url == null || url.isBlank()) return null;

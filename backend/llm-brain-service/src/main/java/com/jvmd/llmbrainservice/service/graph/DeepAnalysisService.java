@@ -1,5 +1,6 @@
 package com.jvmd.llmbrainservice.service.graph;
 
+import com.jvmd.llmbrainservice.service.citation.ReferenceAuditService;
 import com.jvmd.llmbrainservice.client.GraphServiceClient;
 import com.jvmd.llmbrainservice.dto.*;
 import com.jvmd.llmbrainservice.service.graph.link.LinkableSubject;
@@ -29,6 +30,7 @@ public class DeepAnalysisService {
 
     private final GraphServiceClient graphServiceClient;
     private final PrimaryLawResolver primaryLawResolver;
+    private final ReferenceAuditService referenceAuditService;
 
     @Value("${deep-analysis.max-laws-total:25}")
     private int maxLawsTotal;
@@ -69,8 +71,10 @@ public class DeepAnalysisService {
             return createEmptyResult("Не удалось получить текст " + linker.displayNameGenitive() + " — попробуйте ещё раз через несколько секунд.");
         }
 
+        ReferenceAuditService.Audit audit = auditReferences(graphId, linker, subject, docText, ctry, progress);
         List<LawInfo> primaryAttached = resolveAndAttachPrimaryLaws(graphId, linker, subject, docText, ctry, progress);
         if (primaryAttached.isEmpty()) {
+            if (!audit.markdown().isBlank()) return createEmptyResult(audit.markdown());
             return createEmptyResult("В базе не найдено законов, релевантных содержимому " + linker.displayNameGenitive() + ".");
         }
 
@@ -98,7 +102,13 @@ public class DeepAnalysisService {
             conflictsFlagged = scanConflicts(graphId, linker, subject, ctry, primaryAttached, articlesByLaw, docText, progress);
         }
 
+        conflictsFlagged += (int) audit.problems();
         String report = buildReport(primaryAttached, secondaryAttached, tertiaryAttached, articlesByLaw, articlesLinked, conflictsFlagged, safeDepth, linker.displayNameGenitive());
+        if (!audit.markdown().isBlank()) {
+            int firstSection = report.indexOf("\n### ");
+            report = firstSection < 0 ? report + "\n" + audit.markdown()
+                    : report.substring(0, firstSection + 1) + audit.markdown() + "\n" + report.substring(firstSection + 1);
+        }
 
         emit(progress, "persist", 0, 1, "Сохраняю комментарий в граф…");
         persistAnalysisComment(graphId, linker, subject, report, primaryAttached, secondaryAttached, tertiaryAttached, articlesByLaw, ctry);
@@ -106,6 +116,54 @@ public class DeepAnalysisService {
         emit(progress, "done", 1, 1, "Готово.");
 
         return new DeepAnalysisResult(primaryAttached.size(), secondaryAttached.size(), tertiaryAttached.size(), articlesLinked, conflictsFlagged, report);
+    }
+
+    private ReferenceAuditService.Audit auditReferences(String graphId, SubjectLinker linker, LinkableSubject subject,
+                                                        String docText, String ctry, Consumer<ProgressEvent> progress) {
+        emit(progress, "references", 0, 1, "Проверяю ссылки на статьи законов…");
+        ReferenceAuditService.Audit audit;
+        try {
+            audit = referenceAuditService.audit(docText);
+        } catch (RuntimeException e) {
+            log.warn("DeepAnalysis: reference audit failed: {}", e.getMessage());
+            return ReferenceAuditService.Audit.empty();
+        }
+        if (audit.findings().isEmpty()) return audit;
+
+        Set<String> attachedLaws = new LinkedHashSet<>();
+        int done = 0;
+        for (ReferenceAuditService.Finding f : audit.findings()) {
+            String lawCode = f.lawCode();
+            if (lawCode == null || lawCode.isBlank() || f.verdict() == ReferenceAuditService.Verdict.REPEALED) continue;
+            try {
+                if (attachedLaws.add(lawCode)) {
+                    graphServiceClient.addLawToUserGraph(graphId, lawCode, ctry);
+                    linker.linkToLaw(graphId, subject, lawCode, ctry);
+                }
+                String clauseRef = f.clause().isBlank() ? "auto" : f.clause();
+                if (f.isProblem() && !f.citedArticle().isBlank()) {
+                    String reason = switch (f.verdict()) {
+                        case WRONG_ARTICLE -> "Ошибочная ссылка на ст. " + f.citedArticle() + " " + lawCode
+                                + (f.correctArticle().isBlank() ? "" : " — правильно ст. " + f.correctArticle());
+                        case NOT_FOUND -> "Статьи " + f.citedArticle() + " нет в " + lawCode;
+                        case VIOLATION -> "Нарушение: " + f.explanation();
+                        default -> f.explanation();
+                    };
+                    linker.flagConflictOnArticle(graphId, subject, lawCode, ctry, f.citedArticle(), clauseRef,
+                            reason, 0.9);
+                }
+                String good = f.isProblem() ? f.correctArticle() : f.citedArticle();
+                if (!good.isBlank()) {
+                    linker.linkClauseToArticle(graphId, subject, lawCode, ctry, good, clauseRef,
+                            f.clause(), f.explanation(), 0.9);
+                }
+            } catch (Exception e) {
+                log.warn("DeepAnalysis: could not mirror reference finding {} {}: {}", lawCode, f.citedArticle(), e.getMessage());
+            }
+            emit(progress, "references", ++done, audit.findings().size(),
+                    (f.isProblem() ? "Проблема: ст. " : "Ссылка верна: ст. ") + f.citedArticle() + " " + lawCode);
+        }
+        return audit;
     }
 
     private String fetchSubjectText(SubjectLinker linker, LinkableSubject subject, String graphId) {

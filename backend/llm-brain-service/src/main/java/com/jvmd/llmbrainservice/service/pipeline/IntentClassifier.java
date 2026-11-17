@@ -168,10 +168,6 @@ public class IntentClassifier {
         );
     }
 
-    /**
-     * Whole-word matching only: substring matching made "риски"/"исключительное" hit "иск",
-     * and question lists like "как оформить передачу ... договор?" were routed to drafting.
-     */
     private boolean looksLikeDraftRequest(String message) {
         if (!containsAnyWord(message, IntentKeywords.DRAFT_TYPE)) {
             return false;

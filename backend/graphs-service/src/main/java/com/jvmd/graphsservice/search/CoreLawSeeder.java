@@ -30,23 +30,15 @@ public class CoreLawSeeder {
         this.pathQueue = pathQueue;
     }
 
-    private sealed interface SeedUrl permits ZanGovUrl, AdiletUrl {
+    private sealed interface SeedUrl permits AdiletUrl {
         String toUrl();
-    }
-
-    private record ZanGovUrl(int id) implements SeedUrl {
-        public String toUrl() {
-            return "https://zan.gov.kz/client/#!/doc/" + id + "/rus";
-        }
     }
 
     private record AdiletUrl(String code) implements SeedUrl {
         public String toUrl() {
             return "https://adilet.zan.kz/rus/docs/" + code;
         }
-    }
-
-    private record Seed(
+    }    private record Seed(
         String code,
         String citationCode,
         String title,
@@ -67,18 +59,29 @@ public class CoreLawSeeder {
                 "переработка премия выходное пособие дисциплинарное взыскание безработный " +
                 "испытательный срок перевод на другую должность",
             "Кодекс",
-            new ZanGovUrl(95666)
+            new AdiletUrl("K1500000414")
         ),
         new Seed(
             "ГК РК",
             "ГК РК",
-            "Гражданский кодекс Республики Казахстан",
+            "Гражданский кодекс Республики Казахстан (Общая часть)",
             "Кодекс",
             "договор обязательство сделка купля-продажа аренда займ кредит поставка подряд " +
                 "возмездное оказание услуг неустойка пени исковая давность возмещение ущерба " +
                 "собственность право собственности наследование дарение залог поручительство",
             "Кодекс",
-            new ZanGovUrl(879)
+            new AdiletUrl("K940001000_")
+        ),
+        new Seed(
+            "ГК РК (Особенная часть)",
+            "ГК РК (Особенная часть)",
+            "Гражданский кодекс Республики Казахстан (Особенная часть)",
+            "Кодекс",
+            "договор купля-продажа аренда займ подряд возмездное оказание услуг перевозка " +
+                "хранение страхование поручение комиссия доверительное управление " +
+                "возмещение вреда неосновательное обогащение наследование",
+            "Кодекс",
+            new AdiletUrl("K990000409_")
         ),
         new Seed(
             "УК РК",
@@ -89,7 +92,7 @@ public class CoreLawSeeder {
                 "мошенничество кража грабёж разбой побои насилие шантаж принуждение клевета " +
                 "оскорбление взятка коррупция хулиганство",
             "Кодекс",
-            new ZanGovUrl(81097)
+            new AdiletUrl("K1400000226")
         ),
         new Seed(
             "ГПК РК",
@@ -101,7 +104,7 @@ public class CoreLawSeeder {
                 "апелляция кассация подача иска истец ответчик представитель судебное решение " +
                 "обеспечительные меры судебный приказ мировое соглашение обжалование",
             "Кодекс",
-            new ZanGovUrl(95109)
+            new AdiletUrl("K1500000377")
         ),
         new Seed(
             "КоАП РК",
@@ -112,7 +115,7 @@ public class CoreLawSeeder {
                 "административный арест лишение прав мелкое хулиганство нарушение ПДД " +
                 "нарушение трудового законодательства санитарные нормы",
             "Кодекс",
-            new ZanGovUrl(81245)
+            new AdiletUrl("K1400000235")
         ),
         new Seed(
             "УПК РК",
@@ -123,7 +126,7 @@ public class CoreLawSeeder {
                 "прокурор защитник адвокат следователь допрос обыск выемка " +
                 "предварительное следствие судебное разбирательство приговор",
             "Кодекс",
-            new ZanGovUrl(81164)
+            new AdiletUrl("K1400000231")
         ),
         new Seed(
             "НК РК",
@@ -133,7 +136,7 @@ public class CoreLawSeeder {
             "налог НДС КПН ИПН налогообложение налоговая декларация налоговая проверка " +
                 "уклонение от уплаты налогов налоговый агент социальный налог акциз",
             "Кодекс",
-            new ZanGovUrl(212543)
+            new AdiletUrl("K1700000120")
         ),
         new Seed(
             "СК РК",
@@ -143,7 +146,7 @@ public class CoreLawSeeder {
             "брак развод алименты дети усыновление опека попечительство раздел имущества " +
                 "супруги семья родители родительские права лишение родительских прав",
             "Кодекс",
-            new ZanGovUrl(62568)
+            new AdiletUrl("K1100000518")
         ),
         new Seed(
             "ЗК РК",
@@ -153,7 +156,7 @@ public class CoreLawSeeder {
             "земля земельный участок право на землю аренда земли покупка земли " +
                 "сельскохозяйственные угодья изъятие земельного участка",
             "Кодекс",
-            new ZanGovUrl(15924)
+            new AdiletUrl("K030000442_")
         ),
         new Seed(
             "ПК РК",
@@ -163,7 +166,7 @@ public class CoreLawSeeder {
             "предпринимательство бизнес лицензирование регулирование проверки " +
                 "малый средний крупный бизнес государственный контроль",
             "Кодекс",
-            new ZanGovUrl(94981)
+            new AdiletUrl("K1500000375")
         ),
         new Seed(
             "ЭК РК",
@@ -173,7 +176,7 @@ public class CoreLawSeeder {
             "экология охрана природы природопользование экологический ущерб " +
                 "загрязнение отходы экологическая экспертиза",
             "Кодекс",
-            new ZanGovUrl(151312)
+            new AdiletUrl("K2100000400")
         ),
         new Seed(
             "ВК РК",
@@ -182,7 +185,7 @@ public class CoreLawSeeder {
             "Кодекс",
             "вода водные ресурсы водопользование водный объект загрязнение воды",
             "Кодекс",
-            new ZanGovUrl(16225)
+            new AdiletUrl("K2500000178")
         ),
         new Seed(
             "Конституция РК",
@@ -192,7 +195,7 @@ public class CoreLawSeeder {
             "конституционные права свободы граждан право на жизнь право на труд " +
                 "право на образование право на жильё право на справедливый суд",
             "Конституция",
-            new ZanGovUrl(1)
+            new AdiletUrl("K2600000000")
         ),
         new Seed(
             "ЖК РК",
@@ -283,12 +286,6 @@ public class CoreLawSeeder {
                 queued++;
                 log.debug("Queued (priority) {}: {}", s.code(), url);
             }
-        }
-
-        String gkSpecialUrl = new ZanGovUrl(3559).toUrl();
-        if (!pathQueue.contains(gkSpecialUrl)) {
-            pathQueue.addFirst(gkSpecialUrl);
-            queued++;
         }
 
         log.info(

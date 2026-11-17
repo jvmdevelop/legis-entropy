@@ -198,16 +198,12 @@ public abstract class GraphLawParserManager<T extends Parser> {
 
                         Law law;
                         LawStructure.ExtractionResult structure = null;
-                        Object parsed = lawParser.parse(documentUrl);
-                        if (parsed instanceof Law l) {
-                            law = l;
-                        } else {
-                            law = (Law) parsed;
-                        }
                         if (lawParser instanceof GraphKzLawParser kzParser) {
                             var full = kzParser.parseFull(documentUrl);
                             law = full.law();
                             structure = full.structure();
+                        } else {
+                            law = (Law) lawParser.parse(documentUrl);
                         }
                         if (law.getSource() == null) {
                             law.applyProvenance(

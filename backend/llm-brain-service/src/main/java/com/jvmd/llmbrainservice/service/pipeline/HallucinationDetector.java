@@ -1,7 +1,9 @@
 package com.jvmd.llmbrainservice.service.pipeline;
 
+import com.jvmd.llmbrainservice.service.citation.ArticleReferenceVerifier;
 import com.jvmd.llmbrainservice.service.citation.Citation;
 import com.jvmd.llmbrainservice.service.context.DocumentContext;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,7 +15,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
+@RequiredArgsConstructor
 public class HallucinationDetector {
+
+    private final ArticleReferenceVerifier articleVerifier;
 
     private static final Pattern LAW_REFERENCE_PATTERN = Pattern.compile(
             "(?:стать[яиеею]|ст\\.?|закон|приказ|кодекс|постановление|положение|инструкция|" +
@@ -27,10 +32,10 @@ public class HallucinationDetector {
     );
 
     private static final Pattern LAW_CODE_PATTERN = Pattern.compile(
-            "(?iu)\\b(?:УК|ГК|ТК|НК|СК|ЖК|ЗК|КоАП|ГПК|АППК)(?:\\s+(?:РК|РФ))?\\b"
+            "(?iu)(?<![\\p{L}])(?:ГПК|УПК|АППК|КоАП|УК|ГК|ТК|НК|СК|ЖК|ЗК|ПК|ЭК)(?:\\s+(?:РК|РФ))?(?![\\p{L}])"
     );
 
-    public record UngroundedArticleReference(int number, String label, int start, int end) {}
+    public record UngroundedArticleReference(int number, String label, String lawCode, int start, int end) {}
 
     public boolean hasGroundingContext(DocumentContext context) {
         return !retrievedArticleNumbers(context).isEmpty();
@@ -47,6 +52,7 @@ public class HallucinationDetector {
     ) {
         if (answer == null || answer.isBlank()) return List.of();
         List<UngroundedArticleReference> ungrounded = new ArrayList<>();
+        String dominantCode = dominantLawCode(answer);
         Matcher matcher = STATUTE_FULL_PATTERN.matcher(answer);
         while (matcher.find()) {
             int number;
@@ -55,9 +61,12 @@ public class HallucinationDetector {
             } catch (NumberFormatException ignored) {
                 continue;
             }
-            if (!isGrounded(number, answer, matcher.start(), matcher.end(), context)) {
-                ungrounded.add(new UngroundedArticleReference(number, matcher.group(1), matcher.start(), matcher.end()));
-            }
+            if (isGrounded(number, answer, matcher.start(), matcher.end(), context)) continue;
+            String lawCode = nearbyLawCode(answer, matcher.start(), matcher.end());
+            if (lawCode == null) lawCode = lineLawCode(answer, matcher.start());
+            if (lawCode == null) lawCode = dominantCode;
+            if (lawCode != null && articleVerifier.exists(lawCode, number)) continue;
+            ungrounded.add(new UngroundedArticleReference(number, matcher.group(1), lawCode, matcher.start(), matcher.end()));
         }
         return List.copyOf(ungrounded);
     }
@@ -130,6 +139,33 @@ public class HallucinationDetector {
             }
         }
         return nearest;
+    }
+
+    private String dominantLawCode(String answer) {
+        java.util.Map<String, Integer> counts = new java.util.HashMap<>();
+        java.util.Map<String, String> spelling = new java.util.HashMap<>();
+        Matcher matcher = LAW_CODE_PATTERN.matcher(answer);
+        while (matcher.find()) {
+            String key = normalizeCode(matcher.group()).replaceAll("(РК|РФ)$", "");
+            counts.merge(key, 1, Integer::sum);
+            spelling.putIfAbsent(key, matcher.group());
+        }
+        return counts.entrySet().stream()
+                .max(java.util.Map.Entry.comparingByValue())
+                .map(e -> spelling.get(e.getKey()))
+                .orElse(null);
+    }
+
+    private String lineLawCode(String answer, int position) {
+        int lineStart = answer.lastIndexOf('\n', position) + 1;
+        int lineEnd = answer.indexOf('\n', position);
+        Matcher matcher = LAW_CODE_PATTERN.matcher(answer.substring(lineStart, lineEnd < 0 ? answer.length() : lineEnd));
+        String found = null;
+        while (matcher.find()) {
+            if (found != null && !normalizeCode(found).equals(normalizeCode(matcher.group()))) return null;
+            found = matcher.group();
+        }
+        return found;
     }
 
     private String normalizeCode(String code) {

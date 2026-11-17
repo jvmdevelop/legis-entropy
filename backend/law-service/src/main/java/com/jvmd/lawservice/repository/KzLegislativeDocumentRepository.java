@@ -21,6 +21,9 @@ public interface KzLegislativeDocumentRepository extends JpaRepository<KzLegisla
 
     List<KzLegislativeDocument> findByDocumentType(KzLegislativeDocumentType type);
 
+    @Query("SELECT COUNT(DISTINCT d.title) FROM KzLegislativeDocument d")
+    long countDistinctTitles();
+
     List<KzLegislativeDocument> findByDocumentTypeAndIsActiveTrue(KzLegislativeDocumentType type);
 
     List<KzLegislativeDocument> findByParentDocumentId(UUID parentId);

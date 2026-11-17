@@ -11,4 +11,8 @@ public interface BrainModelClient {
     BrainResponse answer(String userPrompt, List<HistoryEntry> history);
 
     Flux<String> streamAnswer(String userPrompt, List<HistoryEntry> history);
+
+    default String complete(String systemPrompt, String userPrompt) {
+        return answer(systemPrompt + "\n\n" + userPrompt, List.of()).content();
+    }
 }

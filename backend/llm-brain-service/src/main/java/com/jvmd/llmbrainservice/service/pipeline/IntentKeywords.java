@@ -104,7 +104,6 @@ final class IntentKeywords {
             "разработай", "разработайте"
     );
 
-    /** Infinitives: "как оформить договор?" is a question, "помоги составить договор" is a request. */
     static final List<String> DRAFT_ACTION_INFINITIVE = List.of(
             "составить", "написать", "подготовить", "сформировать",
             "сгенерировать", "создать", "оформить", "разработать"

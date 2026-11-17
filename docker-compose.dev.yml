@@ -349,9 +349,12 @@ services:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
       LLM_BASE_URL: ${LLM_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai/}
-      LLM_API_KEY: ${LLM_API_KEY:?Set LLM_API_KEY in .env}
+      LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_MODEL: ${LLM_MODEL:-gemini-3.8-flash}
       LLM_TEMPERATURE: ${LLM_TEMPERATURE:-0.2}
+      NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
+      NVIDIA_LLM_MODEL: ${NVIDIA_LLM_MODEL:-nvidia/nemotron-3.5-super-vl-120b-a12b}
+      NVIDIA_LLM_BASE_URL: ${NVIDIA_LLM_BASE_URL:-https://integrate.api.nvidia.com/v1/}
       GRAPH_SERVICE_URL: http://graphs-service:8086
       DEEP_ANALYSIS_MAX_LAWS_TOTAL: ${DEEP_ANALYSIS_MAX_LAWS_TOTAL:-25}
       DEEP_ANALYSIS_MAX_ARTICLES_TOTAL: ${DEEP_ANALYSIS_MAX_ARTICLES_TOTAL:-75}
@@ -599,6 +602,27 @@ services:
     depends_on:
       - prometheus
 
+
+  telegram-bot:
+    container_name: telegram-bot
+    profiles: ["bot"]   # docker compose --profile bot up -d telegram-bot
+    build:
+      context: ./telegram-bot
+    restart: unless-stopped
+    networks:
+      - legis-entropy-network
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}  # from @BotFather; the bot exits with a message if empty
+      DOCUMENT_SERVICE_URL: http://document-service:8093
+      BRAIN_URL: http://llm-brain-service:8085
+      BOT_MAX_FILE_MB: ${BOT_MAX_FILE_MB:-15}
+    depends_on:
+      document-service: { condition: service_healthy }
+      llm-brain-service: { condition: service_started }
+    deploy:
+      resources:
+        limits:
+          memory: 192M
 
 networks:
   legis-entropy-network:

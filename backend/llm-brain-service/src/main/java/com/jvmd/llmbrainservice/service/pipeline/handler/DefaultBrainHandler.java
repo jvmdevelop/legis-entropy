@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -109,35 +108,27 @@ public class DefaultBrainHandler implements BrainTaskHandler {
                             try {
                                 emitter.send(SseEmitter.event().name("error").data("Ошибка при получении ответа от ИИ: " + e.getMessage()));
                             } catch (IOException ignored) {}
-                            emitter.completeWithError(e);
+                            emitter.complete();
                         },
                         () -> {
                             String finalAnswer = accumulatedAnswer.toString();
+                            String processed = answerPostProcessor.process(finalAnswer, plan, context);
                             boolean grounded = hallucinationDetector.hasGroundingContext(context);
-                            if (grounded) {
-                                var ungrounded = hallucinationDetector.getUngroundedArticleReferences(finalAnswer, context);
-                                if (!ungrounded.isEmpty()) {
-                                    log.warn("Stream redaction: {} ungrounded article(s) {}", ungrounded.size(), ungrounded);
-                                    String redacted = hallucinationDetector.redactUngroundedArticleReferences(finalAnswer, ungrounded);
-                                    String list = ungrounded.stream()
-                                            .map(HallucinationDetector.UngroundedArticleReference::number)
-                                            .distinct()
-                                            .map(String::valueOf)
-                                            .collect(Collectors.joining(", "));
-                                    String footer = "\n\n> Не удалось подтвердить номера статей по retrieval-контексту: **"
-                                            + list + "**. Перепроверьте по официальному источнику — модель могла перепутать раздел кодекса.";
-                                    try {
-                                        emitter.send(SseEmitter.event().name("redaction").data(redacted + footer));
-                                    } catch (IOException ignored) {}
-                                }
-                            } else if (hallucinationDetector.hasLawReferences(finalAnswer)) {
-                                String footer = "\n\n> ℹ️ Это аналитический ответ без обращения к retrieval-базе. "
+                            if (!grounded && !request.hasDocumentId()
+                                    && processed.equals(finalAnswer.strip())
+                                    && hallucinationDetector.hasLawReferences(processed)) {
+                                processed += "\n\n> ℹ️ Это аналитический ответ без обращения к retrieval-базе. "
                                         + "Перед использованием в правовом документе перепроверьте указанные нормы и номера статей по официальному источнику (adilet.zan.kz).";
+                            }
+                            if (!processed.equals(finalAnswer.strip())) {
                                 try {
-                                    emitter.send(SseEmitter.event().name("redaction").data(finalAnswer + footer));
+                                    emitter.send(SseEmitter.event().name("redaction").data(processed));
                                 } catch (IOException ignored) {}
                             }
 
+                            try {
+                                emitter.send(SseEmitter.event().name("done").data(""));
+                            } catch (IOException ignored) {}
                             log.info("Streaming completed successfully for user {}", request.userId());
                             emitter.complete();
                         }
@@ -145,10 +136,6 @@ public class DefaultBrainHandler implements BrainTaskHandler {
         return emitter;
     }
 
-    /**
-     * Laws used as retrieval context for a plain question are attached to the workspace graph,
-     * so the graph reflects what the answer was grounded on (no situation/document is created).
-     */
     private List<String> addRetrievedLawsToGraph(BrainRequest request, ContextPlan plan, DocumentContext context) {
         if (!request.hasGraphId() || context == null || !context.hasCitations()) {
             return List.of();
