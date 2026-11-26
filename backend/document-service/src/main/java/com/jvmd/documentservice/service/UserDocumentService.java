@@ -67,6 +67,31 @@ public class UserDocumentService {
         return requireDocument(documentId, userId).getPlainText();
     }
 
+    public List<com.jvmd.documentservice.edit.DocxPages.Page> pages(String documentId, String userId) {
+        UserDocument d = requireDocument(documentId, userId);
+        if (d.getStatus() == DocumentProcessingStatus.DELETED) throw new IllegalArgumentException("Document not found.");
+        String text = d.getPlainText() == null ? "" : d.getPlainText();
+        String name = d.getFileName() == null ? "" : d.getFileName().toLowerCase(Locale.ROOT);
+        String type = d.getContentType() == null ? "" : d.getContentType();
+        try {
+            if (name.endsWith(".pdf") || type.contains("pdf")) {
+                StoredObject f = documentStorageService.load(d.getObjectName(), d.getFileName(), type);
+                List<String> pageTexts = documentReader.read(new StoredMultipartFile(f)).stream()
+                        .map(Document::getText).toList();
+                return com.jvmd.documentservice.edit.DocxPages.byLengths(pageTexts);
+            }
+            if (name.endsWith(".docx") || type.contains("wordprocessingml")) {
+                StoredObject f = documentStorageService.load(d.getObjectName(), d.getFileName(), type);
+                return com.jvmd.documentservice.edit.DocxPages.fromDocx(f.content());
+            }
+        } catch (IllegalArgumentException e) {
+            throw e;
+        } catch (Exception e) {
+            log.warn("Page index for {} failed, single page: {}", documentId, e.getMessage());
+        }
+        return com.jvmd.documentservice.edit.DocxPages.byFormFeed(text);
+    }
+
     public StoredObject loadFile(String documentId, String userId) {
         UserDocument d = requireDocument(documentId, userId);
         if (d.getStatus() == DocumentProcessingStatus.DELETED) throw new IllegalArgumentException("Document not found.");

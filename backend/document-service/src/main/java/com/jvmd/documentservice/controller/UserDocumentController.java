@@ -134,6 +134,17 @@ public class UserDocumentController {
         }
     }
 
+    @GetMapping("/{documentId}/pages")
+    public ResponseEntity<Map<String, Object>> pages(
+            @PathVariable String documentId,
+            @RequestHeader("X-User-Id") String userId) {
+        try {
+            return ResponseEntity.ok(Map.of("pages", userDocumentService.pages(documentId, userId)));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @GetMapping("/{documentId}/file")
     public ResponseEntity<byte[]> file(
             @PathVariable String documentId,
