@@ -113,8 +113,8 @@ class _Span:
 
 
 class DocumentEditService:
-    def __init__(self, auditor: ReferenceAuditService, documents: DocumentPort, llm: Completer | None):
-        self.auditor, self.documents, self.llm = auditor, documents, llm
+    def __init__(self, auditor: ReferenceAuditService, documents: DocumentPort, llm: Completer | None, graph=None):
+        self.auditor, self.documents, self.llm, self.graph = auditor, documents, llm, graph
 
     async def suggest_for_text(self, text: str) -> tuple[list[EditProposal], str]:
         proposals, audit = await self.suggest_with_audit(text)
@@ -224,7 +224,7 @@ class DocumentEditService:
         return out, [p.id for _, p in sorted(located, key=lambda x: x[0])], skipped
 
     async def apply(self, document_id: str, user_id: str, proposals: list[EditProposal],
-                    title: str | None = None) -> EditApplyResponse:
+                    title: str | None = None, in_place: bool = False, graph_id: str | None = None) -> EditApplyResponse:
         text = await self.documents.text(document_id, user_id)
         if not text:
             raise LookupError("document text unavailable")
@@ -234,6 +234,8 @@ class DocumentEditService:
         by_id, pos = {p.id: p for p in proposals}, self._positions(text, proposals)
         edits = [{"original": by_id[i].original, "replacement": by_id[i].replacement,
                   "occurrence": occurrence(text, by_id[i].original, pos[i])} for i in applied]
+        if in_place:
+            return await self._apply_in_place(document_id, user_id, edits, applied, skipped, graph_id)
         try:
             r = await self.documents.edited_copy(document_id, user_id, edits, title)
         except Exception as e:
@@ -248,6 +250,25 @@ class DocumentEditService:
         name = title or await self._edited_name(document_id, user_id)
         new_id = await self.documents.upload(user_id, name, new_text.encode("utf-8"), "text/plain; charset=utf-8")
         return EditApplyResponse(document_id=new_id, file_name=name, applied=applied, skipped=skipped)
+
+    async def _apply_in_place(self, document_id: str, user_id: str, edits: list[dict], applied: list[str],
+                              skipped: list[EditSkip], graph_id: str | None) -> EditApplyResponse:
+        r = await self.documents.edit_in_place(document_id, user_id, edits)
+        if not r or not r.get("documentId"):
+            return EditApplyResponse(document_id=None, file_name=None, applied=[], skipped=skipped, in_place=True)
+        done = {applied[k] for k in r.get("applied") or [] if 0 <= k < len(applied)}
+        skipped = skipped + [EditSkip(id=applied[x["index"]], reason=x.get("reason") or "")
+                             for x in r.get("skipped") or [] if 0 <= x.get("index", -1) < len(applied)]
+        removed = None
+        if graph_id and self.graph is not None:
+            try:
+                g = await self.graph.document_revised(graph_id, document_id, r.get("fileName"), user_id)
+                removed = int((g or {}).get("removedLinks") or 0)
+            except Exception as e:
+                log.warning("graph refresh after in-place edit of %s failed: %s", document_id, e)
+        return EditApplyResponse(document_id=document_id, file_name=r.get("fileName"),
+                                 applied=[i for i in applied if i in done], skipped=skipped, in_place=True,
+                                 graph_links_removed=removed)
 
     @staticmethod
     def _positions(text: str, proposals: list[EditProposal]) -> dict[str, int]:

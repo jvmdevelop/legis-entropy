@@ -174,3 +174,26 @@ async def test_pipeline_routes_edit_command_before_intent():
 
     p = BrainPipeline(Boom(), Boom(), None, Handler())
     assert (await p.answer(BrainRequest(message="примени правки", document_id="d1"))).content == "edited"
+
+
+async def test_apply_in_place_keeps_document_and_refreshes_graph():
+    class Docs(FakeDocs):
+        async def edit_in_place(self, doc_id, user_id, edits):
+            self.inplace = (doc_id, user_id, edits)
+            return {"documentId": doc_id, "fileName": "Договор.docx", "applied": [0], "skipped": []}
+
+        async def edited_copy(self, *a, **k):
+            raise AssertionError("copy must not be created in place mode")
+
+    class Graph:
+        async def document_revised(self, graph_id, document_id, file_name, user_id):
+            self.call = (graph_id, document_id, file_name, user_id)
+            return {"removedLinks": 3}
+
+    docs, graph = Docs({"d1": DOC}), Graph()
+    svc = DocumentEditService(None, docs, None, graph)
+    p = EditProposal(id="a", clause="3.1", original="статьёй 49", replacement="статьёй 36")
+    r = await svc.apply("d1", "u1", [p], in_place=True, graph_id="g1")
+    assert (r.document_id, r.in_place, r.applied, r.graph_links_removed) == ("d1", True, ["a"], 3)
+    assert docs.inplace[2] == [{"original": "статьёй 49", "replacement": "статьёй 36", "occurrence": 0}]
+    assert graph.call == ("g1", "d1", "Договор.docx", "u1")

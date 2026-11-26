@@ -97,7 +97,11 @@ def build_router(documents: DocumentPort, auditor: ReferenceAuditService,
         if not x_user_id or edits is None:
             return Response(status_code=400 if not x_user_id else 501)
         try:
-            return await edits.apply(document_id, x_user_id, body.proposals, body.title)
+            result = await edits.apply(document_id, x_user_id, body.proposals, body.title, body.in_place,
+                                       body.graph_id)
+            if result.in_place and result.document_id and structure is not None:
+                structure.invalidate(document_id)
+            return result
         except LookupError:
             return Response(status_code=404)
         except Exception as e:

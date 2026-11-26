@@ -55,6 +55,10 @@ class StructureService:
             self._cache.popitem(last=False)
         return structure
 
+    def invalidate(self, document_id: str) -> None:
+        for key in [k for k in self._cache if k[0] == document_id]:
+            self._cache.pop(key, None)
+
     def attach_pages(self, structure: DocumentStructure, items) -> None:
         for it in items:
             c = structure.clause(getattr(it, "clause", None))

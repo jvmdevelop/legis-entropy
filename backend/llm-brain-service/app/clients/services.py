@@ -48,6 +48,11 @@ class DocumentClient:
                               json={"edits": edits, "fileName": file_name})
         return r if isinstance(r, dict) else None
 
+    async def edit_in_place(self, document_id: str, user_id: str, edits: list[Json]) -> Json | None:
+        r = await self.c.post(f"/api/user-documents/{_p(document_id)}/edits-in-place", headers={"X-User-Id": user_id},
+                              json={"edits": edits})
+        return r if isinstance(r, dict) else None
+
     async def pages(self, document_id: str, user_id: str) -> list[Json]:
         r = await self.c.get(f"/api/user-documents/{_p(document_id)}/pages", headers={"X-User-Id": user_id})
         return (r or {}).get("pages") or [] if isinstance(r, dict) else []
@@ -81,6 +86,11 @@ class GraphClient:
 
     async def link_clause(self, req: Json) -> None:
         await self.c.post("/api/graph/articles/link-document", json=req)
+
+    async def document_revised(self, graph_id: str, document_id: str, file_name: str | None,
+                               user_id: str | None) -> Json | None:
+        return await self.c.post(f"/api/v1/user-graphs/{_p(graph_id)}/documents/{_p(document_id)}/revised",
+                                 params={"fileName": file_name}, headers={"X-User-Id": user_id})
 
     async def add_law(self, graph_id: str, code: str, country: str) -> None:
         await self.c.post(f"/api/v1/user-graphs/{_p(graph_id)}/laws/{_p(code)}", params={"country": country})

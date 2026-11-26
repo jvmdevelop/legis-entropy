@@ -55,7 +55,7 @@ def wire(c: Container, risk: RiskClassifier | None = None) -> AnalysisFeature:
         c.laws, embedder=c.embedder, nli=c.nli, ner=c.ner, repealed=RepealedActChecker(c.graph),
         labor=LaborNormChecker(c.llm), similarity=t.clause_similarity, nli_threshold=t.nli_entailment)
     audit = ReferenceAuditService(verifier, c.llm, CitationVerifier(c.laws, c.llm, t.clause_similarity))
-    edits = DocumentEditService(audit, c.documents, c.llm)
+    edits = DocumentEditService(audit, c.documents, c.llm, c.graph)
     structure = StructureService(c.documents, c.llm)
     playbook_router = playbooks.build_router(PlaybookStore(c.settings.redis_url), PlaybookChecker(c.llm), c.documents,
                                              structure)

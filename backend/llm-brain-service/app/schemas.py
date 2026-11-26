@@ -165,6 +165,8 @@ class EditRewriteRequest(CamelModel):
 class EditApplyRequest(CamelModel):
     proposals: list[EditProposal]
     title: str | None = None
+    in_place: bool = False
+    graph_id: str | None = None
 
 
 class EditSkip(CamelModel):
@@ -177,6 +179,8 @@ class EditApplyResponse(CamelModel):
     file_name: str | None
     applied: list[str] = []
     skipped: list[EditSkip] = []
+    in_place: bool = False
+    graph_links_removed: int | None = None
 
 
 class PlaybookRule(CamelModel):
