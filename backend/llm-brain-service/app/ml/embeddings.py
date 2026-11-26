@@ -26,12 +26,14 @@ class _SimilarityMixin:
 class BgeM3Embedder(_SimilarityMixin):
     name = "bge-m3"
 
-    def __init__(self, model: str, device: str):
+    def __init__(self, model: str, device: str, max_tokens: int = 512, batch_size: int = 8):
         from sentence_transformers import SentenceTransformer
         self._model = SentenceTransformer(model, device=device)
+        self._model.max_seq_length = min(self._model.max_seq_length or max_tokens, max_tokens)
+        self._batch = batch_size
 
     async def embed(self, texts: list[str]) -> list[list[float]]:
-        vecs = await asyncio.to_thread(self._model.encode, texts, normalize_embeddings=True, batch_size=16)
+        vecs = await asyncio.to_thread(self._model.encode, texts, normalize_embeddings=True, batch_size=self._batch)
         return [v.tolist() for v in vecs]
 
 

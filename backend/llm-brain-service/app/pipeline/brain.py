@@ -15,10 +15,12 @@ log = logging.getLogger(__name__)
 
 
 class BrainPipeline:
-    def __init__(self, intent: IntentClassifier, profession: ProfessionClassifier, handlers: HandlerRegistry):
+    def __init__(self, intent: IntentClassifier, profession: ProfessionClassifier, handlers: HandlerRegistry,
+                 edit_handler=None):
         self.intent = intent
         self.profession = profession
         self.handlers = handlers
+        self.edit_handler = edit_handler
 
     async def resolve_plan(self, req: BrainRequest) -> ContextPlan:
         plan, professions = await asyncio.gather(self.intent.classify(req), self.profession.classify(req.message))
@@ -29,10 +31,16 @@ class BrainPipeline:
         return dataclasses.replace(plan, professions=professions)
 
     async def answer(self, req: BrainRequest) -> BrainResponse:
+        if self.edit_handler is not None and self.edit_handler.matches(req):
+            return await self.edit_handler.handle(req)
         plan = await self.resolve_plan(req)
         return await self.handlers.resolve(plan.task).handle(req, plan)
 
     async def stream(self, req: BrainRequest) -> AsyncIterator[Sse]:
+        if self.edit_handler is not None and self.edit_handler.matches(req):
+            async for event in self.edit_handler.stream(req):
+                yield event
+            return
         try:
             plan = await self.resolve_plan(req)
             handler = self.handlers.resolve(plan.task)

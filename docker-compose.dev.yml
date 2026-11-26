@@ -338,6 +338,7 @@ services:
 
   llm-brain-service:
     container_name: llm-brain-service
+    restart: unless-stopped
     build:
       context: ./backend/llm-brain-service
       dockerfile: Dockerfile
@@ -362,6 +363,10 @@ services:
       LOCAL_LLM_MODEL: ${LOCAL_LLM_MODEL:-llama3.2:3b}
       ML_ENABLED: ${LLM_BRAIN_ML_ENABLED:-false}
       ML_DEVICE: ${LLM_BRAIN_ML_DEVICE:-cpu}
+      EMBEDDING_MODEL: ${LLM_BRAIN_EMBEDDING_MODEL-BAAI/bge-m3}
+      RERANKER_MODEL: ${LLM_BRAIN_RERANKER_MODEL-BAAI/bge-reranker-v2-m3}
+      NLI_MODEL: ${LLM_BRAIN_NLI_MODEL-MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7}
+      NER_MODEL: ${LLM_BRAIN_NER_MODEL-urchade/gliner_multi-v2.1}
       INTENT_MODEL: ${LLM_BRAIN_INTENT_MODEL:-/fine-tuned/intent}
       PROFESSION_MODEL: ${LLM_BRAIN_PROFESSION_MODEL:-/fine-tuned/profession}
       RISK_MODEL: ${LLM_BRAIN_RISK_MODEL:-/fine-tuned/risk}

@@ -60,6 +60,7 @@ class Settings(BaseSettings):
     ml_enabled: bool = Field(False, alias="ML_ENABLED")
     ml_device: str = Field("cpu", alias="ML_DEVICE")
     embedding_model: str = Field("BAAI/bge-m3", alias="EMBEDDING_MODEL")
+    embedding_max_tokens: int = Field(512, alias="EMBEDDING_MAX_TOKENS")
     reranker_model: str = Field("BAAI/bge-reranker-v2-m3", alias="RERANKER_MODEL")
     nli_model: str = Field("MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7", alias="NLI_MODEL")
     ner_model: str = Field("urchade/gliner_multi-v2.1", alias="NER_MODEL")

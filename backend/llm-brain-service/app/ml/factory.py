@@ -23,7 +23,7 @@ class Candidate:
 
 REGISTRY: dict[str, list[Candidate]] = {
     "embedder": [
-        Candidate("bge-m3", lambda s, d: BgeM3Embedder(s.embedding_model, s.ml_device)),
+        Candidate("bge-m3", lambda s, d: BgeM3Embedder(s.embedding_model, s.ml_device, s.embedding_max_tokens)),
         Candidate("trigram", lambda s, d: TrigramEmbedder(), needs_ml=False),
     ],
     "reranker": [

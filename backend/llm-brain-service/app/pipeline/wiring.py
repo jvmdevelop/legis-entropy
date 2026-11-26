@@ -13,6 +13,7 @@ from app.pipeline.profession import ProfessionClassifier
 from app.pipeline.retrieval import (HybridLegalRetrievalStrategy, LawRetrievalStrategy, NoRetrievalStrategy,
                                     QueryRewriter, RetrievalRouter, UserDocumentRetrievalStrategy)
 from app.pipeline.tools import register_tools
+from app.pipeline.handlers.edit import DocumentEditHandler
 from app.ports import EditSuggester, LawGraphWriter, LawNameLinker, ReferenceReports
 from app.prompt.builder import BrainPromptBuilder, SubjectTextLoader
 
@@ -42,5 +43,6 @@ def wire(c: Container, reports: ReferenceReports | None = None,
                                                detector, graph_actions=graph_writer, ner=c.ner,
                                                linker=law_linker, edits=edits, documents=c.documents))
     register_tools(c.tools, intent, profession, claims, c.ner)
-    pipeline = BrainPipeline(intent, profession, c.handlers)
+    edit_handler = DocumentEditHandler(edits, c.documents) if hasattr(edits, "apply") else None
+    pipeline = BrainPipeline(intent, profession, c.handlers, edit_handler)
     return PipelineFeature(pipeline, routers=[brain_api.build_router(pipeline)])

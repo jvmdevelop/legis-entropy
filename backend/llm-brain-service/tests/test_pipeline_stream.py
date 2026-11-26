@@ -79,3 +79,19 @@ def test_sse_wire_format_matches_spring():
     assert encode(Sse("Привет")) == "data:Привет\n\n"
     assert encode(Sse("a\nb", "redaction")) == "event:redaction\ndata:a\ndata:b\n\n"
     assert encode(Sse(" лидирующий пробел")) == "data: лидирующий пробел\n\n"
+
+
+def test_numeric_ids_accepted_like_java_jackson():
+    from app.schemas import BrainRequest
+    r = BrainRequest.model_validate({"message": "x", "userId": 42, "graphId": 7, "documentId": 9,
+                                     "history": [{"role": "USER", "content": "hi"}]})
+    assert (r.user_id, r.graph_id, r.document_id) == ("42", "7", "9")
+
+
+def test_gateway_user_header_wins_over_body():
+    from app.api.brain import with_caller
+    from app.schemas import BrainRequest
+    req = BrainRequest(message="x", user_id="someone-else")
+    assert with_caller(req, "real-user").user_id == "real-user"
+    assert with_caller(req, None).user_id == "someone-else"
+    assert with_caller(BrainRequest(message="x"), " u1 ").user_id == "u1"

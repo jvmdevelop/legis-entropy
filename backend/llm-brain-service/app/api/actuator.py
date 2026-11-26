@@ -4,7 +4,7 @@ from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 router = APIRouter(prefix="/actuator", tags=["actuator"])
 
 
-@router.get("/health")
+@router.api_route("/health", methods=["GET", "HEAD"])
 async def health() -> dict:
     return {"status": "UP"}
 

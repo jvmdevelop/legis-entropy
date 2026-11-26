@@ -15,7 +15,7 @@ def test_compare_truncation_user_priority_and_alignment():
                     json={"leftKind": "DOCUMENT", "leftId": "d1", "leftLabel": "Договор",
                           "rightKind": "LAW", "rightId": "ГК РК", "userId": "body"})
     assert r.status_code == 200 and r.json() == {"content": "diff", "tokens": 7}
-    assert docs.calls == [("d1", "body")]
+    assert docs.calls == [("d1", "hdr")]
     p = llm.prompts[0]
     assert "=== ДОКУМЕНТ A: документ Договор ===" in p and "=== ДОКУМЕНТ B: закон ГК РК ===" in p
     left = p.split("=== ДОКУМЕНТ A: документ Договор ===\n", 1)[1].split("\n\n[...текст обрезан]", 1)[0]

@@ -9,7 +9,7 @@ def build_router(service: CompareService) -> APIRouter:
 
     @router.post("/compare", response_model=BrainResponse)
     async def compare(req: CompareRequest, x_user_id: str | None = Header(None)):
-        user = req.user_id if req.user_id and req.user_id.strip() else x_user_id
+        user = x_user_id.strip() if x_user_id and x_user_id.strip() else req.user_id
         return await service.compare(req.model_copy(update={"user_id": user}))
 
     return router

@@ -9,5 +9,6 @@ def test_health_and_prometheus(monkeypatch):
     get_settings.cache_clear()
     with TestClient(create_app()) as c:
         assert c.get("/actuator/health").json() == {"status": "UP"}
+        assert c.head("/actuator/health").status_code == 200
         r = c.get("/actuator/prometheus")
         assert r.status_code == 200 and "python_info" in r.text

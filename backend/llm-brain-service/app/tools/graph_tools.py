@@ -2,6 +2,7 @@ import logging
 import re
 from dataclasses import dataclass
 
+from app.analysis.references import canonical_code
 from app.clients.ports import DocumentPort, GraphPort, LawPort, SituationPort
 from app.graph.actions import GraphActionService
 from app.llm.tools import ToolRegistry
@@ -154,6 +155,9 @@ DESCRIPTIONS = {
 }
 
 
+FULL_ARTICLE_CHARS = 4000
+
+
 @dataclass
 class GraphTools:
     laws: LawPort
@@ -245,8 +249,21 @@ class GraphTools:
         m = _NUM.search(text)
         return code, m.group(0) if m else None
 
+    async def _article_from_laws(self, code: str, number: str, country: str) -> str:
+        try:
+            found = await self.laws.lookup_articles(code, [number], country, FULL_ARTICLE_CHARS)
+        except Exception as e:
+            log.warning("Failed to retrieve article %s for law %s from law-service: %s", number, code, e)
+            return f"Ошибка при получении статьи {number} закона {code}."
+        if not found:
+            return f"Статья {number} закона {code} не найдена."
+        art = found[0]
+        title = f" — {art['articleTitle']}" if art.get("articleTitle") else ""
+        return f"**Ст. {number} {code}{title}**\n\n{art.get('excerpt') or ''}\n\n_Источник: law-service (adilet.zan.kz)_"
+
     async def find_article(self, a: ArticleLookupArgs) -> str:
         code, number = await self._resolve_article_ref(a.code, a.number)
+        code = canonical_code(code) or code
         country = default_country(a.country)
         log.info("Tool findArticle called: %s ст. %s (%s)", code, number, country)
         if not code or not number:
@@ -254,10 +271,10 @@ class GraphTools:
         try:
             art = await self.graph.article(code, number, country)
         except Exception as e:
-            log.warning("Failed to retrieve article %s for law %s: %s", number, code, e)
-            return f"Ошибка при получении статьи {number} закона {code}."
+            log.warning("Failed to retrieve article %s for law %s from graph: %s", number, code, e)
+            art = None
         if not art:
-            return f"Статья {number} закона {code} не найдена."
+            return await self._article_from_laws(code, number, country)
         out = f"**Ст. {art.get('number')} {art.get('lawCode')}" + (f" — {art['title']}" if art.get("title") else "")
         out += "**\n\n" + (f"{art['body']}\n\n" if art.get("body") else "")
         if art.get("source"):

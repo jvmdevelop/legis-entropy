@@ -116,3 +116,61 @@ def test_occurrence_index_for_repeated_fragment():
     t = "3.1. статьёй 49 ...\n9.2. статьёй 49 ..."
     assert occurrence(t, "статьёй 49", t.find("статьёй 49")) == 0
     assert occurrence(t, "статьёй 49", t.rfind("статьёй 49")) == 1
+
+
+def test_edit_command_detection():
+    from app.pipeline.handlers.edit import is_edit_command
+    from app.schemas import BrainRequest
+    yes = ["примени изменения к документу", "Внеси исправления в договор", "исправь ошибки в договоре",
+           "примени правки", "подготовь исправленный документ"]
+    no = ["какие изменения внесли в ТК РК в 2025", "проверь договор на ошибки", "свяжи документ с законами",
+          "что такое правка закона"]
+    for m in yes:
+        assert is_edit_command(BrainRequest(message=m, document_id="d1")), m
+    for m in no:
+        assert not is_edit_command(BrainRequest(message=m, document_id="d1")), m
+    assert not is_edit_command(BrainRequest(message="примени изменения к документу"))
+
+
+async def test_edit_handler_applies_and_reports():
+    from app.pipeline.handlers.edit import RESULT_EVENT, DocumentEditHandler
+    from app.schemas import BrainRequest, EditApplyResponse, EditSkip
+
+    p1 = EditProposal(id="a", clause="3.1", original="статьёй 49", replacement="статьёй 36", law_basis="ст. 36 ТК РК")
+    p2 = EditProposal(id="b", clause="6.1", original="21", replacement="24", source="llm")
+
+    class Edits:
+        async def suggest_with_audit(self, text):
+            return [p1, p2], None
+
+        async def apply(self, document_id, user_id, proposals, title=None):
+            assert (document_id, user_id) == ("d1", "u1")
+            return EditApplyResponse(document_id="copy-1", file_name="Договор (исправлено).docx", applied=["a"],
+                                     skipped=[EditSkip(id="b", reason="Фрагмент не найден")])
+
+    h = DocumentEditHandler(Edits(), FakeDocs({"d1": DOC}))
+    req = BrainRequest(message="примени изменения к документу", document_id="d1", user_id="u1")
+    text = (await h.handle(req)).content
+    assert "Создан документ «Договор (исправлено).docx»" in text and "«статьёй 49» → «статьёй 36»" in text
+    assert "п. 6.1: Фрагмент не найден" in text
+    events = [e async for e in h.stream(req)]
+    assert [e.event for e in events] == ["thinking", RESULT_EVENT, None, "done"]
+
+
+async def test_pipeline_routes_edit_command_before_intent():
+    from app.pipeline.brain import BrainPipeline
+    from app.schemas import BrainRequest, BrainResponse
+
+    class Handler:
+        def matches(self, req):
+            return True
+
+        async def handle(self, req):
+            return BrainResponse(content="edited", tokens=0)
+
+    class Boom:
+        async def classify(self, *a):
+            raise AssertionError("intent must not run")
+
+    p = BrainPipeline(Boom(), Boom(), None, Handler())
+    assert (await p.answer(BrainRequest(message="примени правки", document_id="d1"))).content == "edited"

@@ -64,3 +64,21 @@ async def test_search_laws_reranks_and_add_tools_report():
     assert chunks[0]["text"] == "трудовой договор и оплата труда"
     out = await c.tools.call("addLawToUserGraph", {"graphId": "g", "code": "ТК РК"})
     assert out == "Закон ТК РК добавлен в граф."
+
+
+async def test_find_article_short_code_and_law_service_fallback():
+    c = make_container()
+    seen = []
+
+    async def failing_article(code, number, country):
+        seen.append(code)
+        raise RuntimeError("graphs-service: 500")
+
+    async def lookup(code, numbers, country, max_chars=None):
+        return [{"articleNumber": "36", "articleTitle": "Условие об испытательном сроке", "excerpt": "не более трёх"}]
+
+    c.graph.article = failing_article
+    c.laws.lookup_articles = lookup
+    out = await c.tools.call("findArticle", {"code": "ТК", "number": "36"})
+    assert seen == ["ТК РК"]
+    assert out.startswith("**Ст. 36 ТК РК — Условие об испытательном сроке**") and "не более трёх" in out
