@@ -2,7 +2,15 @@ package com.jvmd.documentservice.controller;
 
 import com.jvmd.documentservice.dto.DocumentStatusResponse;
 import com.jvmd.documentservice.dto.RetrievalChunkResponse;
+import com.jvmd.documentservice.edit.EditResult;
+import com.jvmd.documentservice.edit.TextEdit;
+import com.jvmd.documentservice.service.EditedCopyService;
+import com.jvmd.documentservice.service.StoredObject;
 import com.jvmd.documentservice.service.UserDocumentService;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import java.nio.charset.StandardCharsets;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -22,6 +30,12 @@ import java.util.Map;
 public class UserDocumentController {
 
     private final UserDocumentService userDocumentService;
+    private final EditedCopyService editedCopyService;
+
+    public record EditedCopyRequest(List<TextEdit> edits, String fileName) {}
+
+    public record EditedCopyResponse(String documentId, String fileName, String format, List<Integer> applied,
+                                     List<EditResult.Skipped> skipped) {}
 
     @GetMapping
     public ResponseEntity<Page<DocumentStatusResponse>> list(
@@ -95,6 +109,44 @@ public class UserDocumentController {
         try {
             userDocumentService.deleteDocument(documentId, userId);
             return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/{documentId}/edited-copy")
+    public ResponseEntity<?> editedCopy(
+            @PathVariable String documentId,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestBody EditedCopyRequest request) {
+        try {
+            EditedCopyService.Result r = editedCopyService.create(documentId, userId,
+                    request.edits(), request.fileName());
+            return ResponseEntity.ok(new EditedCopyResponse(r.documentId(), r.fileName(), r.format(),
+                    r.applied(), r.skipped()));
+        } catch (IllegalArgumentException e) {
+            log.warn("Edited copy of {} rejected: {}", documentId, e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("Edited copy of {} failed: {}", documentId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Could not create edited copy."));
+        }
+    }
+
+    @GetMapping("/{documentId}/file")
+    public ResponseEntity<byte[]> file(
+            @PathVariable String documentId,
+            @RequestHeader("X-User-Id") String userId) {
+        try {
+            StoredObject f = userDocumentService.loadFile(documentId, userId);
+            MediaType type = f.contentType() == null ? MediaType.APPLICATION_OCTET_STREAM
+                    : MediaType.parseMediaType(f.contentType());
+            return ResponseEntity.ok()
+                    .contentType(type)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
+                            .filename(f.fileName(), StandardCharsets.UTF_8).build().toString())
+                    .body(f.content());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
         }

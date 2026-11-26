@@ -67,6 +67,12 @@ public class UserDocumentService {
         return requireDocument(documentId, userId).getPlainText();
     }
 
+    public StoredObject loadFile(String documentId, String userId) {
+        UserDocument d = requireDocument(documentId, userId);
+        if (d.getStatus() == DocumentProcessingStatus.DELETED) throw new IllegalArgumentException("Document not found.");
+        return documentStorageService.load(d.getObjectName(), d.getFileName(), d.getContentType());
+    }
+
     public DocumentStatusResponse getStatus(String documentId, String userId) {
         return toStatus(requireDocument(documentId, userId));
     }
