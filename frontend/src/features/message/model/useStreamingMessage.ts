@@ -35,6 +35,7 @@ export interface EditProposal {
   verdict?: string;
   lawBasis?: string | null;
   source?: "rule" | "llm" | string;
+  page?: number | null;
 }
 
 export interface DocumentEditProposals {

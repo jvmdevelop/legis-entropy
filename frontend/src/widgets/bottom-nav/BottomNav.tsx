@@ -28,6 +28,24 @@ function IcTemplates() {
   )
 }
 
+function IcDocs() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 2.5h7l3.5 3.5V17a.5.5 0 0 1-.5.5H5a.5.5 0 0 1-.5-.5V3a.5.5 0 0 1 .5-.5z" />
+      <path d="M12 2.5V6h3.5M7.5 10h5M7.5 13h5" />
+    </svg>
+  )
+}
+
+function IcRules() {
+  return (
+    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 5h9M8 10h9M8 15h9" />
+      <path d="M3 5l1 1 2-2M3 10l1 1 2-2M3 15l1 1 2-2" />
+    </svg>
+  )
+}
+
 function IcScan() {
   return (
     <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="1.65" strokeLinecap="round" strokeLinejoin="round">
@@ -66,6 +84,18 @@ const NAV_ITEMS = [
     match: (p: string) => p.startsWith('/templates'),
   },
   {
+    icon: IcDocs,
+    label: 'документы',
+    href: '/documents',
+    match: (p: string) => p.startsWith('/documents'),
+  },
+  {
+    icon: IcRules,
+    label: 'правила',
+    href: '/playbooks',
+    match: (p: string) => p.startsWith('/playbooks'),
+  },
+  {
     icon: IcScan,
     label: 'скан',
     href: '/scan',
@@ -79,7 +109,10 @@ export function BottomNav() {
   const { logout, user } = useAuthStore()
 
   return (
-    <nav className="le-bottom-nav">
+    <nav
+      className="le-bottom-nav"
+      style={{ gridTemplateColumns: `repeat(${NAV_ITEMS.length + 1}, minmax(0, 1fr))` }}
+    >
       {NAV_ITEMS.map(({ icon: Icon, label, href, match }) => (
         <button
           key={href}

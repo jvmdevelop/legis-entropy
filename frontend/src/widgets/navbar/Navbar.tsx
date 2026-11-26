@@ -24,6 +24,8 @@ export function Navbar() {
   const isScan = location.pathname.startsWith('/scan')
   const isWatcher = location.pathname.startsWith('/watcher')
   const isTemplates = location.pathname.startsWith('/templates')
+  const isDocuments = location.pathname.startsWith('/documents')
+  const isPlaybooks = location.pathname.startsWith('/playbooks')
   const isAdmin = location.pathname.startsWith('/admin')
   const isWorkspaceArea = location.pathname.startsWith('/workspace/')
   const isGraph = isWorkspaceArea && !!params.graphId
@@ -94,7 +96,7 @@ export function Navbar() {
       {!isWorkspaceArea && !isMobile && (
         <nav className="le-tabs">
           <button
-            className={'le-tab' + (!isLaws && !isSearch && !isScan && !isWatcher && !isTemplates && !isAdmin ? ' le-tab--active' : '')}
+            className={'le-tab' + (!isLaws && !isSearch && !isScan && !isWatcher && !isTemplates && !isDocuments && !isPlaybooks && !isAdmin ? ' le-tab--active' : '')}
             onClick={() => navigate('/workspaces')}
           >
             пространства
@@ -110,6 +112,18 @@ export function Navbar() {
             onClick={() => navigate('/templates')}
           >
             шаблоны
+          </button>
+          <button
+            className={'le-tab' + (isDocuments ? ' le-tab--active' : '')}
+            onClick={() => navigate('/documents')}
+          >
+            документы
+          </button>
+          <button
+            className={'le-tab' + (isPlaybooks ? ' le-tab--active' : '')}
+            onClick={() => navigate('/playbooks')}
+          >
+            правила
           </button>
           <button
             className={'le-tab' + (isScan ? ' le-tab--active' : '')}

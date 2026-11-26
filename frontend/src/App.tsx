@@ -20,6 +20,9 @@ import ArticlePage from "@/pages/article/ArticlePage";
 import ConflictsPage from "@/pages/conflicts/ConflictsPage";
 import ContractScannerPage from "@/pages/contract-scan/ContractScannerPage";
 import TemplatesPage from "@/pages/templates/TemplatesPage";
+import DocumentsPage from "@/pages/documents/DocumentsPage";
+import DocumentViewerPage from "@/pages/documents/DocumentViewerPage";
+import PlaybooksPage from "@/pages/playbooks/PlaybooksPage";
 import AdminPage from "@/pages/admin/AdminPage";
 
 function AuthBootstrap({ children }: { children: ReactNode }) {
@@ -155,6 +158,36 @@ export default function App() {
                 <ProtectedRoute>
                   <MainLayout>
                     <TemplatesPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/documents"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <DocumentsPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/documents/:documentId"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <DocumentViewerPage />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/playbooks"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <PlaybooksPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

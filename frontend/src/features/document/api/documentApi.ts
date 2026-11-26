@@ -51,4 +51,13 @@ export const documentApi = {
       .get<{ text: string }>(`/user-documents/${documentId}/text`)
       .then((r) => r.data?.text ?? "");
   },
+
+  file(documentId: string) {
+    return apiClient
+      .get<Blob>(`/user-documents/${documentId}/file`, {
+        responseType: "blob",
+        timeout: 120_000,
+      })
+      .then((r) => r.data);
+  },
 };
