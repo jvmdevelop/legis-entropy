@@ -1,4 +1,8 @@
 spring:
+  http:
+    clients:
+      connect-timeout: 10s
+      read-timeout: 15m
   threads:
     virtual:
       enabled: true
@@ -8,6 +12,11 @@ spring:
     gateway:
       server:
         webmvc:
+          streaming-media-types:
+            - text/event-stream
+            - text/event-stream;charset=UTF-8
+            - application/x-ndjson
+          streaming-buffer-size: 1024
           globalcors:
             corsConfigurations:
               '[/**]':
