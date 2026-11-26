@@ -151,6 +151,10 @@ public class UserDocumentService {
                 .toList();
     }
 
+    public String extractText(MultipartFile file) {
+        return extractPlainText(file);
+    }
+
     private String extractPlainText(MultipartFile file) {
         try {
             StringBuilder text = new StringBuilder();

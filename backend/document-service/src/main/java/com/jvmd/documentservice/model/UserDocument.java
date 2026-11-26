@@ -46,6 +46,9 @@ public class UserDocument {
     @Column(name = "plain_text", columnDefinition = "TEXT")
     private String plainText;
 
+    @Column(name = "previous_object_name")
+    private String previousObjectName;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;

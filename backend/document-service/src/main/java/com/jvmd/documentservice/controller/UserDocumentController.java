@@ -134,6 +134,26 @@ public class UserDocumentController {
         }
     }
 
+    @PostMapping("/{documentId}/edits-in-place")
+    public ResponseEntity<?> editInPlace(
+            @PathVariable String documentId,
+            @RequestHeader("X-User-Id") String userId,
+            @RequestBody EditedCopyRequest request) {
+        try {
+            EditedCopyService.Result r = editedCopyService.applyInPlace(documentId, userId, request.edits());
+            return ResponseEntity.ok(new EditedCopyResponse(r.documentId(), r.fileName(), r.format(),
+                    r.applied(), r.skipped()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            log.error("In-place edit of {} failed: {}", documentId, e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Could not edit document."));
+        }
+    }
+
     @GetMapping("/{documentId}/pages")
     public ResponseEntity<Map<String, Object>> pages(
             @PathVariable String documentId,
