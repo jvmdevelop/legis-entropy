@@ -15,7 +15,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ArticleLookupService {
 
-    private static final int EXCERPT_CHARS = 600;
+    public static final int EXCERPT_CHARS = 600;
+    public static final int MAX_CHARS = 8000;
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -24,6 +25,11 @@ public class ArticleLookupService {
     public record ArticleTitle(String articleNumber, String articleTitle) {}
 
     public List<ArticleInfo> lookup(String lawCode, Collection<String> numbers, String country) {
+        return lookup(lawCode, numbers, country, EXCERPT_CHARS);
+    }
+
+    public List<ArticleInfo> lookup(String lawCode, Collection<String> numbers, String country, int maxChars) {
+        int limit = Math.max(1, Math.min(maxChars, MAX_CHARS));
         if (lawCode == null || lawCode.isBlank() || numbers == null || numbers.isEmpty()) {
             return List.of();
         }
@@ -40,15 +46,20 @@ public class ArticleLookupService {
                          COALESCE((metadata->>'chunk_index')::int, 0)
                 """, normalizedCountry(country), lawCode, String.join(",", numbers));
 
-        Map<String, ArticleInfo> byNumber = new LinkedHashMap<>();
+        Map<String, String> titles = new LinkedHashMap<>();
+        Map<String, StringBuilder> bodies = new LinkedHashMap<>();
         for (Map<String, Object> row : rows) {
             String num = (String) row.get("num");
-            if (byNumber.containsKey(num)) continue;
+            boolean first = !bodies.containsKey(num);
+            if (!first && limit <= EXCERPT_CHARS) continue;
             String title = (String) row.get("title");
-            byNumber.put(num, new ArticleInfo(lawCode, num, title == null ? "" : title,
-                    excerpt((String) row.get("content"))));
+            titles.putIfAbsent(num, title == null ? "" : title);
+            StringBuilder sb = bodies.computeIfAbsent(num, k -> new StringBuilder());
+            if (sb.length() < limit) sb.append(first ? "" : " ").append(body((String) row.get("content")));
         }
-        return new ArrayList<>(byNumber.values());
+        List<ArticleInfo> out = new ArrayList<>();
+        bodies.forEach((num, sb) -> out.add(new ArticleInfo(lawCode, num, titles.get(num), cut(sb.toString(), limit))));
+        return out;
     }
 
     public List<ArticleTitle> titles(String lawCode, String country) {
@@ -79,13 +90,16 @@ public class ArticleLookupService {
         }
     }
 
-    private static String excerpt(String content) {
+    private static String body(String content) {
         if (content == null) return "";
         String body = content;
         int newline = body.indexOf('\n');
         if (newline > 0 && newline < 300) body = body.substring(newline + 1);
-        body = body.strip().replaceAll("\\s+", " ");
-        return body.length() <= EXCERPT_CHARS ? body : body.substring(0, EXCERPT_CHARS) + "…";
+        return body.strip().replaceAll("\\s+", " ");
+    }
+
+    private static String cut(String body, int limit) {
+        return body.length() <= limit ? body : body.substring(0, limit) + "…";
     }
 
     private static String normalizedCountry(String country) {

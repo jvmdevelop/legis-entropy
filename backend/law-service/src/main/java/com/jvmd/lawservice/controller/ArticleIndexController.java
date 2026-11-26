@@ -52,11 +52,12 @@ public class ArticleIndexController {
     public List<ArticleLookupService.ArticleInfo> lookup(
             @RequestParam String lawCode,
             @RequestParam List<String> numbers,
-            @RequestParam(defaultValue = "RK") String country) {
+            @RequestParam(defaultValue = "RK") String country,
+            @RequestParam(defaultValue = "" + ArticleLookupService.EXCERPT_CHARS) int maxChars) {
         if (numbers.size() > 200) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "too many article numbers");
         }
-        return articleLookupService.lookup(lawCode, numbers, country);
+        return articleLookupService.lookup(lawCode, numbers, country, maxChars);
     }
 
     @GetMapping("/titles")
