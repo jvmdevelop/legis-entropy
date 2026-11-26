@@ -32,6 +32,7 @@ import { MessageSkeleton } from "@/shared/ui/Skeleton";
 import { cn } from "@/shared/lib/cn";
 import type { MessageResponse } from "@/entities/message/types";
 import { GraphView } from "@/widgets/graph-view";
+import { DocumentEditsCard } from "@/features/document-edits";
 
 type AttachedFileStatus = "READY" | "ERROR";
 
@@ -51,6 +52,7 @@ export function ChatWindow() {
     thinkingSteps,
     deepProgress,
     draftResult,
+    editProposals,
     startStream,
     cancelStream,
     reset: resetStream,
@@ -325,6 +327,16 @@ export function ChatWindow() {
 
             {draftResult && !isStreaming && (
               <DocumentDraftCard result={draftResult} />
+            )}
+
+            {editProposals && !isStreaming && (
+              <DocumentEditsCard
+                key={editProposals.documentId + editProposals.proposals.length}
+                data={editProposals}
+                onApplied={(documentId, name) =>
+                  setAttachedFile({ documentId, name, status: "READY" })
+                }
+              />
             )}
 
             {voiceMessages.length > 0 && (

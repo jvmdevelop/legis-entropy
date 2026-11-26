@@ -26,6 +26,23 @@ export interface DocumentDraftResult {
   lawCodes?: string[];
 }
 
+export interface EditProposal {
+  id: string;
+  clause: string;
+  original: string;
+  replacement: string;
+  reason?: string;
+  verdict?: string;
+  lawBasis?: string | null;
+  source?: "rule" | "llm" | string;
+}
+
+export interface DocumentEditProposals {
+  documentId: string;
+  summary?: string;
+  proposals: EditProposal[];
+}
+
 export interface StreamState {
   streamingContent: string;
   isStreaming: boolean;
@@ -33,6 +50,7 @@ export interface StreamState {
   thinkingSteps: ThinkingStep[];
   deepProgress: DeepAnalysisProgress[];
   draftResult: DocumentDraftResult | null;
+  editProposals: DocumentEditProposals | null;
 }
 
 export interface UseStreamingMessageReturn extends StreamState {
@@ -50,6 +68,8 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
   const [draftResult, setDraftResult] = useState<DocumentDraftResult | null>(
     null,
   );
+  const [editProposals, setEditProposals] =
+    useState<DocumentEditProposals | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const cancelStream = useCallback(() => {
@@ -65,6 +85,7 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
     setThinkingSteps([]);
     setDeepProgress([]);
     setDraftResult(null);
+    setEditProposals(null);
   }, []);
 
   const startStream = useCallback(async (req: ChatRequest): Promise<string> => {
@@ -77,6 +98,7 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
     setError(null);
     setThinkingSteps([]);
     setDeepProgress([]);
+    setEditProposals(null);
 
     const token = tokenStore.get();
     let fullContent = "";
@@ -125,6 +147,8 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
               tryAddDeepProgress(eventBuf, setDeepProgress);
             } else if (currentEventType === "document-draft-result") {
               trySetDraftResult(eventBuf, setDraftResult);
+            } else if (currentEventType === "document-edit-proposals") {
+              trySetEditProposals(eventBuf, setEditProposals);
             } else if (currentEventType === "redaction") {
               fullContent = eventBuf;
               setStreamingContent(eventBuf);
@@ -145,6 +169,8 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
           tryAddDeepProgress(eventBuf, setDeepProgress);
         } else if (currentEventType === "document-draft-result") {
           trySetDraftResult(eventBuf, setDraftResult);
+        } else if (currentEventType === "document-edit-proposals") {
+          trySetEditProposals(eventBuf, setEditProposals);
         } else if (currentEventType === "redaction") {
           fullContent = eventBuf;
           setStreamingContent(eventBuf);
@@ -175,6 +201,7 @@ export function useStreamingMessage(): UseStreamingMessageReturn {
     thinkingSteps,
     deepProgress,
     draftResult,
+    editProposals,
     startStream,
     cancelStream,
     reset,
@@ -188,6 +215,18 @@ function trySetDraftResult(
   try {
     const result: DocumentDraftResult = JSON.parse(raw.trim());
     setResult(result);
+  } catch {
+
+  }
+}
+
+function trySetEditProposals(
+  raw: string,
+  setResult: React.Dispatch<React.SetStateAction<DocumentEditProposals | null>>,
+) {
+  try {
+    const result: DocumentEditProposals = JSON.parse(raw.trim());
+    if (result?.proposals?.length) setResult(result);
   } catch {
 
   }
