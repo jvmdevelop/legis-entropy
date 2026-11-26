@@ -19,7 +19,7 @@ export function SelectionToolbar({ style, blocked, busy, onSubmit }: Props) {
       style={{
         ...style,
         fontFamily: SANS,
-        background: "var(--color-bg, #fff)",
+        background: "var(--color-bg)",
         border: "1px solid var(--color-border)",
         boxShadow: "0 8px 24px rgba(30,27,75,0.14)",
       }}

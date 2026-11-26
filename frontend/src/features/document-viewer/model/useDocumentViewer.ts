@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import { documentApi } from "@/features/document/api/documentApi";
-import { editsApi } from "@/features/document-edits/api/editsApi";
+import { editsApi, type ApplyOptions } from "@/features/document-edits/api/editsApi";
 import type { DocumentStatusResponse } from "@/entities/document/types";
 import type { EditProposal } from "@/features/message/model/useStreamingMessage";
 import { segmentText } from "../lib/segmentText";
@@ -19,6 +19,8 @@ export interface ViewerSuggestion {
 export interface AppliedResult {
   documentId: string;
   fileName: string | null;
+  message: string;
+  inPlace: boolean;
 }
 
 const PROCESSING = new Set(["UPLOADING", "INDEXING"]);
@@ -31,7 +33,9 @@ function uniqueId(id: string | undefined, taken: Set<string>): string {
   return candidate;
 }
 
-export function useDocumentViewer(documentId: string) {
+export function useDocumentViewer(documentId: string, applyOptions: ApplyOptions = {}) {
+  const inPlace = applyOptions.inPlace ?? false;
+  const graphId = applyOptions.graphId;
   const [doc, setDoc] = useState<DocumentStatusResponse | null>(null);
   const [text, setText] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -169,27 +173,31 @@ export function useDocumentViewer(documentId: string) {
       const res = await editsApi.apply(
         documentId,
         accepted.map((s) => s.proposal),
+        { inPlace, graphId },
       );
       if (!res.documentId) {
         toast.error("Ни одна правка не применена");
         return null;
       }
       const skipped = res.skipped?.length ?? 0;
-      toast.success(
-        `Применено правок: ${res.applied?.length ?? 0}` +
+      const message = res.inPlace
+        ? `Документ обновлён: применено правок ${res.applied?.length ?? 0}` +
+          (skipped ? `, пропущено ${skipped}` : "") +
+          (res.graphLinksRemoved ? `. Устаревших связей в графе убрано: ${res.graphLinksRemoved}` : "")
+        : `Применено правок: ${res.applied?.length ?? 0}` +
           (skipped ? `, пропущено: ${skipped}` : "") +
-          (res.fileName ? `. Создан «${res.fileName}»` : ""),
-      );
-      return { documentId: res.documentId, fileName: res.fileName };
+          (res.fileName ? `. Создан «${res.fileName}»` : "");
+      return { documentId: res.documentId, fileName: res.fileName, message, inPlace: !!res.inPlace };
     } catch {
       toast.error("Не удалось применить правки");
       return null;
     } finally {
       setApplying(false);
     }
-  }, [accepted, documentId]);
+  }, [accepted, documentId, inPlace, graphId]);
 
   return {
+    inPlace,
     doc,
     text,
     loadError,

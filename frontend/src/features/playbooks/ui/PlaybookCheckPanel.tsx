@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { Building2, Loader2, MapPin, ShieldCheck } from "lucide-react";
 import { playbooksApi, type Playbook, type PlaybookCheckResponse, type PlaybookRuleResult } from "../api/playbooksApi";
 import { STATUS_META, STATUS_ORDER } from "../lib/options";
-import { MONO, SANS, fieldStyle } from "./fieldStyle";
+import { MONO, fieldStyle } from "./fieldStyle";
 
 interface Props {
   documentId: string;
@@ -59,12 +59,12 @@ export function PlaybookCheckPanel({ documentId, onLocate }: Props) {
 
   return (
     <section
-      className="flex flex-col gap-3 rounded-2xl p-4 min-w-0"
-      style={{ fontFamily: SANS, background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.25)" }}
+      className="le-dv-card flex flex-col gap-3 min-w-0"
+      style={{ borderColor: "color-mix(in oklab, var(--color-info) 30%, var(--line))", boxShadow: "inset 3px 0 0 var(--color-info)" }}
     >
       <div className="flex items-center gap-2 flex-wrap">
         <Building2 size={14} style={{ color: POLICY, flexShrink: 0 }} />
-        <span style={{ fontFamily: MONO, fontSize: "10px", letterSpacing: "0.1em", color: POLICY, textTransform: "uppercase" }}>
+        <span className="le-section-head__label" style={{ color: POLICY }}>
           Внутренняя политика
         </span>
         <Link to="/playbooks" className="ml-auto text-xs" style={{ color: POLICY }}>
@@ -105,10 +105,9 @@ export function PlaybookCheckPanel({ documentId, onLocate }: Props) {
             type="button"
             onClick={() => void check()}
             disabled={checking || !selected}
-            className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs cursor-pointer disabled:opacity-60"
-            style={{ background: POLICY, color: "#fff" }}
+            className="le-btn le-btn--primary le-btn--full"
           >
-            {checking ? <Loader2 size={12} className="animate-spin" /> : <ShieldCheck size={12} />}
+            {checking ? <Loader2 className="animate-spin" /> : <ShieldCheck />}
             {checking ? "Проверяем… до 3 минут" : "Проверить"}
           </button>
         </div>

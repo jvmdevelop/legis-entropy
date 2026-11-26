@@ -2,7 +2,6 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { DocumentViewerModel, ViewerSuggestion } from "../model/useDocumentViewer";
 import type { DocumentStructureModel } from "../model/useDocumentStructure";
 import { layoutWithStructure, type LayoutItem } from "../lib/structureLayout";
-import { SANS } from "../lib/verdict";
 import { TextSegment } from "./TextSegment";
 import { ClauseAnchor, PageDivider } from "./StructureMarks";
 import { ProposalCard } from "./ProposalCard";
@@ -63,7 +62,10 @@ export function DocumentText({ model, structure }: Props) {
       setActiveId(null);
     };
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setActiveId(null);
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setActiveId(null);
+      }
     };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("keydown", onKey);
@@ -170,18 +172,7 @@ export function DocumentText({ model, structure }: Props) {
     <div
       ref={rootRef}
       data-dv-text=""
-      className="relative rounded-2xl px-4 py-5 sm:px-8 sm:py-7"
-      style={{
-        fontFamily: SANS,
-        fontSize: "14px",
-        lineHeight: 1.75,
-        color: "var(--color-text)",
-        background: "var(--color-bg, #fff)",
-        border: "1px solid var(--color-border)",
-        whiteSpace: "pre-wrap",
-        overflowWrap: "anywhere",
-        minWidth: 0,
-      }}
+      className="le-dv-paper"
       onMouseUp={() => setTimeout(evaluate, 0)}
       onPointerDown={() => setSelection(null)}
     >
@@ -208,7 +199,7 @@ export function DocumentText({ model, structure }: Props) {
             left: popPos.left,
             width: popPos.width,
             whiteSpace: "normal",
-            background: "var(--color-bg, #fff)",
+            background: "var(--color-bg)",
             border: "1px solid var(--color-border)",
             boxShadow: "0 12px 32px rgba(30,27,75,0.16)",
           }}

@@ -1,26 +1,17 @@
 import { ListTree, Loader2 } from "lucide-react";
 import type { DocumentStructureModel } from "../model/useDocumentStructure";
-import { MONO, SANS } from "../lib/verdict";
+import { MONO } from "../lib/verdict";
 
 export function StructurePanel({ structure }: { structure: DocumentStructureModel }) {
   const { loading, failed, clauses, pages, typeStats, typeFilter } = structure;
 
   return (
     <section
-      className="flex flex-col gap-3 rounded-2xl p-4 min-w-0"
-      style={{ fontFamily: SANS, background: "var(--color-surface)", border: "1px solid var(--color-border)" }}
+      className="le-dv-card flex flex-col gap-3 min-w-0"
     >
       <div className="flex items-center gap-2">
         <ListTree size={14} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
-        <span
-          style={{
-            fontFamily: MONO,
-            fontSize: "10px",
-            letterSpacing: "0.1em",
-            color: "var(--color-accent)",
-            textTransform: "uppercase",
-          }}
-        >
+        <span className="le-section-head__label" style={{ color: "var(--purple)" }}>
           Структура договора
         </span>
       </div>
@@ -63,7 +54,7 @@ export function StructurePanel({ structure }: { structure: DocumentStructureMode
                       fontSize: "10px",
                       lineHeight: "18px",
                       color: "var(--color-accent)",
-                      background: "rgba(139,92,246,0.10)",
+                      background: "var(--purple-tint)",
                     }}
                   >
                     {t.count}

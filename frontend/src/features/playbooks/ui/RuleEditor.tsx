@@ -2,13 +2,13 @@ import type { ReactNode } from "react";
 import { Trash2 } from "lucide-react";
 import { CLAUSE_TYPES, CLAUSE_TYPE_LABEL, MODALITY_LABEL, PARTIES } from "@/entities/clause/labels";
 import type { PlaybookRule, RuleKind, RuleModality } from "../api/playbooksApi";
-import { MONO, SANS, fieldStyle } from "./fieldStyle";
+import { fieldStyle } from "./fieldStyle";
 import { RULE_KINDS, RULE_KIND_HINT, RULE_KIND_LABEL, ruleError } from "../lib/options";
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <label className="flex flex-col gap-1 min-w-0" style={{ fontFamily: SANS }}>
-      <span style={{ fontFamily: MONO, fontSize: "10px", color: "var(--color-text-muted)" }}>{label}</span>
+    <label className="le-pb-field">
+      <span className="le-pb-field__label">{label}</span>
       {children}
     </label>
   );
@@ -30,32 +30,23 @@ export function RuleEditor({ index, rule, readOnly, showErrors, onChange, onRemo
   const typeOptions = CLAUSE_TYPES.filter((c) => c !== "OTHER");
 
   return (
-    <div
-      className="flex flex-col gap-2.5 rounded-xl p-3 min-w-0"
-      style={{
-        background: "var(--color-surface)",
-        border: `1px solid ${error ? "var(--color-error)" : "var(--color-border)"}`,
-      }}
-    >
-      <div className="flex items-center gap-2">
-        <span style={{ fontFamily: MONO, fontSize: "10px", color: "var(--color-text-muted)" }}>
-          правило {index + 1}
-        </span>
+    <div className={"le-pb-rule" + (error ? " le-pb-rule--error" : "")}>
+      <div className="le-pb-rule__head">
+        <span className="le-pb-rule__index">правило {index + 1}</span>
         {!readOnly && (
           <button
             type="button"
             onClick={onRemove}
             aria-label="Удалить правило"
             title="Удалить правило"
-            className="ml-auto cursor-pointer"
-            style={{ color: "var(--color-text-muted)" }}
+            className="le-pb-rule__remove"
           >
-            <Trash2 size={13} />
+            <Trash2 size={14} />
           </button>
         )}
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-2 min-w-0">
+      <div className="le-pb-grid">
         <Field label="Тип правила">
           <select
             value={kind}
@@ -158,9 +149,7 @@ export function RuleEditor({ index, rule, readOnly, showErrors, onChange, onRemo
         />
       </Field>
 
-      <span style={{ fontSize: "11px", color: error ? "var(--color-error)" : "var(--color-text-muted)" }}>
-        {error ?? RULE_KIND_HINT[kind]}
-      </span>
+      <span className={"le-pb-hint" + (error ? " le-pb-hint--error" : "")}>{error ?? RULE_KIND_HINT[kind]}</span>
     </div>
   );
 }

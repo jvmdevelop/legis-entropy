@@ -10,6 +10,7 @@ import { CommentViewerOverlay } from "@/features/comment";
 import { GeneratedDocumentViewer } from "@/features/template/ui/GeneratedDocumentViewer";
 import { generatedDocumentApi } from "@/features/template/api/templateApi";
 import type { GeneratedDocumentDTO } from "@/entities/template";
+import { DocumentReviewModal } from "@/widgets/document-reviewer";
 
 interface Props {
   state: WorkspaceShellState;
@@ -279,6 +280,11 @@ export default function WorkspaceShellDesktop({ state }: Props) {
     compareResult,
     toggleCompare,
     runCompare,
+    refreshContent,
+    reviewDoc,
+    canReview,
+    openReview,
+    closeReview,
   } = state;
 
   const [situationsOpen, setSituationsOpen] = useState(false);
@@ -303,7 +309,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.ctrlKey || e.metaKey || e.altKey || reviewDoc) return;
       const t = e.target as HTMLElement | null;
       if (t) {
         const tag = t.tagName;
@@ -334,7 +340,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [graphId, analyzeSelected]);
+  }, [graphId, analyzeSelected, reviewDoc]);
 
   function closeSituations() {
     setSituationsOpen(false);
@@ -466,6 +472,7 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                 onToggleVoicePlayback={toggleVoicePlayback}
                 playingVoiceId={playingVoiceId}
                 onOpenComment={(node) => setOpenCommentId(node.id)}
+                onOpenNode={openReview}
               />
 
               {compareNodes.length > 0 && (
@@ -608,6 +615,19 @@ export default function WorkspaceShellDesktop({ state }: Props) {
                         title="Глубокий анализ выделенного (A)"
                       >
                         ✦ ИИ-анализ
+                      </button>
+                    )}
+                    {canReview(selectedNode) && (
+                      <button
+                        className="le-rpanel__analyze"
+                        style={{
+                          background: "var(--purple-tint)",
+                          color: "var(--purple)",
+                        }}
+                        onClick={() => openReview(selectedNode)}
+                        title="Открыть ИИ-ревью документа (двойной клик по узлу)"
+                      >
+                        ✦ проверить документ
                       </button>
                     )}
                     {((selectedNode.kind === "SITUATION" &&
@@ -1048,6 +1068,16 @@ export default function WorkspaceShellDesktop({ state }: Props) {
             </div>
           </div>
         </div>
+      )}
+
+      {reviewDoc && (
+        <DocumentReviewModal
+          documentId={reviewDoc.id}
+          title={reviewDoc.label}
+          graphId={graphId}
+          onClose={closeReview}
+          onApplied={() => void refreshContent()}
+        />
       )}
 
       {compareOpen && (

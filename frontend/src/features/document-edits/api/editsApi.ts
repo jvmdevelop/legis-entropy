@@ -11,6 +11,13 @@ export interface EditApplyResponse {
   fileName: string | null;
   applied: string[];
   skipped: EditSkip[];
+  inPlace?: boolean;
+  graphLinksRemoved?: number | null;
+}
+
+export interface ApplyOptions {
+  inPlace?: boolean;
+  graphId?: string;
 }
 
 export interface EditSuggestResponse {
@@ -44,11 +51,11 @@ export const editsApi = {
       .then((r) => r.data);
   },
 
-  apply(documentId: string, proposals: EditProposal[]) {
+  apply(documentId: string, proposals: EditProposal[], options: ApplyOptions = {}) {
     return apiClient
       .post<EditApplyResponse>(
         `${base(documentId)}/apply`,
-        { proposals },
+        { proposals, inPlace: options.inPlace ?? false, graphId: options.graphId },
         { timeout: 120_000 },
       )
       .then((r) => r.data);

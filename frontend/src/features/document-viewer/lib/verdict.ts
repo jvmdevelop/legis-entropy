@@ -1,5 +1,5 @@
-export const MONO = "'IBM Plex Mono', monospace";
-export const SANS = "'IBM Plex Sans', sans-serif";
+export const MONO = "var(--mono)";
+export const SANS = "var(--mono)";
 
 export const VERDICT_LABEL: Record<string, string> = {
   WRONG_ARTICLE: "ошибочная ссылка",
@@ -18,7 +18,7 @@ export interface VerdictTone {
 const RED: VerdictTone = { color: "var(--color-error)", background: "rgba(239,68,68,0.12)" };
 const AMBER: VerdictTone = { color: "var(--color-warning)", background: "rgba(245,158,11,0.16)" };
 const MUTED: VerdictTone = { color: "var(--color-text-muted)", background: "rgba(91,84,112,0.10)" };
-const ACCENT: VerdictTone = { color: "var(--color-accent)", background: "rgba(139,92,246,0.12)" };
+const ACCENT: VerdictTone = { color: "var(--color-accent)", background: "var(--purple-tint)" };
 
 export function verdictTone(verdict?: string | null): VerdictTone {
   switch (verdict) {

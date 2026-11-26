@@ -55,6 +55,8 @@ interface GraphCanvasProps {
   playingVoiceId?: string | null;
 
   onOpenComment?: (node: UserGraphNode) => void;
+
+  onOpenNode?: (node: UserGraphNode) => void;
 }
 
 class CanvasErrorBoundary extends Component<
@@ -115,12 +117,14 @@ function GraphCanvasInner({
   onToggleVoicePlayback,
   playingVoiceId,
   onOpenComment,
+  onOpenNode,
 }: GraphCanvasProps) {
   const compareSet = useMemo(() => new Set(compareIds), [compareIds]);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const fgRef = useRef<any>(null);
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const lastClickRef = useRef<{ id: string; at: number } | null>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
 
   useEffect(() => {
@@ -208,6 +212,14 @@ function GraphCanvasInner({
         onToggleCompare?.(userNode);
         return;
       }
+      const now = Date.now();
+      const last = lastClickRef.current;
+      lastClickRef.current = { id, at: now };
+      if (onOpenNode && last && last.id === id && now - last.at < 400) {
+        lastClickRef.current = null;
+        onOpenNode(userNode);
+        return;
+      }
       setSelectedId(id);
       onSelectNode?.(userNode);
       if (node.kind === "SITUATION" && onEditSituation) {
@@ -234,6 +246,7 @@ function GraphCanvasInner({
       onEditSituation,
       onToggleVoicePlayback,
       onOpenComment,
+      onOpenNode,
     ],
   );
 

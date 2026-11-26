@@ -118,7 +118,7 @@ export function ProposalCard({ item, onAccept, onReject, onReset, onClose }: Pro
               style={{
                 fontFamily: SANS,
                 color: "var(--color-accent)",
-                border: "1px solid rgba(139,92,246,0.3)",
+                border: "1px solid color-mix(in oklab, var(--purple) 35%, transparent)",
               }}
             >
               <Undo2 size={12} /> Отменить

@@ -4,8 +4,6 @@ import { toast } from "sonner";
 import { BookCopy, ListChecks, Loader2, Plus } from "lucide-react";
 import { PlaybookEditor, newRule, playbooksApi, type Playbook } from "@/features/playbooks";
 
-const MONO = "'IBM Plex Mono', monospace";
-const SANS = "'IBM Plex Sans', sans-serif";
 
 interface Editing {
   key: string;
@@ -86,25 +84,24 @@ export default function PlaybooksPage() {
   const activeId = editing?.playbook.id;
 
   return (
-    <div className="flex-1 min-w-0 overflow-y-auto overflow-x-hidden" style={{ fontFamily: SANS }}>
-      <div className="mx-auto flex flex-col gap-4 min-w-0" style={{ maxWidth: 1100 }}>
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex flex-col min-w-0">
-            <h1 style={{ fontSize: 20, fontWeight: 600, margin: 0, color: "var(--color-text)" }}>
-              Правила организации
-            </h1>
-            <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>
-              Внутренние требования к договорам. Это не нормы закона — их проверяет ИИ на странице документа.
-            </span>
+    <div className="le-dv-scroll">
+      <div className="le-dv le-dv-page" style={{ maxWidth: 1100 }}>
+        <div className="le-cpage__hero">
+          <div className="le-cpage__hero-icon">
+            <ListChecks />
           </div>
-          <button
-            type="button"
-            onClick={() => open(blank())}
-            className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs cursor-pointer"
-            style={{ background: "var(--color-accent)", color: "#fff" }}
-          >
-            <Plus size={12} /> Новый набор
-          </button>
+          <div className="le-cpage__hero-text">
+            <div className="le-cpage__eyebrow">внутренняя политика</div>
+            <h1 className="le-cpage__title">Правила организации</h1>
+            <p className="le-cpage__sub">
+              внутренние требования к договорам — это не нормы закона; их проверяет ИИ на странице документа
+            </p>
+          </div>
+          <div className="le-cpage__hero-actions">
+            <button type="button" className="le-btn le-btn--primary" onClick={() => open(blank())}>
+              <Plus /> новый набор
+            </button>
+          </div>
         </div>
 
         <div className="grid gap-4 min-w-0 lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start">
@@ -138,8 +135,8 @@ export default function PlaybooksPage() {
 
           <div
             ref={editorRef}
-            className="rounded-2xl p-4 min-w-0"
-            style={{ background: "var(--color-bg, #fff)", border: "1px solid var(--color-border)", scrollMarginTop: 8 }}
+            className="le-dv-card min-w-0"
+            style={{ scrollMarginTop: 8 }}
           >
             {editing ? (
               <PlaybookEditor
@@ -174,45 +171,28 @@ interface ListProps {
 function PlaybookList({ title, icon, items, activeId, empty, onOpen, onCopy }: ListProps) {
   return (
     <section className="flex flex-col gap-2 min-w-0">
-      <span
-        className="flex items-center gap-1.5"
-        style={{ fontFamily: MONO, fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--color-accent)" }}
-      >
-        {icon} {title} · {items.length}
-      </span>
+      <div className="le-section-head le-section-head--accent">
+        {icon}
+        <span className="le-section-head__label">{title}</span>
+        <span className="le-section-head__count">{items.length}</span>
+      </div>
       {items.length === 0 ? (
         <span style={{ fontSize: 12, color: "var(--color-text-muted)" }}>{empty}</span>
       ) : (
-        <ul className="flex flex-col gap-1.5 m-0 p-0" style={{ listStyle: "none" }}>
+        <ul className="le-pb-list">
           {items.map((p) => (
-            <li
-              key={p.id}
-              className="flex items-center gap-2 rounded-xl px-3 py-2 min-w-0"
-              style={{
-                background: "var(--color-surface)",
-                border: `1px solid ${p.id === activeId ? "var(--color-accent)" : "var(--color-border)"}`,
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => onOpen(p)}
-                className="flex flex-col min-w-0 flex-1 text-left cursor-pointer"
-              >
-                <span className="truncate" style={{ fontSize: 13, color: "var(--color-text)" }}>
-                  {p.name || "Без названия"}
-                </span>
-                <span style={{ fontFamily: MONO, fontSize: 10, color: "var(--color-text-muted)" }}>
-                  правил: {p.rules.length}
-                </span>
+            <li key={p.id} className={"le-pb-row" + (p.id === activeId ? " le-pb-row--active" : "")}>
+              <button type="button" onClick={() => onOpen(p)} className="le-pb-row__main">
+                <span className="le-pb-row__name">{p.name || "Без названия"}</span>
+                <span className="le-pb-row__meta">правил: {p.rules.length}</span>
               </button>
               {onCopy && (
                 <button
                   type="button"
                   onClick={() => onCopy(p)}
-                  className="shrink-0 rounded-lg px-2 py-1 text-xs cursor-pointer"
-                  style={{ color: "var(--color-accent)", border: "1px solid rgba(139,92,246,0.3)" }}
+                  className="le-btn le-btn--ghost le-pb-row__action"
                 >
-                  Создать из шаблона
+                  из шаблона
                 </button>
               )}
             </li>

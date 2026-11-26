@@ -18,23 +18,13 @@ export function SuggestionsPanel({ model, onFocus, onApply }: Props) {
   return (
     <aside
       data-dv-panel=""
-      className="flex flex-col gap-3 rounded-2xl p-4 min-w-0"
-      style={{
-        fontFamily: SANS,
-        background: "var(--color-surface)",
-        border: "1px solid var(--color-border)",
-      }}
+      className="le-dv-card flex flex-col gap-3 min-w-0"
     >
       <div className="flex items-center gap-2">
         <FilePen size={14} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
         <span
-          style={{
-            fontFamily: MONO,
-            fontSize: "10px",
-            letterSpacing: "0.1em",
-            color: "var(--color-accent)",
-            textTransform: "uppercase",
-          }}
+          className="le-section-head__label"
+          style={{ color: "var(--purple)" }}
         >
           ИИ-ассистент · {items.length}
         </span>
@@ -44,10 +34,9 @@ export function SuggestionsPanel({ model, onFocus, onApply }: Props) {
         type="button"
         onClick={() => void model.check()}
         disabled={checking || model.text === null}
-        className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-        style={{ fontFamily: SANS, background: "var(--color-accent)", color: "#fff" }}
+        className="le-btn le-btn--primary le-btn--full"
       >
-        {checking ? <Loader2 size={12} className="animate-spin" /> : <ScanSearch size={12} />}
+        {checking ? <Loader2 className="animate-spin" /> : <ScanSearch />}
         {checking ? "Проверяем документ…" : checked ? "Проверить ИИ ещё раз" : "Проверить ИИ"}
       </button>
       {checking && (
@@ -64,7 +53,7 @@ export function SuggestionsPanel({ model, onFocus, onApply }: Props) {
             lineHeight: 1.55,
             whiteSpace: "pre-wrap",
             overflowWrap: "anywhere",
-            background: "var(--color-bg, #fff)",
+            background: "var(--bg)",
             border: "1px solid var(--color-border)",
             color: "var(--color-text)",
           }}
@@ -106,15 +95,16 @@ export function SuggestionsPanel({ model, onFocus, onApply }: Props) {
           type="button"
           onClick={onApply}
           disabled={applying || accepted.length === 0}
-          className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{ fontFamily: SANS, background: "var(--color-success)", color: "#fff" }}
+          className="le-btn le-btn--primary le-btn--full"
         >
-          {applying ? <Loader2 size={12} className="animate-spin" /> : <Check size={12} />}
+          {applying ? <Loader2 className="animate-spin" /> : <Check />}
           Применить принятые ({accepted.length})
         </button>
         <span style={{ fontSize: "11px", color: "var(--color-text-muted)" }}>
           {pending > 0 ? `Ожидают решения: ${pending}. ` : ""}
-          Исправленный документ сохранится отдельной копией — оригинал не изменится.
+          {model.inPlace
+            ? "Правки будут внесены в сам документ — он обновится в графе."
+            : "Исправленный документ сохранится отдельной копией — оригинал не изменится."}
         </span>
       </div>
     </aside>
@@ -141,7 +131,7 @@ function SuggestionRow({ item, active, missing, onFocus, onAccept, onReject, onR
     <li
       className="flex gap-2 rounded-xl p-2.5"
       style={{
-        background: "var(--color-bg, #fff)",
+        background: "var(--bg)",
         border: `1px solid ${active ? tone.color : "var(--color-border)"}`,
         borderLeft: `3px solid ${item.status === "accepted" ? "var(--color-success)" : tone.color}`,
         opacity: dim ? 0.55 : 1,
@@ -202,7 +192,7 @@ function SuggestionRow({ item, active, missing, onFocus, onAccept, onReject, onR
             aria-label="Отменить решение"
             title="Отменить решение"
             className={iconBtn}
-            style={{ color: "var(--color-accent)", background: "rgba(139,92,246,0.10)" }}
+            style={{ color: "var(--color-accent)", background: "var(--purple-tint)" }}
           >
             <Undo2 size={13} />
           </button>

@@ -52,8 +52,8 @@ export function ClauseAnchor({ index, clause, open, dim, onToggle }: AnchorProps
                 fontSize: "9.5px",
                 lineHeight: "16px",
                 color: "var(--color-accent)",
-                background: "rgba(139,92,246,0.10)",
-                border: t.source === "llm" ? "1px dashed rgba(139,92,246,0.45)" : "1px solid transparent",
+                background: "var(--purple-tint)",
+                border: t.source === "llm" ? "1px dashed color-mix(in oklab, var(--purple) 35%, transparent)" : "1px solid transparent",
               }}
             >
               {t.label}

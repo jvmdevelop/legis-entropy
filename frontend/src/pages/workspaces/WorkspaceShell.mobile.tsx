@@ -9,6 +9,7 @@ import {
 } from "./useWorkspaceShell";
 import { I } from "./wsIcons";
 import { SituationsPanel } from "@/features/situation";
+import { DocumentReviewModal } from "@/widgets/document-reviewer";
 
 interface Props {
   state: WorkspaceShellState;
@@ -66,6 +67,11 @@ export default function WorkspaceShellMobile({ state }: Props) {
     compareResult,
     toggleCompare,
     runCompare,
+    refreshContent,
+    reviewDoc,
+    canReview,
+    openReview,
+    closeReview,
   } = state;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -158,6 +164,7 @@ export default function WorkspaceShellMobile({ state }: Props) {
                 setActiveMobileTab("situations");
                 setMobileEditSitId(node.id);
               }}
+              onOpenNode={openReview}
             />
 
             {compareNodes.length > 0 && (
@@ -209,6 +216,17 @@ export default function WorkspaceShellMobile({ state }: Props) {
                     {selectedNode.label}
                   </div>
                 </div>
+                {canReview(selectedNode) && (
+                  <button
+                    className="le-m-iconbtn"
+                    onClick={() => openReview(selectedNode)}
+                    title="проверить документ"
+                    aria-label="проверить документ"
+                    style={{ color: "var(--purple)" }}
+                  >
+                    <I.ai />
+                  </button>
+                )}
                 <button
                   className="le-m-iconbtn le-m-iconbtn--danger"
                   onClick={removeSelected}
@@ -744,6 +762,15 @@ export default function WorkspaceShellMobile({ state }: Props) {
             </div>
           </div>
         </div>
+      )}
+      {reviewDoc && (
+        <DocumentReviewModal
+          documentId={reviewDoc.id}
+          title={reviewDoc.label}
+          graphId={graphId}
+          onClose={closeReview}
+          onApplied={() => void refreshContent()}
+        />
       )}
     </div>
   );

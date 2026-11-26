@@ -4,10 +4,8 @@ import { toast } from "sonner";
 import { FileText, Loader2, RefreshCw, Upload } from "lucide-react";
 import { documentApi } from "@/features/document/api/documentApi";
 import type { DocumentStatusResponse } from "@/entities/document/types";
-import { docId, formatDate, statusMeta } from "./documentMeta";
+import { docId, formatDate, statusMeta } from "@/entities/document/meta";
 
-const MONO = "'IBM Plex Mono', monospace";
-const SANS = "'IBM Plex Sans', sans-serif";
 const PROCESSING = new Set(["UPLOADING", "INDEXING"]);
 
 export default function DocumentsPage() {
@@ -63,30 +61,29 @@ export default function DocumentsPage() {
   };
 
   return (
-    <div className="flex-1 min-w-0 overflow-y-auto" style={{ fontFamily: SANS }}>
-      <div className="mx-auto flex flex-col gap-4" style={{ maxWidth: 960 }}>
-        <div className="flex items-center gap-3 flex-wrap">
-          <h1 style={{ fontSize: 20, fontWeight: 600, margin: 0, color: "var(--color-text)" }}>
-            Документы
-          </h1>
-          <div className="ml-auto flex gap-2">
-            <button
-              type="button"
-              onClick={() => void reload()}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs cursor-pointer"
-              style={{ border: "1px solid var(--color-border)", color: "var(--color-text-muted)" }}
-            >
-              <RefreshCw size={12} /> Обновить
+    <div className="le-dv-scroll">
+      <div className="le-dv le-dv-page le-dv-page--narrow">
+        <div className="le-cpage__hero">
+          <div className="le-cpage__hero-icon">
+            <FileText />
+          </div>
+          <div className="le-cpage__hero-text">
+            <div className="le-cpage__eyebrow">мои документы</div>
+            <h1 className="le-cpage__title">Документы</h1>
+            <p className="le-cpage__sub">откройте договор, чтобы проверить его с ИИ-ассистентом и внести правки</p>
+          </div>
+          <div className="le-cpage__hero-actions">
+            <button type="button" className="le-btn" onClick={() => void reload()}>
+              <RefreshCw /> обновить
             </button>
             <button
               type="button"
+              className="le-btn le-btn--primary"
               onClick={() => inputRef.current?.click()}
               disabled={uploadPct !== null}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs cursor-pointer disabled:opacity-60"
-              style={{ background: "var(--color-accent)", color: "#fff" }}
             >
-              {uploadPct !== null ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
-              {uploadPct !== null ? `Загрузка ${uploadPct}%` : "Загрузить"}
+              {uploadPct !== null ? <Loader2 className="animate-spin" /> : <Upload />}
+              {uploadPct !== null ? `загрузка ${uploadPct}%` : "загрузить"}
             </button>
             <input
               ref={inputRef}
@@ -102,52 +99,46 @@ export default function DocumentsPage() {
           </div>
         </div>
 
-        {loading ? (
-          <div className="flex items-center gap-2 text-xs" style={{ color: "var(--color-text-muted)" }}>
-            <Loader2 size={14} className="animate-spin" /> Загрузка…
-          </div>
-        ) : docs.length === 0 ? (
-          <p style={{ fontSize: 13, color: "var(--color-text-muted)" }}>
-            Документов пока нет. Загрузите договор, чтобы проверить его с ИИ-ассистентом.
-          </p>
-        ) : (
-          <ul className="flex flex-col gap-2 m-0 p-0" style={{ listStyle: "none" }}>
-            {docs.map((d) => {
-              const id = docId(d);
-              const st = statusMeta(d.status);
-              return (
-                <li key={id}>
-                  <Link
-                    to={`/documents/${id}`}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 min-w-0"
-                    style={{
-                      background: "var(--color-bg, #fff)",
-                      border: "1px solid var(--color-border)",
-                      color: "var(--color-text)",
-                      textDecoration: "none",
-                    }}
-                  >
-                    <FileText size={16} style={{ color: "var(--color-accent)", flexShrink: 0 }} />
-                    <span className="flex flex-col min-w-0 flex-1">
-                      <span className="truncate" style={{ fontSize: 13, fontWeight: 500 }}>
-                        {d.fileName || "Без названия"}
-                      </span>
-                      <span style={{ fontFamily: MONO, fontSize: 10, color: "var(--color-text-muted)" }}>
-                        {formatDate(d.createdAt)}
-                      </span>
-                    </span>
-                    <span
-                      className="shrink-0 rounded-lg px-2 py-0.5"
-                      style={{ fontFamily: MONO, fontSize: 10, color: st.color, border: `1px solid ${st.color}` }}
-                    >
-                      {st.label}
-                    </span>
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
+        <div className="le-cpage__body">
+          {loading ? (
+            <div className="flex items-center gap-2" style={{ fontSize: 12, color: "var(--dim)" }}>
+              <Loader2 size={14} className="animate-spin" /> загрузка…
+            </div>
+          ) : docs.length === 0 ? (
+            <p className="le-dv-hint">Документов пока нет. Загрузите договор, чтобы проверить его с ИИ-ассистентом.</p>
+          ) : (
+            <>
+              <div className="le-section-head">
+                <span className="le-section-head__label">файлы</span>
+                <span className="le-section-head__count">{docs.length}</span>
+              </div>
+              <ul className="le-dv-list">
+                {docs.map((d) => {
+                  const id = docId(d);
+                  const st = statusMeta(d.status);
+                  return (
+                    <li key={id}>
+                      <Link to={`/documents/${id}`} className="le-rcard">
+                        <div className="le-rcard__head">
+                          <span className="le-rcard__lhs min-w-0">
+                            <FileText size={14} style={{ color: "var(--purple)", flexShrink: 0 }} />
+                            <span className="le-rcard__title truncate">{d.fileName || "Без названия"}</span>
+                          </span>
+                          <span className={"le-badge " + st.badge}>{st.label}</span>
+                        </div>
+                        <div className="le-rcard__meta">
+                          <span>{formatDate(d.createdAt)}</span>
+                          <span className="le-rcard__sep">·</span>
+                          <span className="le-rcard__open">открыть</span>
+                        </div>
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

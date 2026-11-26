@@ -92,6 +92,8 @@ export function useWorkspaceShell() {
   const [compareLoading, setCompareLoading] = useState(false);
   const [compareResult, setCompareResult] = useState("");
 
+  const [reviewDoc, setReviewDoc] = useState<{ id: string; label: string } | null>(null);
+
   async function loadShell() {
     if (!workspaceId) return;
     setLoading(true);
@@ -596,6 +598,16 @@ export function useWorkspaceShell() {
     }
   }
 
+  const canReview = (node: UserGraphNode | null | undefined): node is UserGraphNode =>
+    !!node && node.kind === "DOCUMENT" && node.type !== "GENERATED";
+
+  const openReview = useCallback((node?: UserGraphNode | null) => {
+    if (!node || node.kind !== "DOCUMENT" || node.type === "GENERATED") return;
+    setReviewDoc({ id: node.id, label: node.label });
+  }, []);
+
+  const closeReview = useCallback(() => setReviewDoc(null), []);
+
   const toggleCompare = useCallback((node: UserGraphNode) => {
     setCompareNodes((prev) => {
       if (prev.some((n) => n.id === node.id))
@@ -708,6 +720,11 @@ export function useWorkspaceShell() {
     handleVoiceAnalyzed,
 
     refreshContent,
+
+    reviewDoc,
+    canReview,
+    openReview,
+    closeReview,
 
     compareNodes,
     setCompareNodes,

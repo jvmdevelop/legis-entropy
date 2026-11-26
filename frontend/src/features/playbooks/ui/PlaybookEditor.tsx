@@ -86,8 +86,7 @@ export function PlaybookEditor({ initial, onSave, onDelete, onCopy }: Props) {
           <button
             type="button"
             onClick={() => setDraft({ ...draft, rules: [...draft.rules, newRule()] })}
-            className={btn + " self-start"}
-            style={{ color: "var(--color-accent)", border: "1px dashed rgba(139,92,246,0.45)" }}
+            className="le-btn le-btn--ghost self-start"
           >
             <Plus size={12} /> Добавить правило
           </button>
@@ -101,8 +100,7 @@ export function PlaybookEditor({ initial, onSave, onDelete, onCopy }: Props) {
           <button
             type="button"
             onClick={() => onCopy(draft)}
-            className={btn}
-            style={{ background: "var(--color-accent)", color: "#fff" }}
+            className="le-btn le-btn--primary"
           >
             <Copy size={12} /> Создать из шаблона
           </button>
@@ -111,8 +109,7 @@ export function PlaybookEditor({ initial, onSave, onDelete, onCopy }: Props) {
             type="button"
             onClick={() => void save()}
             disabled={saving}
-            className={btn}
-            style={{ background: "var(--color-accent)", color: "#fff" }}
+            className="le-btn le-btn--primary"
           >
             {saving ? <Loader2 size={12} className="animate-spin" /> : <Save size={12} />}
             Сохранить
