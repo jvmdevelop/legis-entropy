@@ -1,3 +1,5 @@
+import json
+
 import httpx
 import pytest
 
@@ -90,3 +92,38 @@ async def test_audit_failure_is_not_fatal():
 
     assert await make_backend(handler).audit("tg-1", "doc-1", 10) is None
     assert await make_backend(lambda r: httpx.Response(500)).audit("tg-1", "doc-1", 10) is None
+
+
+async def test_review_apply_and_download_fixed_document():
+    calls = []
+
+    def handler(request: httpx.Request):
+        calls.append((request.method, request.url.path, request.headers["X-User-Id"]))
+        if request.url.path.endswith("/edits/suggest"):
+            return httpx.Response(200, json={"markdown": "### Проверка", "problems": 2,
+                                             "proposals": [{"id": "a", "clause": "3.1"}]})
+        if request.url.path.endswith("/edits/apply"):
+            assert json.loads(request.read()) == {"proposals": [{"id": "a", "clause": "3.1"}]}
+            return httpx.Response(200, json={"documentId": "copy-1", "fileName": "d (исправлено).docx",
+                                             "applied": ["a"], "skipped": []})
+        if request.url.path.endswith("/copy-1/file"):
+            return httpx.Response(200, content=b"PK\x03\x04docx")
+        return httpx.Response(404)
+
+    b = make_backend(handler)
+    review = await b.review("tg-1", "doc-1", 5)
+    assert review["problems"] == 2
+    applied = await b.apply_edits("tg-1", "doc-1", review["proposals"], 5)
+    assert applied["documentId"] == "copy-1"
+    assert await b.download("tg-1", "copy-1") == b"PK\x03\x04docx"
+    assert [c[1] for c in calls] == ["/api/brain/documents/doc-1/edits/suggest",
+                                     "/api/brain/documents/doc-1/edits/apply",
+                                     "/api/user-documents/copy-1/file"]
+    assert all(c[2] == "tg-1" for c in calls)
+
+
+async def test_apply_without_new_document_or_errors_return_none():
+    b = make_backend(lambda r: httpx.Response(200, json={"documentId": None, "applied": [], "skipped": []}))
+    assert await b.apply_edits("tg-1", "doc-1", [], 5) is None
+    b = make_backend(lambda r: httpx.Response(502))
+    assert await b.review("tg-1", "doc-1", 5) is None and await b.download("tg-1", "x") is None

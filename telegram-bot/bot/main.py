@@ -8,7 +8,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, CommandStart
-from aiogram.types import Message
+from aiogram.types import BufferedInputFile, Message
 
 from .backend import ANALYSIS_PROMPT, Backend, BackendError, user_id_for
 from .config import Settings
@@ -26,7 +26,8 @@ HELP = (
     "📄 Пришлите договор файлом (PDF, DOCX или TXT). Я найду:\n"
     "• ссылки на статьи, которые не соответствуют закону;\n"
     "• нарушения норм (например, отпуск меньше 24 дней);\n"
-    "• ссылки на утратившие силу законы.\n\n"
+    "• ссылки на утратившие силу законы.\n"
+    "🛠 Если найду ошибки — пришлю исправленный документ (оригинал не меняется).\n\n"
     "💬 После этого можно задавать вопросы по документу обычным сообщением.\n"
     "Без документа отвечу на общий вопрос по законам РК.\n\n"
     "/new — забыть текущий документ\n\n"
@@ -48,6 +49,11 @@ async def safe_edit_or_send(first: Message, markdown: str) -> None:
                 await first.edit_text(part, parse_mode=None)
             else:
                 await first.answer(part, parse_mode=None)
+
+
+def fixed_caption(n: int) -> str:
+    return (f"✅ Исправленный документ: внесено правок — {n}. Оригинал не изменён. "
+            "Формулировки, предложенные ИИ, проверьте перед подписанием.")
 
 
 class BotApp:
@@ -101,7 +107,8 @@ class BotApp:
         events = self.backend.stream(user_id, ANALYSIS_PROMPT, document_id, self.settings.analysis_timeout_s)
         consume = asyncio.create_task(live.consume(events))
         render = asyncio.create_task(live.render())
-        audit = await self.backend.audit(user_id, document_id, self.settings.analysis_timeout_s)
+        review = await self.backend.review(user_id, document_id, self.settings.analysis_timeout_s)
+        audit = review.get("markdown") if review and review.get("problems") else None
         await ticker.stop()
         if audit:
             await safe_edit_or_send(status_msg, audit)
@@ -114,7 +121,25 @@ class BotApp:
         self.history[message.from_user.id] = deque(maxlen=HISTORY_ENTRIES)
         self._remember(message.from_user.id, f"Проверь документ «{doc.file_name}»",
                        ((audit or "") + "\n\n" + live.buffer).strip())
+        if review and review.get("proposals"):
+            await self._send_fixed(message, user_id, document_id, review["proposals"])
         await message.answer("Можете задать вопрос по этому документу. /new — начать с другим.")
+
+    async def _send_fixed(self, message: Message, user_id: str, document_id: str, proposals: list[dict]) -> None:
+        status = await message.answer("🛠 Вношу исправления в документ…")
+        applied = await self.backend.apply_edits(user_id, document_id, proposals, self.settings.analysis_timeout_s)
+        content = await self.backend.download(user_id, applied["documentId"]) if applied else None
+        if not content:
+            await status.edit_text("⚠️ Не удалось подготовить исправленный документ.")
+            return
+        done = set(applied.get("applied") or [])
+        lines = [f"• п. {p.get('clause')}: «{p.get('original')}» → «{p.get('replacement')}»"
+                 for p in proposals if p.get("id") in done]
+        await status.delete()
+        await message.answer_document(
+            BufferedInputFile(content, filename=applied.get("fileName") or "исправлено.docx"),
+            caption=fixed_caption(len(done)), parse_mode=None)
+        await self._send_plain(message, "Внесённые исправления:\n" + "\n".join(lines))
 
     async def text(self, message: Message, bot: Bot) -> None:
         if message.text.startswith("/"):
@@ -136,6 +161,10 @@ class BotApp:
         entries.append({"role": "USER", "content": question[:HISTORY_CHARS]})
         if answer:
             entries.append({"role": "ASSISTANT", "content": answer[:HISTORY_CHARS]})
+
+    async def _send_plain(self, message: Message, text: str) -> None:
+        for chunk in split_message(text):
+            await message.answer(chunk, parse_mode=None)
 
     async def _send_long(self, message: Message, markdown: str) -> None:
         if not markdown.strip():

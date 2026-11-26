@@ -97,6 +97,50 @@ class Backend:
         body = resp.json()
         return body.get("markdown") if body.get("findings") else None
 
+    async def review(self, user_id: str, document_id: str, timeout_s: float) -> dict | None:
+        try:
+            resp = await self._client.post(
+                f"{self._brain}/api/brain/documents/{document_id}/edits/suggest",
+                headers={"X-User-Id": user_id},
+                timeout=httpx.Timeout(timeout_s, connect=10.0),
+            )
+        except httpx.HTTPError as e:
+            log.warning("review request failed: %s", e)
+            return None
+        if resp.status_code != 200:
+            log.warning("review failed: %s %s", resp.status_code, resp.text[:300])
+            return None
+        return resp.json()
+
+    async def apply_edits(self, user_id: str, document_id: str, proposals: list[dict],
+                          timeout_s: float) -> dict | None:
+        try:
+            resp = await self._client.post(
+                f"{self._brain}/api/brain/documents/{document_id}/edits/apply",
+                headers={"X-User-Id": user_id},
+                json={"proposals": proposals},
+                timeout=httpx.Timeout(timeout_s, connect=10.0),
+            )
+        except httpx.HTTPError as e:
+            log.warning("apply edits request failed: %s", e)
+            return None
+        if resp.status_code != 200:
+            log.warning("apply edits failed: %s %s", resp.status_code, resp.text[:300])
+            return None
+        body = resp.json()
+        return body if body.get("documentId") else None
+
+    async def download(self, user_id: str, document_id: str) -> bytes | None:
+        try:
+            resp = await self._client.get(
+                f"{self._docs}/api/user-documents/{document_id}/file",
+                headers={"X-User-Id": user_id},
+            )
+        except httpx.HTTPError as e:
+            log.warning("download failed: %s", e)
+            return None
+        return resp.content if resp.status_code == 200 and resp.content else None
+
     async def stream(self, user_id: str, message: str, document_id: str | None,
                      timeout_s: float, history: list[dict] | None = None) -> AsyncIterator[SseEvent]:
         payload = {"message": message, "userId": user_id}
