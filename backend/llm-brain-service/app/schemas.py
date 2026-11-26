@@ -104,6 +104,7 @@ class AuditFinding(CamelModel):
     explanation: str | None = None
     confidence: float | None = None
     source: str | None = None
+    page: int | None = None
     verification: str | None = None
     verification_note: str | None = None
 
@@ -145,6 +146,7 @@ class EditProposal(CamelModel):
     verdict: str = ""
     law_basis: str | None = None
     source: str = "rule"
+    page: int | None = None
 
 
 class EditSuggestResponse(CamelModel):
@@ -153,6 +155,11 @@ class EditSuggestResponse(CamelModel):
     proposals: list[EditProposal] = []
     markdown: str = ""
     problems: int = 0
+
+
+class EditRewriteRequest(CamelModel):
+    original: str
+    instruction: str | None = None
 
 
 class EditApplyRequest(CamelModel):
@@ -170,3 +177,36 @@ class EditApplyResponse(CamelModel):
     file_name: str | None
     applied: list[str] = []
     skipped: list[EditSkip] = []
+
+
+class PlaybookRule(CamelModel):
+    id: str = ""
+    kind: str = "text"
+    text: str = ""
+    clause_type: str | None = None
+    party: str | None = None
+    modality: str | None = None
+    max_days: int | None = None
+
+
+class Playbook(CamelModel):
+    id: str = ""
+    name: str
+    rules: list[PlaybookRule] = []
+
+
+class PlaybookResult(CamelModel):
+    rule_id: str
+    rule: str
+    status: str
+    clause: str | None = None
+    page: int | None = None
+    quote: str | None = None
+    explanation: str = ""
+
+
+class PlaybookCheckResponse(CamelModel):
+    playbook_id: str
+    name: str
+    results: list[PlaybookResult] = []
+    summary: str = ""

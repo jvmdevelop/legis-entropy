@@ -15,6 +15,7 @@ from app.ml.embeddings import Embedder
 from app.ml.hybrid import HybridRanker
 from app.ml.nli import NliModel, NliResult
 from app.schemas import ProgressEvent
+from app.legal.hierarchy import resolve
 
 log = logging.getLogger(__name__)
 
@@ -297,7 +298,8 @@ class DeepAnalysisService:
                 try:
                     await self.situations.flag_article_conflict({
                         "graphId": graph_id, "country": ctry, "codeA": ca, "numberA": na, "codeB": cb, "numberB": nb,
-                        "reason": f"Коллизия норм (NLI contradiction={conf:.2f})", "confidence": conf})
+                        "reason": f"Коллизия норм (NLI contradiction={conf:.2f}). {resolve(ca, cb).reason}",
+                        "confidence": conf})
                     ok = True
                 except Exception as e:
                     log.warning("Failed to flag article conflict: %s", e)

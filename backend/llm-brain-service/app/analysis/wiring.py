@@ -14,7 +14,9 @@ from app.analysis.repealed import RepealedActChecker
 from app.analysis.required_clauses import RequiredClauseChecker
 from app.analysis.verifier import ArticleReferenceVerifier
 from app.edits.service import DocumentEditService
-from app.api import compare, contracts, documents
+from app.playbooks.service import PlaybookChecker, PlaybookStore
+from app.structure.service import StructureService
+from app.api import compare, contracts, documents, playbooks
 from app.container import Container
 
 log = logging.getLogger(__name__)
@@ -54,6 +56,10 @@ def wire(c: Container, risk: RiskClassifier | None = None) -> AnalysisFeature:
         labor=LaborNormChecker(c.llm), similarity=t.clause_similarity, nli_threshold=t.nli_entailment)
     audit = ReferenceAuditService(verifier, c.llm, CitationVerifier(c.laws, c.llm, t.clause_similarity))
     edits = DocumentEditService(audit, c.documents, c.llm)
+    structure = StructureService(c.documents, c.llm)
+    playbook_router = playbooks.build_router(PlaybookStore(c.settings.redis_url), PlaybookChecker(c.llm), c.documents,
+                                             structure)
     cmp = CompareService(c.documents, c.graph, c.llm, ClauseAligner(c.embedder, t.clause_similarity))
     return AnalysisFeature(contract_risk, verifier, audit, cmp, edits=edits, routers=[
-        contracts.build_router(contract_risk), documents.build_router(c.documents, audit, edits), compare.build_router(cmp)])
+        contracts.build_router(contract_risk), documents.build_router(c.documents, audit, edits, structure),
+        playbook_router, compare.build_router(cmp)])

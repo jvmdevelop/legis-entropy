@@ -1,0 +1,101 @@
+{
+ "name": "Договор аренды нежилого помещения (тестовый, ГК РК)",
+ "document": "test-documents/test_lease_contract_kz_ru.txt",
+ "contract_type": "аренды",
+ "sources": "номера статей сверены с названиями статей ГК РК в базе law-service; нормы ст. 177, 297 — по тексту статей",
+ "references": [
+  {
+   "clause": "1.1",
+   "law": "ГК РК",
+   "cited": "540",
+   "verdict": "OK",
+   "correct": ""
+  },
+  {
+   "clause": "2.1",
+   "law": "ГК РК",
+   "cited": "545",
+   "verdict": "OK",
+   "correct": ""
+  },
+  {
+   "clause": "3.1",
+   "law": "ГК РК",
+   "cited": "541",
+   "verdict": "WRONG_ARTICLE",
+   "correct": "546"
+  },
+  {
+   "clause": "4.1",
+   "law": "ГК РК",
+   "cited": "553",
+   "verdict": "WRONG_ARTICLE",
+   "correct": "552"
+  },
+  {
+   "clause": "4.2",
+   "law": "ГК РК",
+   "cited": "553",
+   "verdict": "OK",
+   "correct": ""
+  },
+  {
+   "clause": "5.1",
+   "law": "ГК РК",
+   "cited": "293",
+   "verdict": "OK",
+   "correct": ""
+  },
+  {
+   "clause": "5.3",
+   "law": "ГК РК",
+   "cited": "350",
+   "verdict": "OK",
+   "correct": ""
+  },
+  {
+   "clause": "6.1",
+   "law": "ГК РК",
+   "cited": "551",
+   "verdict": "OK",
+   "correct": ""
+  },
+  {
+   "clause": "6.2",
+   "law": "ГК РК",
+   "cited": "556",
+   "verdict": "OK",
+   "correct": ""
+  },
+  {
+   "clause": "7.1",
+   "law": "ГК РК",
+   "cited": "145",
+   "verdict": "WRONG_ARTICLE",
+   "correct": "126"
+  }
+ ],
+ "repealed": [],
+ "valid_acts": [],
+ "violations": [
+  {
+   "clause": "5.2",
+   "article": "297"
+  },
+  {
+   "clause": "8.1",
+   "article": "177"
+  }
+ ],
+ "missing_clauses": [
+  "Порядок передачи имущества"
+ ],
+ "requisites": [
+  {
+   "number": "377-VI"
+  }
+ ],
+ "notes": [
+  "кейс и правила ГК написаны одним автором -> регрессионный тест, не независимая оценка"
+ ]
+}

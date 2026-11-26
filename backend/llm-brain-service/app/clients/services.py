@@ -48,6 +48,10 @@ class DocumentClient:
                               json={"edits": edits, "fileName": file_name})
         return r if isinstance(r, dict) else None
 
+    async def pages(self, document_id: str, user_id: str) -> list[Json]:
+        r = await self.c.get(f"/api/user-documents/{_p(document_id)}/pages", headers={"X-User-Id": user_id})
+        return (r or {}).get("pages") or [] if isinstance(r, dict) else []
+
     async def file(self, document_id: str, user_id: str) -> tuple[bytes, str | None, str | None]:
         r = await self.c.raw("GET", f"/api/user-documents/{_p(document_id)}/file", headers={"X-User-Id": user_id})
         return r.content, _attachment_name(r.headers.get("content-disposition")), r.headers.get("content-type")

@@ -117,7 +117,7 @@ def with_rules(findings: list[AuditFinding], rules: list[Violation]) -> list[Aud
         kept.append(f)
     for r in rules:
         kept = [f for f in kept if not (f.verdict == "VIOLATION" and f.correct_article == r.correct_article)]
-        kept.append(_finding(r.clause, "ТК РК", r.cited_article, "VIOLATION", r.correct_article, r.explanation,
+        kept.append(_finding(r.clause, r.law_code, r.cited_article, "VIOLATION", r.correct_article, r.explanation,
                              source="rule"))
     return kept
 
@@ -148,13 +148,13 @@ def supplement(findings: list[AuditFinding], v: Verification) -> list[AuditFindi
         m = ml.get((f.clause, f.law_code, f.cited_article)) or ml_any.get((f.law_code, f.cited_article))
         if f.confidence is None and m is not None:
             f.confidence = m.confidence
-    rules = {r.correct_article for r in v.violations}
+    rules = {(r.law_code, r.correct_article) for r in v.violations}
     rule_cited = {r.cited_article for r in v.violations}
     out = list(findings)
     for key, f in ml.items():
         if key in covered or key[1:] in covered_any or (f.verdict == "OK" and f.cited_article in rule_cited):
             continue
-        if f.verdict == "VIOLATION" and f.law_code == "ТК РК" and f.cited_article in rules:
+        if f.verdict == "VIOLATION" and (f.law_code, f.cited_article) in rules:
             continue
         f.source = f.source or "ml"
         out.append(f)
@@ -188,8 +188,10 @@ def validate(findings: list[AuditFinding], v: Verification) -> list[AuditFinding
         if f.verdict in ("WRONG_ARTICLE", "OK", "UNVERIFIED") and f.cited_article:
             text = clauses.get(f.clause or "")
             topic = expected_article(text, f.law_code)
-            if topic and topic.article == f.cited_article:
+            if topic and f.cited_article in topic.allowed:
                 f = _finding(f.clause, f.law_code, f.cited_article, "OK", confidence=f.confidence, source="rule")
+            elif topic and f.verdict == "WRONG_ARTICLE" and f.correct_article in topic.allowed:
+                pass
             elif topic:
                 f = _finding(f.clause, f.law_code, f.cited_article, "WRONG_ARTICLE", topic.article,
                              f"Предмет пункта — {topic.title}: это ст. {topic.article} {f.law_code}, "

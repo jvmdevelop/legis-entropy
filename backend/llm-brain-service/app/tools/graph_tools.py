@@ -3,6 +3,7 @@ import re
 from dataclasses import dataclass
 
 from app.analysis.references import canonical_code
+from app.legal.hierarchy import resolve
 from app.clients.ports import DocumentPort, GraphPort, LawPort, SituationPort
 from app.graph.actions import GraphActionService
 from app.llm.tools import ToolRegistry
@@ -364,12 +365,15 @@ class GraphTools:
         try:
             await self.situations.flag_article_conflict({
                 "graphId": a.graph_id, "country": country, "codeA": a.code_a, "numberA": a.number_a,
-                "codeB": a.code_b, "numberB": a.number_b, "reason": a.reason, "confidence": round(r.contradiction, 3)})
+                "codeB": a.code_b, "numberB": a.number_b,
+                "reason": ((a.reason or "Коллизия норм") + ". " + resolve(a.code_a, a.code_b).reason).strip(),
+                "confidence": round(r.contradiction, 3)})
         except Exception as e:
             log.warning("Failed to flag article conflict: %s", e)
             return "Не удалось зафиксировать конфликт — статьи не найдены в базе."
         return (f"Конфликт зафиксирован: {a.code_a} ст.{a.number_a} ↔ {a.code_b} ст.{a.number_b}"
-                + (f" — {a.reason}" if a.reason else "") + f" (NLI contradiction={r.contradiction:.2f})")
+                + (f" — {a.reason}" if a.reason else "") + f" (NLI contradiction={r.contradiction:.2f}). "
+                + resolve(a.code_a, a.code_b).reason)
 
     async def _clause_text(self, a: FlagDocConflictArgs, article: str) -> str | None:
         if a.document_snippet and a.document_snippet.strip():

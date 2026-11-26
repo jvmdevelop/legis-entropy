@@ -36,6 +36,19 @@ class _Edits(BaseModel):
     edits: list[_Edit] = []
 
 
+class _Rewrite(BaseModel):
+    replacement: str = ""
+    reason: str = ""
+
+
+REWRITE_SYSTEM = ("Ты — юрист РК и редактор договоров. Пользователь выделил фрагмент договора. Предложи улучшенную "
+                  "редакцию ТОЛЬКО этого фрагмента: юридически точную, соответствующую законодательству РК, в стиле "
+                  "договора. Не придумывай номера статей и законов, если не уверен. Если фрагмент уже корректен и "
+                  "инструкции нет — верни replacement пустым. Верни JSON {replacement, reason}, reason — одно "
+                  "предложение: что и почему изменено.")
+MAX_REWRITE = 1500
+
+
 def clause_lines(text: str) -> dict[str, tuple[int, int]]:
     out: dict[str, tuple[int, int]] = {}
     for m in _CLAUSE_LINE.finditer(text):
@@ -160,6 +173,30 @@ class DocumentEditService:
                 f, clause, start = todo[e.i]
                 res.append((f, clause, start, e))
         return res
+
+    async def rewrite(self, text: str, original: str, instruction: str | None = None) -> EditProposal | None:
+        original = original.strip()
+        if not original or len(original) > MAX_REWRITE or original not in text or self.llm is None:
+            return None
+        pos = text.find(original)
+        clause_no, clause = "", original
+        for no, (a, b) in clause_lines(text).items():
+            if a <= pos < b:
+                clause_no, clause = no, text[a:b]
+                break
+        body = (f"Пункт договора: «{clause}»\nВыделенный фрагмент: «{original}»\n"
+                + (f"Инструкция пользователя: {instruction.strip()}\n" if instruction and instruction.strip() else ""))
+        try:
+            out = await self.llm.structured(REWRITE_SYSTEM, body, _Rewrite)
+        except Exception as e:
+            log.warning("rewrite LLM failed: %s", e)
+            return None
+        replacement = keep_end_punctuation(original, (out.replacement if out else "").strip())
+        if not replacement or replacement == original or len(replacement) > 3 * MAX_REWRITE:
+            return None
+        return EditProposal(id=_pid(clause_no, original, replacement), clause=clause_no, original=original,
+                            replacement=replacement, reason=(out.reason or "").strip(), verdict="SUGGESTION",
+                            source="llm")
 
     @staticmethod
     def apply_to_text(text: str, proposals: list[EditProposal]) -> tuple[str, list[str], list[EditSkip]]:

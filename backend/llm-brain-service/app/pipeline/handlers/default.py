@@ -7,6 +7,8 @@ from typing import AsyncIterator
 from app.ml.ner import NerModel
 from app.pipeline.context import DocumentContext
 from app.pipeline.hallucination import UNGROUNDED_DISCLAIMER, AnswerPostProcessor, HallucinationDetector
+from app.legal.glossary import render as render_glossary
+from app.pipeline.quotes import QuoteChecker
 from app.pipeline.retrieval import RetrievalRouter
 from app.pipeline.tool_policy import tools_for
 from app.pipeline.types import ContextPlan, RetrievalMode, TaskType
@@ -27,6 +29,7 @@ LAW_CODE_FORMAT = re.compile(r"^\d{1,4}-[IVXL]{1,6}$")
 EDITS_TIMEOUT_S = 180
 EDIT_TASKS = {TaskType.DOCUMENT_AUDIT}
 EDITS_EVENT = "document-edit-proposals"
+GLOSSARY_SCAN = 20000
 
 
 def document_unavailable_message(reason: str | None) -> str:
@@ -42,7 +45,7 @@ class DefaultBrainHandler:
     def __init__(self, router: RetrievalRouter, prompts: BrainPromptBuilder, llm: ChatModel, post: AnswerPostProcessor,
                  detector: HallucinationDetector, graph_actions: LawGraphWriter | None = None,
                  ner: NerModel | None = None, linker: LawNameLinker | None = None,
-                 edits: EditSuggester | None = None, documents: DocumentPort | None = None):
+                 edits: EditSuggester | None = None, documents: DocumentPort | None = None, glossary=None):
         self.router = router
         self.prompts = prompts
         self.llm = llm
@@ -52,9 +55,24 @@ class DefaultBrainHandler:
         self.ner = ner
         self.linker = linker
         self.edits, self.documents = edits, documents
+        self.glossary = glossary
 
     def supports(self, task: TaskType) -> bool:
         return True
+
+    async def _check_quotes(self, req: BrainRequest, answer: str) -> str:
+        if not req.has_document or self.documents is None or not answer:
+            return answer
+        try:
+            text = await self.documents.text(req.document_id, req.user_id)
+        except Exception as e:
+            log.warning("Quote check: document %s unavailable: %s", req.document_id, e)
+            return answer
+        checked, report = QuoteChecker(text or "").check(answer)
+        if report.fixed or report.not_found or report.clause_fixed:
+            log.info("Quote check %s: exact=%d fixed=%d not_found=%d clause_fixed=%d", req.document_id,
+                     report.exact, report.fixed, report.not_found, report.clause_fixed)
+        return checked
 
     async def _edit_proposals(self, req: BrainRequest) -> EditSuggestResponse | None:
         try:
@@ -142,10 +160,22 @@ class DefaultBrainHandler:
 
     async def _retrieve(self, req: BrainRequest, plan: ContextPlan) -> DocumentContext:
         try:
-            return await self.router.retrieve(req, plan)
+            ctx = await self.router.retrieve(req, plan)
         except Exception as e:
             log.warning("Retrieval failed: %s", e)
             return DocumentContext.missing("Retrieval-контекст не использовался для этого запроса.")
+        return await self._with_glossary(req, ctx)
+
+    async def _with_glossary(self, req: BrainRequest, ctx: DocumentContext) -> DocumentContext:
+        if self.glossary is None or ctx.unavailable:
+            return ctx
+        try:
+            terms = await self.glossary.relevant(f"{req.message}\n{ctx.text[:GLOSSARY_SCAN]}")
+        except Exception as e:
+            log.warning("Glossary lookup failed: %s", e)
+            return ctx
+        block = render_glossary(terms)
+        return DocumentContext(f"{ctx.text}\n\n{block}", ctx.citations) if block else ctx
 
     async def handle(self, req: BrainRequest, plan: ContextPlan) -> BrainResponse:
         ctx = await self._retrieve(req, plan)
@@ -153,7 +183,7 @@ class DefaultBrainHandler:
             return BrainResponse(content=document_unavailable_message(ctx.unavailable_reason), tokens=0)
         prompt = await self.prompts.build_user_prompt(req, ctx, plan)
         raw = await self.llm.answer(prompt, req.history, tools=tools_for(req, plan))
-        processed = await self.post.process(raw.content, plan, ctx)
+        processed = await self._check_quotes(req, await self.post.process(raw.content, plan, ctx))
         added = await self.add_retrieved_laws(req, plan, ctx)
         added += await self.add_answer_laws(req, plan, raw.content or "", added, ctx)
         if added:
@@ -188,7 +218,7 @@ class DefaultBrainHandler:
             return
         final = "".join(parts)
         try:
-            processed = await self.post.process(final, plan, ctx)
+            processed = await self._check_quotes(req, await self.post.process(final, plan, ctx))
             if (not self.detector.has_grounding_context(ctx) and not req.has_document
                     and processed == final.strip() and self.detector.has_law_references(processed)):
                 processed += UNGROUNDED_DISCLAIMER

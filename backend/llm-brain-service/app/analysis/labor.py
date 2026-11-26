@@ -14,6 +14,7 @@ class Violation:
     cited_article: str
     correct_article: str
     explanation: str
+    law_code: str = "ТК РК"
 
 
 @dataclass(frozen=True)

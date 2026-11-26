@@ -9,10 +9,15 @@ class Topic:
     pattern: re.Pattern
     article: str
     title: str
+    allowed: frozenset[str]
 
 
-def _t(pattern: str, article: str, title: str) -> Topic:
-    return Topic(re.compile(rf"(?iu){pattern}"), article, title)
+def _t(pattern: str, article: str, title: str, *allowed: str) -> Topic:
+    return Topic(re.compile(rf"(?iu){pattern}"), article, title, frozenset((article, *allowed)))
+
+
+def _range(a: int, b: int) -> tuple[str, ...]:
+    return tuple(str(i) for i in range(a, b + 1))
 
 
 TK_TOPICS: list[Topic] = [
@@ -30,9 +35,31 @@ TK_TOPICS: list[Topic] = [
        "68", "нормальная продолжительность рабочего времени"),
 ]
 
+GK_TOPICS: list[Topic] = [
+    _t(rf"неустойк|пен[яиюь]\b|штраф", "293", "неустойка", *_range(293, 298), "351"),
+    _t(rf"исков{_L}*\s+давност", "178", "исковая давность", *_range(177, 187), "162", "636"),
+    _t(rf"возмещени{_L}*\s+убытк|возмест{_L}*\s+убытк", "350", "возмещение убытков", "9", "351"),
+    _t(rf"арендн{_L}*\s+плат|плат{_L}*\s+(?:за\s+)?(?:аренд|найм|наем)", "546", "плата по договору найма"),
+    _t(rf"срок{_L}*\s+(?:аренды|найма|договора\s+аренды)", "545", "срок договора имущественного найма"),
+    _t(rf"капитальн{_L}*\s+ремонт", "552", "капитальный ремонт нанятого имущества"),
+    _t(rf"текущ{_L}*\s+ремонт", "553", "текущий ремонт нанятого имущества"),
+    _t(rf"субаренд|поднайм|поднаем", "560", "поднаём", "551"),
+    _t(rf"приемк{_L}*\s+(?:выполненн{_L}*\s+)?работ|акт{_L}*\s+(?:приемки|выполненных)\s+работ", "630",
+       "приёмка выполненных работ", "663", "675"),
+    _t(rf"гаранти{_L}*\s+(?:качеств|срок)", "633", "гарантия качества работы", "634", "665"),
+    _t(rf"оплат{_L}*\s+услуг|стоимост{_L}*\s+услуг", "685", "оплата услуг"),
+    _t(rf"конфиденциальн|коммерческ{_L}*\s+тайн", "126", "коммерческая тайна", "638", "676"),
+]
+
+TOPICS: dict[str, list[Topic]] = {"ТКРК": TK_TOPICS, "414-V": TK_TOPICS, "ГКРК": GK_TOPICS}
+
+
+def topics_for(law_code: str | None) -> list[Topic]:
+    return TOPICS.get((law_code or "").upper().replace(" ", ""), [])
+
 
 def expected_article(clause: str | None, law_code: str | None) -> Topic | None:
-    if not clause or (law_code or "").upper().replace(" ", "") not in {"ТКРК", "414-V"}:
+    if not clause:
         return None
-    hits = {t.article: t for t in TK_TOPICS if t.pattern.search(clause)}
+    hits = {t.article: t for t in topics_for(law_code) if t.pattern.search(clause)}
     return next(iter(hits.values())) if len(hits) == 1 else None

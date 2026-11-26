@@ -4,6 +4,7 @@ import re
 import time
 from dataclasses import dataclass, field
 
+from app.analysis.civil import civil_check
 from app.analysis.labor import LaborNormChecker, Violation
 from app.analysis.references import ArticleReference, canonical_code, extract_with_ner
 from app.analysis.repealed import RepealedActChecker, RepealedMention
@@ -110,6 +111,7 @@ class ArticleReferenceVerifier:
     async def verify(self, text: str, compact: bool = False, with_ml: bool = True) -> Verification:
         refs = (await extract_with_ner(text, self.ner))[:MAX_REFERENCES]
         repealed, violations = await asyncio.gather(self.repealed.find(text), self.labor.check(text))
+        violations = violations + civil_check(text)
         v = Verification(refs, repealed, violations, check_requisites(text))
         if v.empty:
             return v
@@ -200,9 +202,9 @@ class ArticleReferenceVerifier:
             for m in v.repealed:
                 sb.append(f"- {m.act.title} (№ {m.act.number}) — {m.act.status}.\n  Пункт: «{m.clause}»\n")
         if v.violations:
-            sb.append("\nНАРУШЕНИЯ НОРМ ТК РК (найдены автоматически, обязательно укажи в рисках):\n")
+            sb.append("\nНАРУШЕНИЯ НОРМ ЗАКОНА (найдены автоматически по правилам, обязательно укажи в рисках):\n")
             for x in v.violations:
-                sb.append(f"- п. {x.clause}: {x.explanation} Правильная норма — ст. {x.correct_article} ТК РК.\n")
+                sb.append(f"- п. {x.clause}: {x.explanation} Правильная норма — ст. {x.correct_article} {x.law_code}.\n")
         if v.requisites:
             sb.append("\nОШИБКИ В РЕКВИЗИТАХ КОДЕКСОВ (проверено по справочнику, обязательно укажи в рисках):\n")
             for r in v.requisites:

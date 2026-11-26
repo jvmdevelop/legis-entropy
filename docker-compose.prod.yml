@@ -371,6 +371,7 @@ services:
       PROFESSION_MODEL: ${LLM_BRAIN_PROFESSION_MODEL:-/fine-tuned/profession}
       RISK_MODEL: ${LLM_BRAIN_RISK_MODEL:-/fine-tuned/risk}
       GRAPH_SERVICE_URL: http://graphs-service:8086
+      REDIS_URL: redis://redis:6379/1
       DEEP_ANALYSIS_MAX_LAWS_TOTAL: ${DEEP_ANALYSIS_MAX_LAWS_TOTAL:-25}
       DEEP_ANALYSIS_MAX_ARTICLES_TOTAL: ${DEEP_ANALYSIS_MAX_ARTICLES_TOTAL:-75}
       DEEP_ANALYSIS_MAX_CONFLICTS: ${DEEP_ANALYSIS_MAX_CONFLICTS:-10}
@@ -386,6 +387,7 @@ services:
         limits:
           memory: ${LLM_BRAIN_MEMORY:-768M}
     depends_on:
+      redis: { condition: service_healthy }
       eureka-server: { condition: service_started }
       document-service: { condition: service_healthy }
     healthcheck:

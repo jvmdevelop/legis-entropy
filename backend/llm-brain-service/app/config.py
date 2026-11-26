@@ -78,6 +78,7 @@ class Settings(BaseSettings):
     rerank_top_k: int = 8
 
     graph_service_url: str = Field("http://localhost:8086", alias="GRAPH_SERVICE_URL")
+    redis_url: str = Field("", alias="REDIS_URL")
     http_timeout_s: float = Field(120.0, alias="HTTP_TIMEOUT_SECONDS")
 
     deep_max_laws_total: int = Field(25, alias="DEEP_ANALYSIS_MAX_LAWS_TOTAL")
