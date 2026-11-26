@@ -773,12 +773,42 @@ public class UserGraphService {
                 );
             }
 
+            List<GraphContentResponse.GraphNodeDTO> allNodes = completeArticles(GraphConsistency.dedupe(nodes), edges);
             return GraphContentResponse.builder()
                 .graph(toDTO(graph))
-                .nodes(nodes)
-                .edges(edges)
+                .nodes(allNodes)
+                .edges(GraphConsistency.withoutDangling(allNodes, edges))
                 .build();
         });
+    }
+
+    private List<GraphContentResponse.GraphNodeDTO> completeArticles(
+            List<GraphContentResponse.GraphNodeDTO> nodes, List<GraphContentResponse.GraphEdgeDTO> edges) {
+        List<Map<String, Object>> keys = GraphConsistency.missingArticleKeys(nodes, edges);
+        if (keys.isEmpty()) return nodes;
+        Map<String, Map<String, Object>> found = new java.util.HashMap<>();
+        for (Map<String, Object> r : neo4jClient
+                .query(
+                    """
+                    UNWIND $keys AS k
+                    MATCH (a:Article)
+                    WHERE a.lawCode = k.lawCode AND toString(a.number) = k.number
+                    RETURN k.id AS id, a.title AS title, a.body AS body
+                    """
+                )
+                .bind(keys)
+                .to("keys")
+                .fetch()
+                .all()) {
+            found.putIfAbsent(str(r, "id"), r);
+        }
+        List<GraphContentResponse.GraphNodeDTO> out = new ArrayList<>(nodes);
+        for (Map<String, Object> k : keys) {
+            Map<String, Object> a = found.get(str(k, "id"));
+            out.add(GraphConsistency.articleNode(str(k, "id"), str(k, "lawCode"), str(k, "number"),
+                    a == null ? null : str(a, "title"), a == null ? null : str(a, "body")));
+        }
+        return out;
     }
 
     private static String str(Map<String, Object> row, String key) {
