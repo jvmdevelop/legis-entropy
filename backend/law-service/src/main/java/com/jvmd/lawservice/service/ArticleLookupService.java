@@ -16,7 +16,7 @@ import java.util.Map;
 public class ArticleLookupService {
 
     public static final int EXCERPT_CHARS = 600;
-    public static final int MAX_CHARS = 8000;
+    public static final int MAX_CHARS = 40000;
 
     private final JdbcTemplate jdbcTemplate;
 
