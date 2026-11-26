@@ -1,3 +1,0 @@
-org.springframework.boot.env.EnvironmentPostProcessor=\
-  com.jvmd.llmbrainservice.config.LocalLlmEnvironmentPostProcessor,\
-  com.jvmd.llmbrainservice.config.NvidiaLlmEnvironmentPostProcessor

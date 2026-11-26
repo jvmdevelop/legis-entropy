@@ -337,17 +337,19 @@ services:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8091/actuator/health || exit 1" ]
 
   llm-brain-service:
-    <<: *java-service
     container_name: llm-brain-service
     build:
-      <<: *java-build
+      context: ./backend/llm-brain-service
+      dockerfile: Dockerfile
       args:
-        SERVICE_NAME: llm-brain-service
+        ML_EXTRAS: ${LLM_BRAIN_ML_EXTRAS:-}
+    networks:
+      - legis-entropy-network
     ports:
       - "${LLM_BRAIN_SERVICE_PORT:-8085}:8085"
     environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      INSTANCE_HOST: llm-brain-service
       LLM_BASE_URL: ${LLM_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai/}
       LLM_API_KEY: ${LLM_API_KEY:-}
       LLM_MODEL: ${LLM_MODEL:-gemini-3.8-flash}
@@ -355,6 +357,14 @@ services:
       NVIDIA_API_KEY: ${NVIDIA_API_KEY:-}
       NVIDIA_LLM_MODEL: ${NVIDIA_LLM_MODEL:-nvidia/nemotron-3.5-super-vl-120b-a12b}
       NVIDIA_LLM_BASE_URL: ${NVIDIA_LLM_BASE_URL:-https://integrate.api.nvidia.com/v1/}
+      LOCAL_LLM_ENABLED: ${LOCAL_LLM_ENABLED:-false}
+      LOCAL_LLM_BASE_URL: ${LOCAL_LLM_BASE_URL:-http://ollama:11434/v1}
+      LOCAL_LLM_MODEL: ${LOCAL_LLM_MODEL:-llama3.2:3b}
+      ML_ENABLED: ${LLM_BRAIN_ML_ENABLED:-false}
+      ML_DEVICE: ${LLM_BRAIN_ML_DEVICE:-cpu}
+      INTENT_MODEL: ${LLM_BRAIN_INTENT_MODEL:-/fine-tuned/intent}
+      PROFESSION_MODEL: ${LLM_BRAIN_PROFESSION_MODEL:-/fine-tuned/profession}
+      RISK_MODEL: ${LLM_BRAIN_RISK_MODEL:-/fine-tuned/risk}
       GRAPH_SERVICE_URL: http://graphs-service:8086
       DEEP_ANALYSIS_MAX_LAWS_TOTAL: ${DEEP_ANALYSIS_MAX_LAWS_TOTAL:-25}
       DEEP_ANALYSIS_MAX_ARTICLES_TOTAL: ${DEEP_ANALYSIS_MAX_ARTICLES_TOTAL:-75}
@@ -363,14 +373,22 @@ services:
       DEEP_ANALYSIS_ARTICLES_PER_LAW: ${DEEP_ANALYSIS_ARTICLES_PER_LAW:-3}
       DEEP_ANALYSIS_RELATED_PER_LAW_HOP2: ${DEEP_ANALYSIS_RELATED_PER_LAW_HOP2:-3}
       DEEP_ANALYSIS_RELATED_PER_LAW_HOP3: ${DEEP_ANALYSIS_RELATED_PER_LAW_HOP3:-2}
-      LOCAL_LLM_ENABLED: ${LOCAL_LLM_ENABLED:-false}
-      LOCAL_LLM_BASE_URL: ${LOCAL_LLM_BASE_URL:-http://ollama:11434/v1}
-      LOCAL_LLM_MODEL: ${LOCAL_LLM_MODEL:-llama3.2:3b}
+    volumes:
+      - llm-brain-models:/models
+      - ./backend/llm-brain-service/models:/fine-tuned:ro
+    deploy:
+      resources:
+        limits:
+          memory: ${LLM_BRAIN_MEMORY:-768M}
     depends_on:
       eureka-server: { condition: service_started }
       document-service: { condition: service_healthy }
     healthcheck:
       test: [ "CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8085/actuator/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   graphs-service:
     <<: *java-service
@@ -629,6 +647,7 @@ networks:
     driver: bridge
 
 volumes:
+  llm-brain-models:
   postgres-user-data:
   postgres-chat-data:
   postgres-documents-data:

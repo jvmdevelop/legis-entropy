@@ -1,0 +1,9 @@
+POST /api/brain/chat - чат с юр. ассистентом: классификация интента -> retrieval -> ответ LLM;
+POST /api/brain/chat/stream - тот же чат, ответ стримом SSE (прогресс + токены);
+POST /api/brain/compare - сравнение двух объектов (LAW/DOCUMENT) через LLM; userId из body или X-User-Id;
+POST /api/brain/contracts/risk-scan - риск-скан текста договора: опасные/отсутствующие пункты; body: text, country;
+POST /api/brain/documents/{documentId}/audit - аудит ссылок на статьи законов в документе; header X-User-Id;
+POST /api/brain/documents/{documentId}/edits/suggest - аудит + правки "было -> стало"; header X-User-Id;
+POST /api/brain/documents/{documentId}/edits/apply - применить выбранные правки -> новый документ (копия), оригинал не меняется; body: proposals[], title?;
+GET /actuator/health - health check;
+GET /actuator/prometheus - метрики Prometheus;

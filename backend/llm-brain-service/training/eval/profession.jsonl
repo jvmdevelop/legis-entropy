@@ -1,0 +1,20 @@
+{"text": "как поделить ипотечную квартиру при разводе", "labels": ["FAMILY_LAWYER", "REAL_ESTATE_LAWYER"]}
+{"text": "алименты на ребёнка если отец безработный", "labels": ["FAMILY_LAWYER"]}
+{"text": "можно ли лишить отца родительских прав за неуплату", "labels": ["FAMILY_LAWYER"]}
+{"text": "хозяин квартиры требует съехать раньше срока аренды", "labels": ["REAL_ESTATE_LAWYER"]}
+{"text": "как оформить право собственности на земельный участок", "labels": ["REAL_ESTATE_LAWYER"]}
+{"text": "продавец квартиры скрыл обременение", "labels": ["REAL_ESTATE_LAWYER"]}
+{"text": "сына задержала полиция, какие у него права", "labels": ["CRIMINAL_LAWYER"]}
+{"text": "что грозит за мошенничество в интернете", "labels": ["CRIMINAL_LAWYER"]}
+{"text": "меня вызвали на допрос свидетелем", "labels": ["CRIMINAL_LAWYER"]}
+{"text": "как вывести участника из ТОО", "labels": ["CORPORATE_LAWYER"]}
+{"text": "порядок ликвидации АО", "labels": ["CORPORATE_LAWYER"]}
+{"text": "директор ТОО превысил полномочия, ответственность", "labels": ["CORPORATE_LAWYER"]}
+{"text": "не выплатили зарплату за два месяца", "labels": ["LABOR_LAWYER"]}
+{"text": "сколько длится испытательный срок", "labels": ["LABOR_LAWYER"]}
+{"text": "работодатель заставляет работать в выходные без доплаты", "labels": ["LABOR_LAWYER"]}
+{"text": "уволили беременную сотрудницу, законно ли", "labels": ["LABOR_LAWYER"]}
+{"text": "как заверить документ у нотариуса", "labels": ["GENERAL_LAWYER"]}
+{"text": "сколько стоит госпошлина в суд", "labels": ["GENERAL_LAWYER"]}
+{"text": "что такое исковая давность", "labels": ["GENERAL_LAWYER"]}
+{"text": "учредитель ТОО не платит сотрудникам зарплату", "labels": ["CORPORATE_LAWYER", "LABOR_LAWYER"]}

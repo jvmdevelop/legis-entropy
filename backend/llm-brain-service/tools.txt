@@ -1,0 +1,15 @@
+searchLaws - гибридный поиск по НПА РК и РФ: BGE-M3 dense + BM25 + RRF + реранкер (law-service);
+searchUserDocuments - гибридный поиск по документам пользователя: BGE-M3 + BM25 + реранкер (document-service);
+getLawGraph - закон + его связи с другими актами, контекст для GraphRAG (graphs-service);
+findRelatedLaws - связанные законы: связи графа + эмбеддинг-близость узлов (graphs-service);
+addLawToUserGraph - добавить закон в граф пользователя (graphs-service);
+findAndAddRelatedLawsToGraph - семантич. поиск BGE-M3 + реранкер, топ-K в граф (graphs-service);
+findArticle - статья по номеру; номер извлекается NER из запроса (graphs-service);
+searchArticles - гибридный поиск по статьям: BGE-M3 + BM25 + реранкер (graphs-service);
+linkDocumentClauseToArticle - связать пункт документа со статьёй: cosine BGE-M3 + проверка cross-encoder (graphs-service);
+flagArticleConflict - конфликт статья-статья, подтверждённый NLI (contradiction) (situation-service);
+flagDocumentArticleConflict - конфликт пункт-статья, подтверждённый NLI (contradiction) (situation-service);
+linkDocumentToLawsInGraph - законы для документа: эмбеддинг документа + реранкер, связь в графе (GraphActionService);
+classifyIntent - новый: интент + профиль юриста, fine-tuned xlm-roberta;
+verifyClaims - новый: NLI-проверка утверждений ответа по источникам, mDeBERTa-v3-xnli;
+extractLegalEntities - новый: NER ссылок на законы/статьи/даты/суммы, GLiNER;
