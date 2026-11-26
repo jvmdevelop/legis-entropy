@@ -11,6 +11,7 @@ import ForceGraph2D from "react-force-graph-2d";
 import { Download, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import type { GraphContentResponse, UserGraphNode } from "@/entities/graph";
+import { sanitizeGraph } from "./sanitize";
 
 export const NODE_COLOR = {
   LAW: { fill: "rgb(139, 92, 246)", ring: "rgba(139, 92, 246, 0.18)" },
@@ -133,13 +134,14 @@ function GraphCanvasInner({
   }, []);
 
   const data = useMemo(() => {
+    const clean = sanitizeGraph(content.nodes, content.edges);
     const degree = new Map<string, number>();
-    for (const e of content.edges) {
+    for (const e of clean.edges) {
       degree.set(e.source, (degree.get(e.source) ?? 0) + 1);
       degree.set(e.target, (degree.get(e.target) ?? 0) + 1);
     }
     return {
-      nodes: content.nodes.map((n) => ({
+      nodes: clean.nodes.map((n) => ({
         id: n.id,
         label: n.label,
         kind: n.kind,
@@ -151,7 +153,7 @@ function GraphCanvasInner({
         generatedDocTitle: n.generatedDocTitle,
         degree: degree.get(n.id) ?? 0,
       })),
-      links: content.edges.map((e) => ({
+      links: clean.edges.map((e) => ({
         source: e.source,
         target: e.target,
         relationType: e.relationType,

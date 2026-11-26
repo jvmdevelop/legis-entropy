@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { streamBrain, BrainStreamError } from "@/shared/api/brainStream";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { apiClient } from "@/shared/api/client";
@@ -493,7 +494,7 @@ export function useWorkspaceShell() {
             content: m.content,
           })),
         },
-        { timeout: 180_000 },
+        { timeout: 600_000 },
       );
       const answer =
         res.data.content ?? res.data.answer ?? JSON.stringify(res.data);
@@ -543,35 +544,52 @@ export function useWorkspaceShell() {
     setTab("ai");
     setChatMsgs((m) => [...m, { role: "user", content: msg }]);
     setChatLoading(true);
-    const toastId = toast.loading(`Анализ ${noun.replace("а", "а")}…`);
+    const toastId = toast.loading(`Анализ ${noun}…`);
+    const history = chatMsgs.map((m) => ({
+      role: m.role.toUpperCase(),
+      content: m.content,
+    }));
+    let started = false;
+    const showAnswer = (content: string) =>
+      setChatMsgs((m) => {
+        if (!started) {
+          started = true;
+          return [...m, { role: "assistant", content }];
+        }
+        const copy = m.slice();
+        copy[copy.length - 1] = { role: "assistant", content };
+        return copy;
+      });
     try {
-      const res = await apiClient.post<{ answer?: string; content?: string }>(
-        "/brain/chat",
+      const answer = await streamBrain(
         {
           message: msg,
-          userId: user?.id ?? "",
+          userId: String(user?.id ?? ""),
           graphId,
           documentId: target.kind === "DOCUMENT" ? target.id : undefined,
           situationId: target.kind === "SITUATION" ? target.id : undefined,
           voiceId: target.kind === "VOICE" ? target.id : undefined,
-          history: chatMsgs.map((m) => ({
-            role: m.role.toUpperCase(),
-            content: m.content,
-          })),
+          history,
         },
-        { timeout: 300_000 },
+        {
+          onProgress: (p) =>
+            toast.loading(
+              p.total > 0
+                ? `${p.message} (${p.done}/${p.total})`
+                : p.message || `Анализ ${noun}…`,
+              { id: toastId },
+            ),
+          onChunk: (_, full) => showAnswer(full),
+        },
       );
-      const answer =
-        res.data.content ?? res.data.answer ?? JSON.stringify(res.data);
-      setChatMsgs((m) => [...m, { role: "assistant", content: answer }]);
+      if (!answer.trim()) throw new Error("empty answer");
+      showAnswer(answer);
       toast.success("Анализ завершён", { id: toastId });
       await refreshContent();
     } catch (e) {
       console.error(e);
-      setChatMsgs((m) => [
-        ...m,
-        { role: "assistant", content: "Анализ прерван." },
-      ]);
+      const reason = e instanceof BrainStreamError ? ` ${e.message}` : "";
+      showAnswer(`Анализ прерван.${reason}`);
       toast.error("Не удалось провести анализ", { id: toastId });
     } finally {
       setChatLoading(false);
