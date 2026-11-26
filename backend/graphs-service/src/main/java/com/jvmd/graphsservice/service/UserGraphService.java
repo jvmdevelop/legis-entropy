@@ -95,6 +95,31 @@ public class UserGraphService {
         return toDTO(doc);
     }
 
+    public long documentRevised(String graphId, String documentId, String fileName) {
+        long removed = neo4jClient
+            .query(
+                """
+                MATCH (d:UserDocument {id: $documentId})-[r:CONFLICTS_WITH|CITES {graphId: $graphId}]->()
+                WITH collect(r) AS rels
+                FOREACH (x IN rels | DELETE x)
+                RETURN size(rels) AS removed
+                """
+            )
+            .bind(graphId).to("graphId")
+            .bind(documentId).to("documentId")
+            .fetchAs(Long.class)
+            .one()
+            .orElse(0L);
+        if (fileName != null && !fileName.isBlank()) {
+            neo4jClient
+                .query("MATCH (d:UserDocument {id: $documentId}) SET d.fileName = $fileName")
+                .bind(documentId).to("documentId")
+                .bind(fileName).to("fileName")
+                .run();
+        }
+        return removed;
+    }
+
     public void removeDocument(String graphId, String documentId) {
         userGraphRepository.detachDocument(graphId, documentId);
     }

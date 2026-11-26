@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/user-graphs")
@@ -107,6 +108,19 @@ public class UserGraphController {
             @PathVariable String documentId) {
         userGraphService.removeDocument(graphId, documentId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{graphId}/documents/{documentId}/revised")
+    public ResponseEntity<Map<String, Object>> documentRevised(
+            @RequestHeader(value = "X-User-Id", required = false) String userId,
+            @PathVariable String graphId,
+            @PathVariable String documentId,
+            @RequestParam(required = false) String fileName) {
+        boolean owner = userGraphService.getGraphContent(graphId)
+                .map(c -> userId == null || userId.equals(c.getGraph().getUserId()))
+                .orElse(false);
+        if (!owner) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(Map.of("removedLinks", userGraphService.documentRevised(graphId, documentId, fileName)));
     }
 
     @PostMapping("/{graphId}/documents/{documentId}/links/{lawCode}")
